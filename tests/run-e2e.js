@@ -19,6 +19,14 @@ async function isServerUp(baseUrl) {
   }
 }
 
+function runCmd(cmd, args, env) {
+  return new Promise((resolve) => {
+    const child = spawn(cmd, args, { env, stdio: 'inherit' })
+    child.on('close', (code) => resolve(code))
+    child.on('error', () => resolve(1))
+  })
+}
+
 async function run() {
   // Пробрасываем безопасные переменные окружения для only-read режима
   const env = { ...process.env }
@@ -29,10 +37,17 @@ async function run() {
   const baseUrl = `http://localhost:${port}`
   env.TEST_BASE_URL = baseUrl
 
+  // 1) Сборка приложения (гарантируем актуальный код)
+  const buildCode = await runCmd(process.execPath, [path.join('node_modules', 'next', 'dist', 'bin', 'next'), 'build'], env)
+  if (buildCode !== 0) {
+    console.error('❌ Build failed')
+    process.exit(buildCode)
+  }
+
+  // 2) Запуск сервера на тестовом порту
   let server
   let startedLocally = false
 
-  // Всегда поднимаем свой сервер на тестовом порту
   server = spawn(process.execPath, [
     path.join('node_modules', 'next', 'dist', 'bin', 'next'),
     'start',
@@ -65,7 +80,7 @@ async function run() {
     process.exit(1)
   }
 
-  // Запускаем API тесты
+  // 3) Запускаем API тесты
   const tests = [
     'tests/api/db-status.test.js',
     'tests/api/manufacturers.test.js',
@@ -75,11 +90,7 @@ async function run() {
 
   let failed = 0
   for (const file of tests) {
-    const code = await new Promise((resolve) => {
-      const child = spawn(process.execPath, [file], { stdio: 'inherit', env })
-      child.on('close', (c) => resolve(c))
-      child.on('error', () => resolve(1))
-    })
+    const code = await runCmd(process.execPath, [file], env)
     if (code !== 0) failed++
   }
 
