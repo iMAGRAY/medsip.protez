@@ -59,7 +59,9 @@
     "clean": "rm -rf .next out dist",
     "analyze": "cross-env ANALYZE=true npm run build",
     "security:check": "node scripts/analysis/security-audit.js",
-    "db:apply-indexes": "node scripts/analysis/apply-indexes.js"
+    "db:apply-indexes": "node scripts/analysis/apply-indexes.js",
+    "db:migrate:ensure": "node scripts/migration/ensure-missing-tables.js",
+    "db:optimize": "npm run db:audit:out && npm run db:apply-indexes && npm run test:perf:db"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",
