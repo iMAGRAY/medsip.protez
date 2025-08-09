@@ -1185,7 +1185,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
                   return (
                     <div className="p-3 max-h-80 overflow-y-auto">
                       <div className="text-sm font-medium mb-3 border-b pb-2">
-                        Добавить в "{targetGroupName}"
+                        Добавить в &quot;{targetGroupName}&quot;
                       </div>
 
                       <div className="space-y-1">

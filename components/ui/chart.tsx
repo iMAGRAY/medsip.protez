@@ -94,6 +94,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   // Применяем стили через style объект вместо HTML
   React.useEffect(() => {
+    if (typeof document === 'undefined') return
+
     const styleElement = document.createElement('style')
     styleElement.id = `chart-style-${id}`
 
@@ -106,8 +108,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
     return () => {
       const existingStyle = document.getElementById(`chart-style-${id}`)
-      if (existingStyle) {
-        document.head.removeChild(existingStyle)
+      if (existingStyle && existingStyle.parentNode) {
+        existingStyle.parentNode.removeChild(existingStyle)
       }
     }
   }, [id, styles])

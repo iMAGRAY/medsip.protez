@@ -753,22 +753,6 @@ export default function HomePage() {
     setView(newView)
   }, [])
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex flex-col min-h-screen notion-page">
-        <Header />
-        <main className="flex-grow flex items-center justify-center">
-          <div className="text-center notion-fade-in">
-            <Loader2 className="w-6 h-6 animate-spin mx-auto mb-4 text-slate-500" />
-            <p className="notion-text-small">Загрузка каталога...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
-
   // Состояние для мобильного фильтра
   const [mobileExpandedCharGroups, setMobileExpandedCharGroups] = useState<Set<string>>(new Set());
   const [desktopExpandedCharGroups, setDesktopExpandedCharGroups] = useState<Set<string>>(new Set());
@@ -797,6 +781,22 @@ export default function HomePage() {
       return newSet;
     });
   }, []);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen notion-page">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center notion-fade-in">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto mb-4 text-slate-500" />
+            <p className="notion-text-small">Загрузка каталога...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen notion-page">

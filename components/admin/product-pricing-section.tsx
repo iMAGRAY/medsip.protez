@@ -110,7 +110,7 @@ export function ProductPricingSection({
         <div className="space-y-0.5 flex-1">
           <Label className="text-sm font-medium">Не показывать цену на сайте</Label>
           <p className="text-xs sm:text-sm text-gray-500">
-            Если включено, вместо цены будет показано "По запросу"
+            Если включено, вместо цены будет показано &quot;По запросу&quot;
           </p>
         </div>
         <Switch
