@@ -115,6 +115,178 @@ async function createProductCategories(pool) {
   await pool.query(`CREATE INDEX IF NOT EXISTS product_categories_active_idx ON product_categories(is_active);`)
 }
 
+async function createProductTags(pool) {
+  const tags = 'product_tags'
+  if (!(await tableExists(pool, tags))) {
+    console.log(`Creating table ${tags} ...`)
+    await pool.query(`
+      CREATE TABLE product_tags (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        slug VARCHAR(120),
+        color VARCHAR(16),
+        bg_color VARCHAR(16),
+        icon VARCHAR(64),
+        sort_order INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        product_id INTEGER NULL REFERENCES products(id) ON DELETE CASCADE,
+        variant_id INTEGER NULL REFERENCES product_variants(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `)
+    await pool.query(`CREATE INDEX IF NOT EXISTS product_tags_active_idx ON product_tags(is_active);`)
+    await pool.query(`CREATE INDEX IF NOT EXISTS product_tags_product_idx ON product_tags(product_id);`)
+    await pool.query(`CREATE INDEX IF NOT EXISTS product_tags_variant_idx ON product_tags(variant_id);`)
+  } else {
+    console.log(`Skip: table ${tags} already exists`)
+  }
+
+  const rel = 'variant_tag_relations'
+  if (!(await tableExists(pool, rel))) {
+    console.log(`Creating table ${rel} ...`)
+    await pool.query(`
+      CREATE TABLE variant_tag_relations (
+        variant_id INTEGER NOT NULL REFERENCES product_variants(id) ON DELETE CASCADE,
+        tag_id INTEGER NOT NULL REFERENCES product_tags(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY(variant_id, tag_id)
+      );
+    `)
+    await pool.query(`CREATE INDEX IF NOT EXISTS variant_tag_relations_tag_idx ON variant_tag_relations(tag_id);`)
+  } else {
+    console.log(`Skip: table ${rel} already exists`)
+  }
+}
+
+async function createWarehouseCore(pool) {
+  async function ensure(name, ddl, indexes = []) {
+    if (await tableExists(pool, name)) {
+      console.log(`Skip: table ${name} already exists`)
+      return
+    }
+    console.log(`Creating table ${name} ...`)
+    await pool.query(ddl)
+    for (const idx of indexes) await pool.query(idx)
+  }
+
+  await ensure('warehouse_regions', `
+    CREATE TABLE warehouse_regions (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      code VARCHAR(16) UNIQUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE UNIQUE INDEX IF NOT EXISTS warehouse_regions_code_idx ON warehouse_regions(code);`
+  ])
+
+  await ensure('warehouse_cities', `
+    CREATE TABLE warehouse_cities (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      region_id INTEGER NOT NULL REFERENCES warehouse_regions(id) ON DELETE CASCADE,
+      code VARCHAR(32),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_cities_region_idx ON warehouse_cities(region_id);`
+  ])
+
+  await ensure('warehouse_warehouses', `
+    CREATE TABLE warehouse_warehouses (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      city_id INTEGER NOT NULL REFERENCES warehouse_cities(id) ON DELETE CASCADE,
+      code VARCHAR(32),
+      address TEXT,
+      phone VARCHAR(64),
+      manager_name VARCHAR(255),
+      total_capacity INTEGER,
+      warehouse_type VARCHAR(64),
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_warehouses_city_idx ON warehouse_warehouses(city_id);`
+  ])
+
+  await ensure('warehouse_zones', `
+    CREATE TABLE warehouse_zones (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      warehouse_id INTEGER NOT NULL REFERENCES warehouse_warehouses(id) ON DELETE CASCADE,
+      code VARCHAR(32),
+      capacity INTEGER,
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_zones_warehouse_idx ON warehouse_zones(warehouse_id);`
+  ])
+
+  await ensure('warehouse_sections', `
+    CREATE TABLE warehouse_sections (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      zone_id INTEGER NOT NULL REFERENCES warehouse_zones(id) ON DELETE CASCADE,
+      code VARCHAR(32),
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_sections_zone_idx ON warehouse_sections(zone_id);`
+  ])
+
+  await ensure('warehouse_inventory', `
+    CREATE TABLE warehouse_inventory (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NULL REFERENCES products(id) ON DELETE SET NULL,
+      sku VARCHAR(64) NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      section_id INTEGER NOT NULL REFERENCES warehouse_sections(id) ON DELETE CASCADE,
+      quantity INTEGER NOT NULL DEFAULT 0,
+      min_stock INTEGER DEFAULT 0,
+      max_stock INTEGER DEFAULT 0,
+      unit_price NUMERIC(12,2),
+      status VARCHAR(32) DEFAULT 'active',
+      expiry_date DATE,
+      batch_number VARCHAR(64),
+      supplier VARCHAR(255),
+      last_counted TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_inventory_section_idx ON warehouse_inventory(section_id);`,
+    `CREATE INDEX IF NOT EXISTS warehouse_inventory_product_idx ON warehouse_inventory(product_id);`,
+    `CREATE INDEX IF NOT EXISTS warehouse_inventory_status_idx ON warehouse_inventory(status);`
+  ])
+
+  await ensure('warehouse_movements', `
+    CREATE TABLE warehouse_movements (
+      id SERIAL PRIMARY KEY,
+      inventory_id INTEGER NOT NULL REFERENCES warehouse_inventory(id) ON DELETE CASCADE,
+      movement_type VARCHAR(32) NOT NULL,
+      quantity INTEGER NOT NULL,
+      from_section_id INTEGER NULL REFERENCES warehouse_sections(id) ON DELETE SET NULL,
+      to_section_id INTEGER NULL REFERENCES warehouse_sections(id) ON DELETE SET NULL,
+      reason TEXT,
+      user_name VARCHAR(255),
+      notes TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `, [
+    `CREATE INDEX IF NOT EXISTS warehouse_movements_inventory_idx ON warehouse_movements(inventory_id);`
+  ])
+}
+
 async function main() {
   const pool = buildPool()
   try {
@@ -122,6 +294,8 @@ async function main() {
     await createProductSpecifications(pool)
     await createFormTemplates(pool)
     await createWarehouseSettings(pool)
+    await createProductTags(pool)
+    await createWarehouseCore(pool)
     console.log('✅ ensure-missing-tables completed')
   } catch (e) {
     console.error('❌ ensure-missing-tables failed:', e.message)
