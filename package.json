@@ -58,7 +58,8 @@
     "format:check": "prettier --check .",
     "clean": "rm -rf .next out dist",
     "analyze": "cross-env ANALYZE=true npm run build",
-    "security:check": "node scripts/analysis/security-audit.js"
+    "security:check": "node scripts/analysis/security-audit.js",
+    "db:apply-indexes": "node scripts/analysis/apply-indexes.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",
