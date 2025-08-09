@@ -2,12 +2,17 @@
 const { spawn } = require('child_process')
 const path = require('path')
 const fetch = require('node-fetch')
+const dotenv = require('dotenv')
+
+// Загружаем локальные env для БД/Redis
+dotenv.config({ path: '.env.local' })
+dotenv.config({ path: 'database.env' })
 
 async function wait(ms) { return new Promise(r => setTimeout(r, ms)) }
 
-async function isServerUp() {
+async function isServerUp(baseUrl) {
   try {
-    const res = await fetch('http://localhost:3000/')
+    const res = await fetch(baseUrl + '/')
     return res.ok
   } catch (_) {
     return false
@@ -19,38 +24,45 @@ async function run() {
   const env = { ...process.env }
   env.READONLY_SQL = env.READONLY_SQL || 'true'
 
+  // Выбираем тестовый порт и BASE_URL
+  const port = String(process.env.TEST_PORT || 3010)
+  const baseUrl = `http://localhost:${port}`
+  env.TEST_BASE_URL = baseUrl
+
   let server
   let startedLocally = false
 
-  // Если сервер уже поднят — не стартуем ещё раз
-  if (!(await isServerUp())) {
-    server = spawn(process.execPath, [path.join('node_modules', 'next', 'dist', 'bin', 'next'), 'start'], {
-      env,
-      stdio: ['ignore', 'pipe', 'pipe']
-    })
-    startedLocally = true
+  // Всегда поднимаем свой сервер на тестовом порту
+  server = spawn(process.execPath, [
+    path.join('node_modules', 'next', 'dist', 'bin', 'next'),
+    'start',
+    '-p', port
+  ], {
+    env,
+    stdio: ['ignore', 'pipe', 'pipe']
+  })
+  startedLocally = true
 
-    let ready = false
-    server.stdout.on('data', (d) => {
-      const t = d.toString()
-      process.stdout.write(t)
-      if (t.includes('started server on') || t.includes('Local:')) ready = true
-    })
-    server.stderr.on('data', (d) => process.stderr.write(d.toString()))
+  let ready = false
+  server.stdout.on('data', (d) => {
+    const t = d.toString()
+    process.stdout.write(t)
+    if (t.includes(`:${port}`) || t.includes('Local:')) ready = true
+  })
+  server.stderr.on('data', (d) => process.stderr.write(d.toString()))
 
-    // Ждём готовность максимум 45с и пингуем /api/health
-    for (let i = 0; i < 45 && !ready; i++) {
-      await wait(1000)
-      try {
-        const res = await fetch('http://localhost:3000/api/health')
-        if (res.ok || res.status === 503) { ready = true; break }
-      } catch (_) { /* ignore */ }
-    }
-    if (!ready) {
-      console.error('❌ Server did not become ready in time')
-      try { server.kill('SIGTERM') } catch (_) {}
-      process.exit(1)
-    }
+  // Ждём готовность максимум 60с и пингуем /api/health на тестовом порту
+  for (let i = 0; i < 60 && !ready; i++) {
+    await wait(1000)
+    try {
+      const res = await fetch(baseUrl + '/api/health')
+      if (res.ok || res.status === 503) { ready = true; break }
+    } catch (_) { /* ignore */ }
+  }
+  if (!ready) {
+    console.error('❌ Server did not become ready in time on', baseUrl)
+    try { server.kill('SIGTERM') } catch (_) {}
+    process.exit(1)
   }
 
   // Запускаем API тесты

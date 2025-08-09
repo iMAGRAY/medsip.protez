@@ -10,11 +10,12 @@ let connectionFailed = false
 
 // Environment validation
 function validateEnvironment(): void {
-  // Пароль допускается пустым в локальной среде
-  const required = ['DATABASE_URL', 'POSTGRESQL_HOST', 'POSTGRESQL_USER', 'POSTGRESQL_DBNAME']
-  const missing = required.filter(key => !process.env[key] && !process.env.DATABASE_URL)
-
-  if (missing.length > 0 && !process.env.DATABASE_URL) {
+  // Разрешаем: либо DATABASE_URL, либо набор POSTGRESQL_HOST/USER/DBNAME
+  const hasDatabaseUrl = !!process.env.DATABASE_URL
+  const hasPgParts = !!(process.env.POSTGRESQL_HOST && process.env.POSTGRESQL_USER && process.env.POSTGRESQL_DBNAME)
+  if (!hasDatabaseUrl && !hasPgParts) {
+    const missing: string[] = []
+    if (!hasDatabaseUrl) missing.push('DATABASE_URL|POSTGRESQL_HOST+POSTGRESQL_USER+POSTGRESQL_DBNAME')
     logger.error('Missing required environment variables', { missing })
     logger.info('Please create .env.local file based on .env.example')
     throw new Error(`Missing environment variables: ${missing.join(', ')}`)
