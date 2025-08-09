@@ -1,0 +1,236 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getPool } from '@/lib/db-connection';
+
+// GET /api/admin/characteristic-templates - получить все шаблоны характеристик
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const groupId = searchParams.get('group_id');
+
+    const pool = getPool();
+
+    let query = `
+      SELECT
+        ct.id,
+        ct.group_id,
+        ct.name,
+        ct.description,
+        ct.input_type,
+        ct.unit_id,
+        ct.is_required,
+        ct.sort_order,
+        ct.validation_rules,
+        ct.default_value,
+        ct.placeholder_text,
+        ct.is_template,
+        ct.created_at,
+        ct.updated_at,
+        cg.name as group_name,
+        cu.code as unit_code,
+        cu.name_ru as unit_name,
+        (SELECT COUNT(*) FROM characteristic_preset_values cpv WHERE cpv.template_id = ct.id) as preset_values_count
+      FROM characteristic_templates ct
+      JOIN characteristic_groups cg ON cg.id = ct.group_id
+      LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
+    `;
+
+    const params = [];
+
+    if (groupId) {
+      query += ` WHERE ct.group_id = $1`;
+      params.push(parseInt(groupId));
+    }
+
+    query += ` ORDER BY cg.ordering, ct.sort_order, ct.name`;
+
+    const result = await pool.query(query, params);
+
+    return NextResponse.json({
+      success: true,
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error('❌ Ошибка получения шаблонов характеристик:', error);
+    return NextResponse.json(
+      { success: false, error: 'Ошибка получения шаблонов характеристик' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/admin/characteristic-templates - создать новый шаблон характеристики
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      group_id,
+      name,
+      description,
+      input_type = 'text',
+      unit_id,
+      is_required = false,
+      sort_order = 0,
+      validation_rules = {},
+      default_value,
+      placeholder_text,
+      preset_values = []
+    } = body;
+
+    if (!group_id || !name) {
+      return NextResponse.json(
+        { success: false, error: 'Обязательные поля: group_id, name' },
+        { status: 400 }
+      );
+    }
+
+    const pool = getPool();
+
+    // Начинаем транзакцию
+    await pool.query('BEGIN');
+
+    try {
+      // Создаем шаблон характеристики
+      const templateResult = await pool.query(`
+        INSERT INTO characteristic_templates (
+          group_id, name, description, input_type, unit_id,
+          is_required, sort_order, validation_rules, default_value, placeholder_text
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *;
+      `, [
+        group_id,
+        name,
+        description,
+        input_type,
+        unit_id || null,
+        is_required,
+        sort_order,
+        JSON.stringify(validation_rules),
+        default_value,
+        placeholder_text
+      ]);
+
+      const template = templateResult.rows[0];
+
+      // Создаем предустановленные значения, если они есть
+      if (preset_values && preset_values.length > 0) {
+        for (let i = 0; i < preset_values.length; i++) {
+          const presetValue = preset_values[i];
+          await pool.query(`
+            INSERT INTO characteristic_preset_values (
+              template_id, value, display_text, sort_order, is_default
+            )
+            VALUES ($1, $2, $3, $4, $5);
+          `, [
+            template.id,
+            presetValue.value || presetValue,
+            presetValue.display_text || presetValue.value || presetValue,
+            presetValue.sort_order || i,
+            presetValue.is_default || false
+          ]);
+        }
+      }
+
+      await pool.query('COMMIT');
+
+      return NextResponse.json({
+        success: true,
+        data: template,
+        message: `Шаблон характеристики "${name}" успешно создан`
+      });
+
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ Ошибка создания шаблона характеристики:', error);
+    return NextResponse.json(
+      { success: false, error: 'Ошибка создания шаблона характеристики' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/admin/characteristic-templates - обновить несколько шаблонов
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { templates } = body;
+
+    if (!Array.isArray(templates)) {
+      return NextResponse.json(
+        { success: false, error: 'Ожидается массив шаблонов' },
+        { status: 400 }
+      );
+    }
+
+    const pool = getPool();
+
+    await pool.query('BEGIN');
+
+    try {
+      for (const template of templates) {
+        const {
+          id,
+          name,
+          description,
+          input_type,
+          unit_id,
+          is_required,
+          sort_order,
+          validation_rules,
+          default_value,
+          placeholder_text
+        } = template;
+
+        await pool.query(`
+          UPDATE characteristic_templates
+          SET
+            name = $2,
+            description = $3,
+            input_type = $4,
+            unit_id = $5,
+            is_required = $6,
+            sort_order = $7,
+            validation_rules = $8,
+            default_value = $9,
+            placeholder_text = $10,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = $1;
+        `, [
+          id,
+          name,
+          description,
+          input_type,
+          unit_id || null,
+          is_required,
+          sort_order,
+          JSON.stringify(validation_rules || {}),
+          default_value,
+          placeholder_text
+        ]);
+      }
+
+      await pool.query('COMMIT');
+
+      return NextResponse.json({
+        success: true,
+        message: `Обновлено ${templates.length} шаблонов характеристик`
+      });
+
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ Ошибка обновления шаблонов характеристик:', error);
+    return NextResponse.json(
+      { success: false, error: 'Ошибка обновления шаблонов характеристик' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,232 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+/vendor/
+pnpm-lock.yaml
+
+# Testing
+/coverage
+/test-results/
+/.nyc_output
+/junit.xml
+
+# Next.js
+/.next/
+/out/
+.next/
+
+# Production builds
+/build
+/dist/
+/.vercel/
+
+# MCP server binary
+/mcp-server/github-mcp-server
+
+# Environment variables and secrets
+.env.local
+.env
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+/database/backups/
+/database/dumps/
+*.sql.backup
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+/logs/
+/temp/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+lib-cov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+*.d.ts.map
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Redis dump files
+dump.rdb
+
+# Media uploads (if storing locally)
+/public/uploads/
+/uploads/
+/media/uploads/
+
+# Cache directories
+.cache/
+.eslintcache
+.stylelintcache
+
+# Storybook build outputs
+/storybook-static
+
+# Documentation builds
+/docs/build/
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Development tools
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Temporary SQL files
+*-import-characteristics.sql
+*-characteristics.sql
+import-*.sql
+bulk-insert.sql
+correct-import-*.sql
+
+# Temporary JSON files
+temp_*.json
+temp_*.js
+temp_*.ts
+*_temp.*
+
+# Admin credentials and secrets
+.admin-credentials.txt
+admin-*.txt
+*.credentials
+*.secrets
+
+# Environment backups
+*.env.backup*
+*.env.local.backup*
+
+# Other temporary files
+*.1751964407036
+*.backup.*
+
+# Miscellaneous
+*.tgz
+*.tar.gz
+
+# Additional cleanup rules
+# Temporary SQL files
+*-import-characteristics.sql
+*-characteristics.sql
+import-*.sql
+bulk-insert.sql
+correct-import-*.sql
+
+# Temporary JSON files
+temp_*.json
+temp_*.js
+temp_*.ts
+*_temp.*
+
+# Admin credentials and secrets
+.admin-credentials.txt
+admin-*.txt
+*.credentials
+*.secrets
+
+# Environment backups
+*.env.backup*
+*.env.local.backup*
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Test files in root
+test-*.js
+*-test.js
+
+# Other temporary files
+*.1751964407036
+*.backup.*

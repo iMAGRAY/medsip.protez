@@ -1,0 +1,357 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom drag and drop animations */
+@layer utilities {
+  .scale-102 {
+    transform: scale(1.02);
+  }
+  
+  .scale-95 {
+    transform: scale(0.95);
+  }
+
+  .rotate-1 {
+    transform: rotate(1deg);
+  }
+
+  .rotate-2 {
+    transform: rotate(2deg);
+  }
+
+  /* Smooth drag transitions */
+  .drag-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Pulse animation for drop zones */
+  .drop-zone-pulse {
+    animation: dropZonePulse 2s infinite;
+  }
+  
+  /* Custom drop zone glow effect */
+  .drop-zone-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes dropZonePulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Основные стили */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #343a40;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* CSS переменные для темы в HSL формате (как ожидает Tailwind) */
+@layer base {
+  :root {
+    /* Основные цвета */
+    --background: 0 0% 100%;
+    --foreground: 220 13% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+    
+    /* Акцентные цвета */
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 215 25% 27%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 84% 5%;
+    
+    /* Состояния (серые тона вместо красных) */
+    --destructive: 215 25% 27%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    /* Границы и элементы */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 215 25% 27%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Скроллбары */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Выделение текста */
+::selection {
+  background: rgba(148, 163, 184, 0.2);
+  color: inherit;
+}
+
+/* Предотвращение задержки на мобильных устройствах */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Улучшение кликабельности на мобильных устройствах */
+@media (pointer: coarse) {
+  /* Увеличиваем минимальный размер только для основных интерактивных элементов */
+  button:not(.w-8):not(.w-2), 
+  a:not(.w-8):not(.w-2), 
+  [role="button"]:not(.w-8):not(.w-2) {
+    min-height: 44px;
+  }
+  
+  /* Увеличение области клика для маленьких кнопок навигации */
+  button.w-8.h-8,
+  button.w-2.h-2 {
+    position: relative;
+  }
+  
+  button.w-8.h-8::before,
+  button.w-2.h-2::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    bottom: -8px;
+    left: -8px;
+  }
+}
+
+/* Исправление проблем с модальными окнами на iOS */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari */
+  .fixed {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Предотвращение прокрутки body при открытом модальном окне */
+  body:has([data-state="open"]) {
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Индикатор скролла для мобильных */
+@media (max-width: 640px) {
+  .scroll-indicator {
+    position: relative;
+  }
+  
+  .scroll-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+    pointer-events: none;
+  }
+}
+
+/* Стили для toast уведомлений */
+[data-sonner-toaster] [data-type="error"] {
+  background-color: rgb(254 226 226) !important;
+  color: rgb(127 29 29) !important;
+  border: 1px solid rgb(254 202 202) !important;
+}
+
+[data-sonner-toaster] [data-type="error"] [data-description] {
+  color: rgb(153 27 27) !important;
+}
+
+[data-sonner-toaster] [data-type="error"] svg {
+  color: rgb(220 38 38) !important;
+}
+
+[data-sonner-toaster] [data-type="success"] {
+  background-color: rgb(220 252 231) !important;
+  color: rgb(22 101 52) !important;
+  border: 1px solid rgb(187 247 208) !important;
+}
+
+[data-sonner-toaster] [data-type="success"] [data-description] {
+  color: rgb(21 128 61) !important;
+}
+
+[data-sonner-toaster] [data-type="success"] svg {
+  color: rgb(34 197 94) !important;
+}
+
+[data-sonner-toaster] [data-type="warning"] {
+  background-color: rgb(254 243 199) !important;
+  color: rgb(120 53 15) !important;
+  border: 1px solid rgb(253 230 138) !important;
+}
+
+[data-sonner-toaster] [data-type="warning"] [data-description] {
+  color: rgb(146 64 14) !important;
+}
+
+[data-sonner-toaster] [data-type="warning"] svg {
+  color: rgb(245 158 11) !important;
+}
+
+[data-sonner-toaster] [data-type="info"] {
+  background-color: rgb(219 234 254) !important;
+  color: rgb(30 58 138) !important;
+  border: 1px solid rgb(191 219 254) !important;
+}
+
+[data-sonner-toaster] [data-type="info"] [data-description] {
+  color: rgb(30 64 175) !important;
+}
+
+[data-sonner-toaster] [data-type="info"] svg {
+  color: rgb(59 130 246) !important;
+}
+
+/* Исправление проблемы двойного нажатия на мобильных устройствах */
+@media (hover: hover) and (pointer: fine) {
+  /* Hover эффекты только для устройств с hover поддержкой */
+  .hover\:bg-gray-50:hover {
+    background-color: rgb(249 250 251);
+  }
+  
+  .hover\:bg-gray-100:hover {
+    background-color: rgb(243 244 246);
+  }
+  
+  .hover\:bg-gray-200:hover {
+    background-color: rgb(229 231 235);
+  }
+  
+  .hover\:border-gray-300:hover {
+    border-color: rgb(209 213 219);
+  }
+  
+  .hover\:text-gray-700:hover {
+    color: rgb(55 65 81);
+  }
+  
+  .hover\:text-cyan-700:hover {
+    color: rgb(14 116 144);
+  }
+  
+  .hover\:underline:hover {
+    text-decoration-line: underline;
+  }
+  
+  .hover\:bg-accent:hover {
+    background-color: hsl(var(--accent));
+  }
+  
+  .hover\:text-accent-foreground:hover {
+    color: hsl(var(--accent-foreground));
+  }
+  
+  .hover\:from-cyan-50:hover {
+    --tw-gradient-from: rgb(236 254 255);
+  }
+  
+  .hover\:to-blue-50:hover {
+    --tw-gradient-to: rgb(239 246 255);
+  }
+  
+  .hover\:from-cyan-100:hover {
+    --tw-gradient-from: rgb(207 250 254);
+  }
+  
+  .hover\:to-blue-100:hover {
+    --tw-gradient-to: rgb(219 234 254);
+  }
+  
+  .hover\:border-cyan-300:hover {
+    border-color: rgb(103 232 249);
+  }
+}
+
+/* Применение touch-manipulation ко всем интерактивным элементам */
+button, 
+a, 
+[role="button"], 
+[tabindex]:not([tabindex="-1"]),
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.cursor-pointer {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Улучшенные активные состояния для мобильных */
+@media (pointer: coarse) {
+  button:active,
+  a:active,
+  [role="button"]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-in-out;
+  }
+  
+  /* Отключение hover эффектов на устройствах с грубым указателем */
+  .hover\:bg-gray-50,
+  .hover\:bg-gray-100,
+  .hover\:bg-gray-200,
+  .hover\:border-gray-300,
+  .hover\:text-gray-700,
+  .hover\:text-cyan-700,
+  .hover\:underline,
+  .hover\:bg-accent,
+  .hover\:text-accent-foreground,
+  .hover\:from-cyan-50,
+  .hover\:to-blue-50,
+  .hover\:from-cyan-100,
+  .hover\:to-blue-100,
+  .hover\:border-cyan-300 {
+    transition: none;
+  }
+}

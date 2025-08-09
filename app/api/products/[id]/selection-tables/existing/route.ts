@@ -1,0 +1,199 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { executeQuery } from '@/lib/db-connection'
+import { logger } from '@/lib/logger'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const startTime = Date.now()
+
+  try {
+    const productId = parseInt(params.id)
+
+    if (isNaN(productId) || productId <= 0) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid product ID' },
+        { status: 400 }
+      )
+    }
+
+    logger.info('Existing product selection tables GET request', { productId })
+
+    // Загружаем таблицы подбора для существующих товаров
+    const query = `
+      SELECT
+        st.*,
+        p.name as product_name
+      FROM selection_tables st
+      LEFT JOIN products p ON st.product_id = p.id
+      WHERE st.product_id = $1
+        AND st.table_type = 'existing_product'
+        AND (st.is_deleted = false OR st.is_deleted IS NULL)
+      ORDER BY st.created_at DESC
+    `
+
+    const result = await executeQuery(query, [productId])
+
+    // Преобразуем данные в нужный формат
+    const tables = result.rows.reduce((acc: any, row: any) => {
+      try {
+        const tableData = typeof row.table_data === 'string'
+          ? JSON.parse(row.table_data)
+          : row.table_data
+
+        acc[row.table_name || 'default'] = {
+          id: row.id,
+          title: row.table_name,
+          description: row.description,
+          data: tableData,
+          isActive: row.is_active,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at
+        }
+      } catch (parseError) {
+        logger.warn('Failed to parse existing table data', { tableId: row.id, error: parseError.message })
+      }
+      return acc
+    }, {})
+
+    const duration = Date.now() - startTime
+    logger.info('Existing product selection tables loaded', {
+      productId,
+      tablesCount: Object.keys(tables).length,
+      duration
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: tables
+    })
+
+  } catch (error) {
+    const duration = Date.now() - startTime
+    logger.error('Error loading existing product selection tables', error, 'API')
+
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to load existing product selection tables',
+      message: 'Database operation failed'
+    }, { status: 500 })
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const startTime = Date.now()
+
+  try {
+    const productId = parseInt(params.id)
+
+    if (isNaN(productId) || productId <= 0) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid product ID' },
+        { status: 400 }
+      )
+    }
+
+    let data
+    try {
+      data = await request.json()
+    } catch (parseError) {
+      logger.error('Failed to parse request body', parseError)
+      return NextResponse.json(
+        { success: false, error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+
+    logger.info('Existing product selection tables PUT request', { productId })
+
+    // Проверяем существование продукта
+    const productCheck = await executeQuery(
+      'SELECT id FROM products WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL)',
+      [productId]
+    )
+
+    if (productCheck.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+
+    // Если переданы таблицы, обновляем/создаем их
+    if (data.tables && typeof data.tables === 'object') {
+      // Начинаем транзакцию
+      await executeQuery('BEGIN')
+
+      try {
+        // Удаляем существующие таблицы existing_product для этого продукта
+        await executeQuery(
+          `UPDATE selection_tables
+           SET is_deleted = true
+           WHERE product_id = $1 AND table_type = 'existing_product'`,
+          [productId]
+        )
+
+        // Добавляем новые таблицы
+        let tablesAdded = 0
+        for (const [tableName, tableInfo] of Object.entries(data.tables)) {
+          if (tableInfo && typeof tableInfo === 'object') {
+            const tableData = (tableInfo as any).data || tableInfo
+
+            await executeQuery(`
+              INSERT INTO selection_tables (
+                product_id, table_type, table_name, table_data,
+                description, is_active, created_at, updated_at
+              ) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            `, [
+              productId,
+              'existing_product',
+              tableName,
+              JSON.stringify(tableData),
+              (tableInfo as any).description || null,
+              (tableInfo as any).isActive !== false
+            ])
+            tablesAdded++
+          }
+        }
+
+        await executeQuery('COMMIT')
+
+        const duration = Date.now() - startTime
+        logger.info('Existing product selection tables updated', {
+          productId,
+          tablesAdded,
+          duration
+        })
+
+        return NextResponse.json({
+          success: true,
+          message: 'Existing product selection tables updated successfully',
+          count: tablesAdded
+        })
+
+      } catch (innerError) {
+        await executeQuery('ROLLBACK')
+        throw innerError
+      }
+    } else {
+      return NextResponse.json({
+        success: false,
+        error: 'No tables data provided'
+      }, { status: 400 })
+    }
+
+  } catch (error) {
+    const duration = Date.now() - startTime
+    logger.error('Existing product selection tables PUT error', error, 'API')
+
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to update existing product selection tables',
+      message: 'Database operation failed'
+    }, { status: 500 })
+  }
+}
