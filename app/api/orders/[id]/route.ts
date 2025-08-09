@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, getPool } from '@/lib/db-connection'
-import { getCacheManager, getLogger } from '@/lib/dependency-injection'
+import { getLogger } from '@/lib/dependency-injection'
 
 // GET - получение деталей заказа
 export async function GET(

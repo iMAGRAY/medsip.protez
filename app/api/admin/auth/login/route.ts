@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { authenticateUser, createUserSession, AUTH_CONFIG } from '@/lib/database-auth'
+import { authenticateUser, AUTH_CONFIG } from '@/lib/database-auth'
 import { logger } from '@/lib/logger'
 
 // Принудительно делаем маршрут динамическим

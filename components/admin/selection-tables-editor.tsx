@@ -4,22 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 import { UI_CONFIG } from '@/lib/app-config'
 import {
   Plus,
   Trash2,
-  Save,
-  RotateCcw,
   Table2,
   PlusCircle,
-  MinusCircle,
-  Copy
+  MinusCircle
 } from 'lucide-react'
 interface TableData {
   title: string;

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Upload, X, Image as ImageIcon, FileText, Video, Loader2 } from "lucide-react"
+import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react"
 import { MediaManager, type UploadResult } from "@/lib/s3-client"
 import { SafeImage } from "@/components/safe-image"
 

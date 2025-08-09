@@ -1,9 +1,5 @@
 import React from 'react'
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Star, Table2, Layers, Package } from 'lucide-react'
+import { Star, Layers, Package } from 'lucide-react'
 
 interface Characteristic {
   value_id: number

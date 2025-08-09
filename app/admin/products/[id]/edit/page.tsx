@@ -25,24 +25,6 @@ export default function EditProductPage() {
   // Проверяем права доступа
   const canUpdateProducts = hasPermission('products.update') || hasPermission('products.*') || hasPermission('*')
 
-  // Если нет прав на редактирование продуктов, показываем сообщение об ошибке
-  if (!canUpdateProducts) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-8">
-              <Shield className="w-16 h-16 text-red-500" />
-              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
-              <p className="text-gray-600 text-center">
-                У вас нет прав для редактирования товаров
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    )
-  }
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -106,10 +88,29 @@ export default function EditProductPage() {
     router.push('/admin/products')
   }
 
+  // Ранний возврат без прав — после хуков
+  if (!canUpdateProducts) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="flex flex-col items-center gap-4 p-8">
+              <Shield className="w-16 h-16 text-red-500" />
+              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
+              <p className="text-gray-600 text-center">
+                У вас нет прав для редактирования товаров
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    )
+  }
+
   if (loading) {
     return (
       <AdminLayout>
-        <Card className="max-w-4xl mx-auto">
+        <Card className="max-4xl mx-auto">
           <CardContent className="p-8">
             <div className="flex items-center justify-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin" />

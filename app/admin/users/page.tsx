@@ -35,11 +35,7 @@ import {
   Edit,
   Trash2,
   Shield,
-  Eye,
-  EyeOff,
   UserCheck,
-  UserX,
-  Calendar,
   Mail,
   Key,
   AlertTriangle,
@@ -105,6 +101,13 @@ export default function UsersPage() {
   // Проверяем права доступа
   const canManageUsers = hasPermission('users.manage') || hasPermission('*')
 
+
+  useEffect(() => {
+    loadUsers()
+    loadRoles()
+  }, [])
+
+  // Ранний возврат без прав — после хуков
   if (!canManageUsers) {
     return (
       <AdminLayout>
@@ -122,11 +125,6 @@ export default function UsersPage() {
       </AdminLayout>
     )
   }
-
-  useEffect(() => {
-    loadUsers()
-    loadRoles()
-  }, [])
 
   const loadUsers = async () => {
     try {

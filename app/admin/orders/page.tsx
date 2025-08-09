@@ -10,10 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import {
   ClipboardList,
@@ -24,7 +23,6 @@ import {
   Package,
   User,
   Search,
-  Filter,
   RefreshCw,
   CheckCircle,
   Clock,
@@ -34,7 +32,6 @@ import {
   Trash2,
   Share2,
   Copy,
-  Download,
   MessageCircle,
   FileSpreadsheet,
   Archive,
@@ -449,7 +446,7 @@ export default function OrdersPage() {
              <AlertDialogHeader>
                <AlertDialogTitle>Удалить заказ?</AlertDialogTitle>
                <AlertDialogDescription>
-                 Заказ #{deletingOrderId} будет перемещен в раздел "Удаленные".
+                 Заказ #{deletingOrderId} будет перемещен в раздел &quot;Удаленные&quot;.
                  Вы сможете восстановить его в любое время.
                </AlertDialogDescription>
              </AlertDialogHeader>

@@ -14,7 +14,6 @@ import {
   Copy,
   ExternalLink,
   ImageIcon,
-  Download,
   Grid3X3,
   Grid2X2,
   Rows3,
@@ -35,8 +34,6 @@ import { SafeImage } from "@/components/safe-image"
 import { useOptimizedMedia } from "@/hooks/use-optimized-media"
 import { VirtualizedMediaGrid } from "./virtualized-media-grid"
 import { toast } from "sonner"
-import { useToast } from '@/hooks/use-toast'
-import { logger } from '@/lib/logger'
 // Простой кеш настроек в памяти для клиентской стороны
 const settingsCache = new Map<string, any>()
 

@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
-import { categoryCache } from '@/lib/redis-client'
 
 export const GET = withCache(async function GET(request: NextRequest) {
   try {

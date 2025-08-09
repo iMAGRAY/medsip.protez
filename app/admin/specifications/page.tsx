@@ -7,12 +7,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-import { Plus, Edit, Trash2, Settings, Database, List, ChevronDown, ChevronRight, Zap, Edit2, Hash, Folder, FolderOpen, Package, Tag } from "lucide-react"
+import { Plus, Edit, Trash2, Settings, Database, ChevronDown, ChevronRight, Hash, Folder, FolderOpen, Package, Tag } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 interface SpecGroup {
@@ -1577,8 +1574,8 @@ if (group.children && group.children.length > 0) {
                     <span className="text-red-600 font-medium">⚠️ Внимание!</span>
                   </div>
                   <p className="text-sm text-red-700 mb-3">
-                    Вы собираетесь удалить {deleteInfo.group.type} <strong>"{deleteInfo.group.name}"</strong>.
-                    {deleteInfo.warnings.length > 0 && " Это приведет к следующим последствиям:"}
+                    Вы собираетесь удалить {deleteInfo.group.type} <strong>&quot;{deleteInfo.group.name}&quot;</strong>.
+                    {deleteInfo.warnings.length > 0 && ' Это приведет к следующим последствиям:'}
                   </p>
 
                   {deleteInfo.warnings.length > 0 && (

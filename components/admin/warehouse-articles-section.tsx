@@ -8,14 +8,11 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { ProductSelector } from '@/components/admin/product-selector'
 import {
   Plus,
   Package,
   QrCode,
-  Weight,
-  Ruler,
   Warehouse,
   AlertTriangle,
   Loader2,

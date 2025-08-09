@@ -10,24 +10,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import {
   Plus,
   Edit,
   Trash2,
   Save,
-  Eye,
   Settings,
   FileText,
   Hash,
   List,
   ToggleLeft,
-  Palette,
   Calendar,
-  Star,
-  ChevronRight
+  Star
 } from 'lucide-react'
 
 interface CharacteristicGroup {

@@ -1,17 +1,13 @@
 "use client"
 
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
 import type { Prosthetic } from "./data"
 import { apiClient } from "./api-client"
 import {
   type SiteSettings,
   type Category,
-  type Material,
-  type Feature,
   type ModelLine,
 } from "./admin-data"
-import { PROSTHETIC_FALLBACK_IMAGE } from "./fallback-image"
 
 // Transform API responses to frontend types
 const transformApiProduct = (apiProduct: any): Prosthetic => {

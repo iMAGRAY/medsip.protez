@@ -26,8 +26,7 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Tag, Palette, Hash, Move, Sparkles, TrendingUp, Star, Percent, Crown, Gem, Leaf, ShieldCheck, Truck, Flag } from 'lucide-react'
-import * as Icons from 'lucide-react'
+import { Plus, Pencil, Trash2, Tag, Sparkles, TrendingUp, Star, Percent, Crown, Gem, Leaf, ShieldCheck, Truck, Flag } from 'lucide-react'
 
 interface ProductTag {
   id: number

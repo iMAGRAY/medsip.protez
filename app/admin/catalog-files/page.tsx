@@ -12,8 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileDown, Share2, Plus, Pencil, Trash2, Upload, Eye, Calendar } from 'lucide-react'
+import { FileDown, Plus, Pencil, Trash2, Eye, Calendar } from 'lucide-react'
 import { formatDate } from "@/lib/utils"
 import { useAuth } from "@/components/admin/auth-guard"
 
@@ -60,26 +59,6 @@ export default function CatalogFilesPage() {
   const canUpdateCatalogs = hasPermission('catalog.update') || hasPermission('catalog.*') || hasPermission('*')
   const canDeleteCatalogs = hasPermission('catalog.delete') || hasPermission('catalog.*') || hasPermission('*')
 
-  // Если нет прав на просмотр каталогов, показываем сообщение об ошибке
-  if (!canViewCatalogs) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-8">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <FileDown className="w-8 h-8 text-red-600" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">Доступ запрещен</h3>
-                <p className="text-gray-600">У вас нет прав для просмотра каталогов</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    )
-  }
 
   const [formData, setFormData] = useState<CatalogFormData>({
     title: '',
@@ -259,6 +238,27 @@ export default function CatalogFilesPage() {
     const sizes = ['Б', 'КБ', 'МБ', 'ГБ']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
+  }
+
+  // Ранний возврат без прав — после хуков
+  if (!canViewCatalogs) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="flex flex-col items-center gap-4 p-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <FileDown className="w-8 h-8 text-red-600" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-2">Доступ запрещен</h3>
+                <p className="text-gray-600">У вас нет прав для просмотра каталогов</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    )
   }
 
   if (loading) {

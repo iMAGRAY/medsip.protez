@@ -14,7 +14,6 @@ import {
   Layers,
   Package,
   BarChart3,
-  Users,
   Activity
 } from "lucide-react"
 

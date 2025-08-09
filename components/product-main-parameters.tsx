@@ -7,8 +7,7 @@ import {
   isImportantValue,
   formatParametersInline,
   groupParametersByType,
-  type CharacteristicGroup,
-  type MainParameter
+  type CharacteristicGroup
 } from '@/lib/main-parameters-utils'
 
 interface ProductMainParametersProps {

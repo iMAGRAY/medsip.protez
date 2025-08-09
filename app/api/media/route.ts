@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3'
 import path from 'path'
 import { getPool } from '@/lib/db-connection'
-import { Worker } from 'worker_threads'
 import { cpus } from 'os'
 
 export const runtime = 'nodejs'

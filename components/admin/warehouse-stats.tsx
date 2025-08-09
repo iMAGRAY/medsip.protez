@@ -5,15 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import {
-  Warehouse,
   Package,
   AlertTriangle,
   CheckCircle,
   Building2,
   Globe,
-  MapPin,
-  TrendingUp,
-  BarChart3
+  MapPin
 } from 'lucide-react'
 
 // Интерфейсы для данных

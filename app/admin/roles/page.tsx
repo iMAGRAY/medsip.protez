@@ -22,7 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import {
   Tabs,
@@ -51,7 +50,6 @@ import {
   AlertTriangle,
   Lock,
   User,
-  Users,
   Key,
   ChevronDown
 } from 'lucide-react'

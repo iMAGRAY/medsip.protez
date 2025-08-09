@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { CheckCircle, Circle, Star, Shield, Clock, Package, Info, Layers } from 'lucide-react'
-import { SafeImage } from '@/components/safe-image'
-import { Button } from '@/components/ui/button'
+import { CheckCircle, Circle } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface ProductVariantV2 {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
-import { RUNTIME_CONFIG } from '@/lib/app-config'
 import { getCacheManager } from '@/lib/dependency-injection'
 import { invalidateRelated } from '@/lib/cache-manager'
 import { requireAuth, hasPermission } from '@/lib/database-auth'

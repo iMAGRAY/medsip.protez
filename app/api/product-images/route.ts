@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
-import { mediaCache } from '@/lib/redis-client'
 
 // GET /api/product-images - получить изображения товара
 export const GET = withCache(async function GET(request: NextRequest) {

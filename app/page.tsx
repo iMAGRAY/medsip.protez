@@ -5,21 +5,17 @@ import Header from "@/components/header"
 import HeroVideo from "@/components/hero-video"
 import { Footer } from "@/components/footer"
 import { ProductGrid } from "@/components/product-grid"
-import { ProductCardList } from '@/components/product-card-list'
-import { SidebarFilters } from '@/components/sidebar-filters'
-import { ProductFilters } from '@/components/product-filters'
 import { CategorySidebar } from '@/components/category-sidebar'
 import { SearchBar } from "@/components/search-bar"
 import { SortDropdown } from "@/components/sort-dropdown"
 import { ViewToggle } from "@/components/view-toggle"
 import { ProductQuickView } from "@/components/product-quick-view"
 import { Button } from "@/components/ui/button"
-import { ChevronRight, Filter, Loader2, Search, X, ChevronUp, ChevronDown } from "lucide-react"
+import { ChevronRight, Filter, Loader2, X, ChevronUp, ChevronDown } from "lucide-react"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { useAdminStore } from "@/lib/admin-store"
 import logger from "@/lib/logger"
 import { CatalogDownloadButtons } from "@/components/catalog-download-buttons"
-import { Card } from "@/components/ui/card"
 
 // Строгие интерфейсы для типизации
 interface Category {

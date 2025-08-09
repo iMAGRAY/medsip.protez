@@ -41,24 +41,6 @@ export default function ProductsAdmin() {
   const canUpdateProducts = hasPermission('products.update') || hasPermission('products.*') || hasPermission('*')
   const canDeleteProducts = hasPermission('products.delete') || hasPermission('products.*') || hasPermission('*')
 
-  // Если нет прав на просмотр продуктов, показываем сообщение об ошибке
-  if (!canViewProducts) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-8">
-              <Shield className="w-16 h-16 text-red-500" />
-              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
-              <p className="text-gray-600 text-center">
-                У вас нет прав для просмотра товаров
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    )
-  }
 
   // Initialize data when component mounts with force refresh
   useEffect(() => {
@@ -134,10 +116,8 @@ export default function ProductsAdmin() {
   // Обновляем данные при возвращении на страницу (фокус на вкладке)
   useEffect(() => {
     const handleFocus = async () => {
-
       try {
         await forceRefresh()
-
       } catch (error) {
         console.error('❌ Error refreshing on focus:', error)
       }
@@ -146,6 +126,30 @@ export default function ProductsAdmin() {
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
   }, [forceRefresh])
+
+  // Сбрасываем страницу при изменении поиска
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
+  // Ранний возврат без прав — после хуков
+  if (!canViewProducts) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="flex flex-col items-center gap-4 p-8">
+              <Shield className="w-16 h-16 text-red-500" />
+              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
+              <p className="text-gray-600 text-center">
+                У вас нет прав для просмотра товаров
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    )
+  }
 
   // Безопасно обрабатываем возможные null/undefined значения полей name и category
   const filteredProducts = products.filter((product) => {
@@ -194,11 +198,6 @@ export default function ProductsAdmin() {
     (currentPage - 1) * ROWS_PER_PAGE,
     currentPage * ROWS_PER_PAGE,
   )
-
-  useEffect(() => {
-    // Сбрасываем страницу если меняется результат поиска
-    setCurrentPage(1)
-  }, [searchQuery])
 
   const handleSaveProduct = async (savedProduct: Prosthetic) => {
     try {

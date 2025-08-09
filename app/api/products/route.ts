@@ -4,7 +4,6 @@ import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { logger } from '@/lib/logger'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
-import { productCache } from '@/lib/redis-client'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

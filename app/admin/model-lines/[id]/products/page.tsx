@@ -18,12 +18,9 @@ import {
   Edit,
   Trash2,
   Eye,
-  Calendar,
-  Building2,
   AlertTriangle,
   CheckCircle,
   Tag,
-  DollarSign,
   Ruler,
   Battery,
   Shield,
@@ -36,7 +33,6 @@ import {
   RussianRuble
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import { InstantLink } from "@/components/instant-link"
 
 interface ModelLine {
   id: number

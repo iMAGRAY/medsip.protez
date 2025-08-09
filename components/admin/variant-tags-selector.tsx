@@ -485,9 +485,9 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
                         <br />
                         Личные теги видны только у этого варианта и идеально подходят для:
                         <ul className="mt-1 ml-4 text-sm list-disc">
-                          <li>Размеров: "XXL", "Детский размер"</li>
-                          <li>Цветов: "Синий металлик", "Красный матовый"</li>
-                          <li>Особенностей: "Усиленная конструкция", "Облегченная версия"</li>
+                          <li>Размеров: &quot;XXL&quot;, &quot;Детский размер&quot;</li>
+                          <li>Цветов: &quot;Синий металлик&quot;, &quot;Красный матовый&quot;</li>
+                          <li>Особенностей: &quot;Усиленная конструкция&quot;, &quot;Облегченная версия&quot;</li>
                         </ul>
                       </AlertDescription>
                     </Alert>

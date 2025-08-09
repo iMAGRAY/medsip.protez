@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { CheckCircle, Circle, Star, Shield, Clock, Package, ChevronDown } from 'lucide-react'
+import { CheckCircle, Circle, Star, Package } from 'lucide-react'
 import { SafeImage } from '@/components/safe-image'
 import { toast } from 'sonner'
 

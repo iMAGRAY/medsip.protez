@@ -8,7 +8,6 @@ import type {
 } from '@/lib/types/warehouse'
 
 import { apiClient } from '@/lib/unified-api-client'
-import { RUNTIME_CONFIG } from '@/lib/app-config'
 
 export class WarehouseService {
   private static instance: WarehouseService

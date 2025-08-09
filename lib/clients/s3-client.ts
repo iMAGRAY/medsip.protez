@@ -1,6 +1,6 @@
 "use client"
 
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
+import { S3Client, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import { ListObjectsV2Command } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { RUNTIME_CONFIG } from '../app-config'

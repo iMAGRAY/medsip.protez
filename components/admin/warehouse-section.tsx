@@ -9,13 +9,11 @@ import { Progress } from '@/components/ui/progress'
 import {
   Warehouse,
   Package,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
   Loader2,
   MapPin,
   Thermometer,
-  Droplets,
   Calendar,
   BarChart3
 } from 'lucide-react'

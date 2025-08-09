@@ -9,33 +9,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Plus,
-  Edit,
   Trash2,
   Settings,
-  Database,
-  Type,
   ChevronDown,
   ChevronRight,
-  Folder,
   FolderOpen,
   Package,
-  Tag,
   Star,
   Save,
   Search,
   Check,
   X,
   Target,
-  Zap,
-  BookOpen,
-  Archive,
-  Palette
+  Archive
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { SearchableSelect } from '@/components/ui/searchable-select'

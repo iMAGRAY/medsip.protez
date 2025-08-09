@@ -26,7 +26,6 @@ import {
   Loader2,
   Activity,
   AlertCircle,
-  TrendingUp,
   FileText,
   Database,
   Server,
@@ -676,14 +675,14 @@ try {
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-gray-700">Добавлен товар "Протез руки"</p>
+                    <p className="text-gray-700">Добавлен товар &quot;Протез руки&quot;</p>
                     <p className="text-xs text-gray-500">2 минуты назад</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-gray-700">Обновлена категория "Протезы"</p>
+                    <p className="text-gray-700">Обновлена категория &quot;Протезы&quot;</p>
                     <p className="text-xs text-gray-500">15 минут назад</p>
                   </div>
                 </div>

@@ -6,13 +6,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { SearchableSelect } from '@/components/ui/searchable-select'
 import { GroupedSearchableSelect } from '@/components/ui/grouped-searchable-select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Loader2, Save, X, Edit, Trash2, AlertTriangle } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { RUSSIAN_REGIONS, FEDERAL_DISTRICTS } from '@/lib/constants'
+import { RUSSIAN_REGIONS } from '@/lib/constants'
 
 // Интерфейсы для форм
 interface FormData {

@@ -10,7 +10,6 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import {
   Warehouse,
   BarChart3,
-  Users,
   Settings,
   RefreshCw,
   Navigation,
@@ -20,7 +19,6 @@ import {
   Package2,
   Grid3x3,
   AlertTriangle,
-  CheckCircle,
   Zap,
   Plus
 } from 'lucide-react'
@@ -30,8 +28,6 @@ import { WarehouseTreeManager } from '@/components/admin/warehouse-tree-manager'
 import { WarehouseAnalyticsDashboard } from '@/components/admin/warehouse-analytics-dashboard'
 import { WarehouseBulkOperations } from '@/components/admin/warehouse-bulk-operations'
 import { WarehouseDialogs } from '@/components/admin/warehouse-dialogs'
-import { WarehouseArticlesSection } from '@/components/admin/warehouse-articles-section'
-import { WarehouseSettings } from '@/components/admin/warehouse-settings'
 // Диалоги будут созданы позже в процессе рефакторинга
 
 // Рефакторированный хук

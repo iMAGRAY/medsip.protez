@@ -678,10 +678,10 @@ export default function ProductVariantsPage() {
                   <div className="flex flex-col items-center">
                     <Package className="w-12 h-12 text-gray-300 mb-4" />
                     <p className="text-lg font-medium text-gray-600 mb-2">Варианты товара не созданы</p>
-                    <p className="text-sm text-gray-500">
-                      Нажмите "Добавить вариант" чтобы создать первый вариант товара
-                    </p>
-                  </div>
+                                          <p className="text-sm text-gray-500">
+                        Нажмите &quot;Добавить вариант&quot; чтобы создать первый вариант товара
+                      </p>
+</div>
                 </TableCell>
               </TableRow>
             ) : (

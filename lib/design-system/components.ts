@@ -3,7 +3,6 @@
  * Централизованные варианты для всех UI компонентов
  */
 
-import { themeColors } from '../theme-colors'
 
 // Варианты кнопок (без красных цветов)
 export const buttonVariants = {

@@ -5,10 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
-import { Separator } from '@/components/ui/separator'
-import { Trash2, Package, Tag, Layers, Plus, Loader2, Edit2, Check, X, ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Trash2, Package, Tag, Layers, Plus, Loader2, Check, X, Search } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 interface CompactCharacteristicsProps {
