@@ -14,22 +14,13 @@ import { useState, useEffect } from "react"
   // Безопасный компонент списка
 function SafeCartButton() {
   const [isClient, setIsClient] = useState(false)
+  const cart = useCart()
 
   useEffect(() => {
     setIsClient(true)
   }, [])
 
-  // Всегда вызываем useCart, но используем результат только на клиенте
-  let cart
-  let totalItems = 0
-
-  try {
-    cart = useCart()
-    totalItems = cart.totalItems
-  } catch (error) {
-    // Игнорируем ошибки контекста на сервере
-    console.warn('Cart context not available:', error)
-  }
+  const totalItems = cart?.totalItems ?? 0
 
   if (!isClient) {
     return (
