@@ -524,7 +524,7 @@ export function ProductsManager({
                         <div className="space-y-0.5">
                           <Label className="text-sm font-medium">Не показывать цену</Label>
                           <p className="text-xs text-gray-500">
-                            Если включено, вместо цены будет показано "По запросу"
+                            Если включено, вместо цены будет показано &quot;По запросу&quot;
                           </p>
                         </div>
                         <Switch
