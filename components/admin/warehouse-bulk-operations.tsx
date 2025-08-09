@@ -954,7 +954,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
           <AlertDialogHeader>
             <AlertDialogTitle>Подтверждение операции</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите выполнить операцию "{pendingOperation?.operation.label}"
+              Вы уверены, что хотите выполнить операцию &quot;{pendingOperation?.operation.label}&quot;
               для {selectedItems.size} элементов?
               {pendingOperation?.operation.type === 'delete' && (
                 <div className="mt-2 p-2 bg-red-50 rounded text-red-700 text-sm">

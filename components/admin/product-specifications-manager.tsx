@@ -839,7 +839,7 @@ export function ProductSpecificationsManager({
                 <div className="space-y-1 text-xs">
                   <div>• Нажмите <span className="bg-green-100 text-green-700 px-1 rounded font-mono">+</span> рядом с группой для добавления как текстовой характеристики</div>
                   <div>• Нажмите <span className="bg-green-100 text-green-700 px-1 rounded font-mono">+</span> рядом с характеристикой для добавления готового значения</div>
-                  <div>• Переключитесь на вкладку "Характеристики" для редактирования значений</div>
+                  <div>• Переключитесь на вкладку &quot;Характеристики&quot; для редактирования значений</div>
                 </div>
               </div>
             </div>
@@ -1083,7 +1083,7 @@ export function ProductSpecificationsManager({
                   <div className="text-center py-8 text-gray-500">
                     <Type className="w-12 h-12 mx-auto mb-4 text-gray-300"/>
                     <div className="text-lg font-medium mb-2">Нет характеристик</div>
-                                            <div className="text-sm mb-4">Добавьте характеристики через вкладку "Группы характеристик"</div>
+                                            <div className="text-sm mb-4">Добавьте характеристики через вкладку &quot;Группы характеристик&quot;</div>
                     <div className="text-xs text-gray-400">
                       Нажмите <span className="bg-green-100 text-green-700 px-1 rounded">+</span> рядом с группами или характеристиками для добавления
                     </div>

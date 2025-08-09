@@ -636,7 +636,7 @@ export function ProductVariantForm({
                         <div className="space-y-0.5">
                           <Label htmlFor="hidePrice">Не показывать цену на сайте</Label>
                           <p className="text-sm text-gray-500">
-                            Если включено, вместо цены будет показано "По запросу"
+                            Если включено, вместо цены будет показано &quot;По запросу&quot;
                           </p>
                         </div>
                         <Switch

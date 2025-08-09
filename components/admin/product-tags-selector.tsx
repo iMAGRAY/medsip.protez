@@ -479,9 +479,9 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
                       <br />
                       Личные теги видны только у этого товара и идеально подходят для:
                       <ul className="mt-1 ml-4 text-sm list-disc">
-                        <li>Срочных акций: "Только сегодня -50%"</li>
-                        <li>Остатков: "Последний экземпляр"</li>
-                        <li>Уникальных предложений: "Подарок в комплекте"</li>
+                        <li>Срочных акций: &quot;Только сегодня -50%&quot;</li>
+                        <li>Остатков: &quot;Последний экземпляр&quot;</li>
+                        <li>Уникальных предложений: &quot;Подарок в комплекте&quot;</li>
                       </ul>
                     </AlertDescription>
                   </Alert>
