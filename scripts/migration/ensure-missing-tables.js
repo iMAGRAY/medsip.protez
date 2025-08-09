@@ -91,9 +91,34 @@ async function createWarehouseSettings(pool) {
   await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS warehouse_settings_key_idx ON warehouse_settings(setting_key);`)
 }
 
+async function createProductCategories(pool) {
+  const name = 'product_categories'
+  if (await tableExists(pool, name)) {
+    console.log(`Skip: table ${name} already exists`)
+    return
+  }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE product_categories (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      parent_id INTEGER REFERENCES product_categories(id),
+      type VARCHAR(64),
+      is_active BOOLEAN DEFAULT true,
+      sort_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS product_categories_parent_idx ON product_categories(parent_id);`)
+  await pool.query(`CREATE INDEX IF NOT EXISTS product_categories_active_idx ON product_categories(is_active);`)
+}
+
 async function main() {
   const pool = buildPool()
   try {
+    await createProductCategories(pool)
     await createProductSpecifications(pool)
     await createFormTemplates(pool)
     await createWarehouseSettings(pool)
