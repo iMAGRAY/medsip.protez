@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { executeQuery, testConnection } from "@/lib/db-connection"
 
+export const dynamic = 'force-dynamic'
+
 // Add a simple handler for all methods to debug
 export async function GET(request: NextRequest) {
 
@@ -10,6 +12,24 @@ export async function GET(request: NextRequest) {
     const isConnected = await testConnection()
     if (!isConnected) {
       console.error("Database connection failed in site-settings GET")
+      return NextResponse.json(getFallbackSettings(), {
+        status: 503,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      })
+    }
+
+    // Проверяем наличие таблицы site_settings, не выполняя DDL
+    const exists = await executeQuery(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'site_settings'
+      ) AS exist
+    `)
+    if (!exists.rows?.[0]?.exist) {
       return NextResponse.json(getFallbackSettings(), {
         status: 503,
         headers: {
