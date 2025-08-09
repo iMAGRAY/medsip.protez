@@ -4,6 +4,8 @@ import { executeQuery } from '@/lib/db-connection'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
 
+export const dynamic = 'force-dynamic'
+
 export const GET = withCache(async function GET(request: NextRequest) {
   try {
     // Проверяем существование таблицы product_categories
@@ -18,29 +20,11 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE product_categories (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          parent_id INTEGER REFERENCES product_categories(id),
-          is_active BOOLEAN DEFAULT true,
-          sort_order INTEGER DEFAULT 0,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
-
-      // Добавляем несколько базовых категорий
-      await executeQuery(`
-        INSERT INTO product_categories (name, description, sort_order) VALUES
-        ('Протезы ног', 'Протезы нижних конечностей', 1),
-        ('Протезы рук', 'Протезы верхних конечностей', 2),
-        ('Ортезы', 'Ортопедические изделия', 3),
-        ('Аксессуары', 'Дополнительные принадлежности', 4)
-      `)
+      // Безопасно возвращаем 503 вместо создания схемы в GET
+      return NextResponse.json(
+        { success: false, error: 'Categories schema is not initialized' },
+        { status: 503 }
+      )
     }
 
     const { searchParams } = new URL(request.url);
@@ -176,12 +160,12 @@ export const GET = withCache(async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Categories API Error:', error);
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: (error as any).message,
+      stack: (error as any).stack,
+      name: (error as any).name
     });
     return NextResponse.json(
-      { error: 'Failed to fetch categories', success: false, details: error.message },
+      { error: 'Failed to fetch categories', success: false, details: (error as any).message },
       { status: 500 }
     );
   }

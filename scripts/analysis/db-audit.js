@@ -109,6 +109,22 @@ async function getForeignKeys(pool) {
   return rows
 }
 
+async function getColumnsMap(pool) {
+  const { rows } = await pool.query(`
+    SELECT table_name, column_name
+    FROM information_schema.columns
+    WHERE table_schema='public'
+  `)
+  const map = new Map()
+  for (const r of rows) {
+    const key = r.table_name
+    const set = map.get(key) || new Set()
+    set.add(r.column_name)
+    map.set(key, set)
+  }
+  return map
+}
+
 function normalizeColumns(value) {
   if (Array.isArray(value)) return value.map(v => String(v))
   if (value == null) return []
@@ -180,7 +196,7 @@ function ddlCreateIndex(table, columns, concurrently = true) {
 
 function pick(a, keys) { const o = {}; for (const k of keys) o[k] = a[k]; return o }
 
-async function detectCodeUsageIndexes(pool) {
+async function detectCodeUsageIndexes(pool, columnsMap) {
   const candidates = [
     { table: 'products', columns: ['category_id'] },
     { table: 'products', columns: ['manufacturer_id'] },
@@ -200,6 +216,15 @@ async function detectCodeUsageIndexes(pool) {
     { table: 'warehouse_zones', columns: ['warehouse_id'] },
     { table: 'warehouse_warehouses', columns: ['city_id'] },
   ]
+
+  // Отфильтруем только реально существующие комбинации колонок
+  const exists = (table, cols) => {
+    const set = columnsMap.get(table)
+    if (!set) return false
+    return cols.every(c => set.has(c))
+  }
+
+  const filtered = candidates.filter(c => exists(c.table, c.columns))
 
   // Existing indexes: collect sets of leading column sequences per table
   const idxSql = `
@@ -225,7 +250,7 @@ async function detectCodeUsageIndexes(pool) {
   }
 
   const missing = []
-  for (const c of candidates) {
+  for (const c of filtered) {
     const list = tableToIndexCols.get(c.table) || []
     const has = list.some(cols => {
       if (cols.length < c.columns.length) return false
@@ -272,12 +297,13 @@ async function main() {
   const report = { startedAt }
 
   try {
-    const [info, tables, indexes, fks, vac] = await Promise.all([
+    const [info, tables, indexes, fks, vac, columnsMap] = await Promise.all([
       getRuntimeInfo(pool),
       getTables(pool),
       getIndexes(pool),
       getForeignKeys(pool),
-      getVacuumStats(pool)
+      getVacuumStats(pool),
+      getColumnsMap(pool)
     ])
 
     report.info = info
@@ -296,20 +322,21 @@ async function main() {
     // Missing FK indexes
     report.missingFkIndexes = await findMissingFkIndexes(pool, fks)
 
-    // Code usage based indexes
-    report.recommendedIndexes = await detectCodeUsageIndexes(pool)
+    // Code usage based indexes (учитываем схему)
+    report.recommendedIndexes = await detectCodeUsageIndexes(pool, columnsMap)
 
     // Missing tables referenced by code
     report.schemaGaps = await checkMissingTables(pool)
 
-    // Build SQL for indexes
-    const ddl = []
+    // Build SQL for indexes (dedup)
+    const ddlSet = new Set()
     for (const m of report.missingFkIndexes) {
-      ddl.push(ddlCreateIndex(m.table, m.columns))
+      ddlSet.add(ddlCreateIndex(m.table, m.columns))
     }
     for (const r of report.recommendedIndexes) {
-      ddl.push(ddlCreateIndex(r.table, r.columns))
+      ddlSet.add(ddlCreateIndex(r.table, r.columns))
     }
+    const ddl = Array.from(ddlSet)
 
     // Output files
     const ts = nowTs()

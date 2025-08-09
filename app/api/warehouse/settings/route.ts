@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/db-connection';
 
+export const dynamic = 'force-dynamic'
+
 // GET - получить настройки складской системы
 export async function GET(request: NextRequest) {
   try {
@@ -16,45 +18,7 @@ export async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery);
 
     if (!tableExists.rows[0].exists) {
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE warehouse_settings (
-          id SERIAL PRIMARY KEY,
-          setting_key VARCHAR(255) UNIQUE NOT NULL,
-          setting_value TEXT,
-          data_type VARCHAR(50) DEFAULT 'string',
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Вставляем настройки по умолчанию
-      const defaultSettings = [
-        { key: 'auto_reorder_enabled', value: 'false', type: 'boolean' },
-        { key: 'low_stock_threshold', value: '10', type: 'number' },
-        { key: 'critical_stock_threshold', value: '5', type: 'number' },
-        { key: 'default_warehouse_capacity', value: '1000', type: 'number' },
-        { key: 'email_notifications', value: 'true', type: 'boolean' },
-        { key: 'low_stock_alerts', value: 'true', type: 'boolean' },
-        { key: 'movement_notifications', value: 'false', type: 'boolean' },
-        { key: 'daily_reports', value: 'true', type: 'boolean' },
-        { key: 'auto_zone_assignment', value: 'false', type: 'boolean' },
-        { key: 'auto_section_optimization', value: 'false', type: 'boolean' },
-        { key: 'batch_processing_enabled', value: 'true', type: 'boolean' },
-        { key: 'require_confirmation_for_deletion', value: 'true', type: 'boolean' },
-        { key: 'audit_trail_enabled', value: 'true', type: 'boolean' },
-        { key: 'user_activity_tracking', value: 'true', type: 'boolean' },
-        { key: 'cache_analytics_minutes', value: '15', type: 'number' },
-        { key: 'max_concurrent_operations', value: '5', type: 'number' },
-        { key: 'enable_background_sync', value: 'true', type: 'boolean' }
-      ];
-
-      for (const setting of defaultSettings) {
-        await executeQuery(`
-          INSERT INTO warehouse_settings (setting_key, setting_value, data_type)
-          VALUES ($1, $2, $3)
-        `, [setting.key, setting.value, setting.type]);
-      }
+      return NextResponse.json({ success: false, error: 'Warehouse settings schema is not initialized' }, { status: 503 })
     }
 
     // Получаем все настройки
