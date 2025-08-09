@@ -1,10 +1,13 @@
 {
   "root": true,
   "extends": [
-    "next/core-web-vitals",
-    "plugin:unused-imports/recommended"
+    "next"
   ],
   "plugins": ["unused-imports"],
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
   "rules": {
     "unused-imports/no-unused-imports": "warn",
     "unused-imports/no-unused-vars": [

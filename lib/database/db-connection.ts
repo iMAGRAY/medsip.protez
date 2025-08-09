@@ -10,7 +10,8 @@ let connectionFailed = false
 
 // Environment validation
 function validateEnvironment(): void {
-  const required = ['DATABASE_URL', 'POSTGRESQL_HOST', 'POSTGRESQL_USER', 'POSTGRESQL_PASSWORD', 'POSTGRESQL_DBNAME']
+  // Пароль допускается пустым в локальной среде
+  const required = ['DATABASE_URL', 'POSTGRESQL_HOST', 'POSTGRESQL_USER', 'POSTGRESQL_DBNAME']
   const missing = required.filter(key => !process.env[key] && !process.env.DATABASE_URL)
 
   if (missing.length > 0 && !process.env.DATABASE_URL) {
@@ -33,8 +34,8 @@ function createPool(): Pool {
     database: process.env.DB_NAME || process.env.POSTGRESQL_DBNAME || "medsip_protez",
     max: 20,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 15_000, // Увеличиваем до 15 секунд
-    query_timeout: 30_000, // Добавляем таймаут для запросов
+    connectionTimeoutMillis: 15_000,
+    query_timeout: 30_000,
     ssl: (process.env.PGSSL === "true" || process.env.DATABASE_SSL === "true" || process.env.DATABASE_URL?.includes("sslmode=require")) ? { rejectUnauthorized: false } : undefined,
   }
 
@@ -108,7 +109,6 @@ export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
   try {
     const db = getPool()
 
-    // Log connection pool status
     logger.info('Database query starting', {
       query: query.substring(0, 100) + '...',
       paramsCount: params?.length || 0,
@@ -244,5 +244,10 @@ export interface DatabaseProduct {
   updated_at: Date
 }
 
-// Экспорт pool для совместимости
-export const db = getPool()
+// Экспорт pool для совместимости (ленивая инициализация через Proxy)
+export const db = new Proxy({} as Pool, {
+  get(_target, prop) {
+    const real = getPool() as any
+    return real[prop as any]
+  }
+})
