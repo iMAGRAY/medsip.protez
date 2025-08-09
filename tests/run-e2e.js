@@ -6,9 +6,13 @@ const fetch = require('node-fetch')
 async function wait(ms) { return new Promise(r => setTimeout(r, ms)) }
 
 async function run() {
-  // Стартуем next dev сервер
+  // Пробрасываем безопасные переменные окружения для only-read режима
+  const env = { ...process.env }
+  env.READONLY_SQL = env.READONLY_SQL || 'true'
+
+  // Стартуем next сервер
   const server = spawn(process.execPath, [path.join('node_modules', 'next', 'dist', 'bin', 'next'), 'start'], {
-    env: { ...process.env },
+    env,
     stdio: ['ignore', 'pipe', 'pipe']
   })
 
@@ -25,7 +29,7 @@ async function run() {
     await wait(1000)
     try {
       const res = await fetch('http://localhost:3000/api/health')
-      if (res.ok) { ready = true; break }
+      if (res.ok || res.status === 503) { ready = true; break }
     } catch (_) { /* ignore */ }
   }
   if (!ready) {
@@ -45,7 +49,7 @@ async function run() {
   let failed = 0
   for (const file of tests) {
     const code = await new Promise((resolve) => {
-      const child = spawn(process.execPath, [file], { stdio: 'inherit', env: { ...process.env } })
+      const child = spawn(process.execPath, [file], { stdio: 'inherit', env })
       child.on('close', (c) => resolve(c))
       child.on('error', () => resolve(1))
     })

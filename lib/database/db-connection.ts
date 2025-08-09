@@ -100,6 +100,20 @@ export async function testConnection(): Promise<boolean> {
 // Типы для параметров запросов (включая массивы)
 export type QueryParam = string | number | boolean | null | undefined | QueryParam[]
 
+// Простая защита от записывающих запросов в режиме READONLY_SQL
+function isWriteQuery(sql: string): boolean {
+  const q = sql.trim().toUpperCase()
+  // Разрешаем SELECT/VALUES/SHOW/EXPLAIN/WITH (без DML) и CALL? По умолчанию блокируем типичные DML/DDL
+  if (/^(INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|REPLACE|GRANT|REVOKE|VACUUM|ANALYZE|LOCK|MERGE|UPSERT)\b/.test(q)) {
+    return true
+  }
+  // WITH ... INSERT/UPDATE - грубая проверка на вхождение операций
+  if (q.startsWith('WITH') && /(INSERT|UPDATE|DELETE)\b/.test(q)) {
+    return true
+  }
+  return false
+}
+
 // Улучшенная типизация для executeQuery
 export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
   query: string,
@@ -108,6 +122,12 @@ export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
   const startTime = Date.now()
   try {
     const db = getPool()
+
+    if (process.env.READONLY_SQL === 'true' && isWriteQuery(query)) {
+      const err = new Error('Write operation blocked by READONLY_SQL mode')
+      logger.error('Blocked write query in READONLY_SQL mode', { query: query.substring(0, 120) + '...' })
+      throw err
+    }
 
     logger.info('Database query starting', {
       query: query.substring(0, 100) + '...',
