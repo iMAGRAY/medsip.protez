@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
 
   try {
@@ -26,20 +28,7 @@ export async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE model_series (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          manufacturer_id INTEGER NOT NULL,
-          category_id INTEGER,
-          is_active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ success: false, error: 'Model series schema is not initialized' }, { status: 503 })
     }
 
     const { searchParams } = new URL(request.url);
@@ -164,12 +153,12 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Model Lines API Error:', error);
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: (error as any).message,
+      stack: (error as any).stack,
+      name: (error as any).name
     });
     return NextResponse.json(
-      { error: 'Failed to fetch model lines', success: false, details: error.message },
+      { error: 'Failed to fetch model lines', success: false, details: (error as any).message },
       { status: 500 }
     );
   }

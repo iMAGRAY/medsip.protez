@@ -31,23 +31,7 @@ export async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE manufacturers (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL UNIQUE,
-          description TEXT,
-          website_url VARCHAR(500),
-          country VARCHAR(100),
-          founded_year INTEGER,
-          logo_url VARCHAR(500),
-          is_active BOOLEAN DEFAULT true,
-          sort_order INTEGER DEFAULT 0,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ success: false, error: 'Manufacturers schema is not initialized' }, { status: 503 })
     }
 
     let query = `
@@ -81,12 +65,12 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Manufacturers API Error:', error);
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: (error as any).message,
+      stack: (error as any).stack,
+      name: (error as any).name
     });
     return NextResponse.json(
-      { error: 'Failed to fetch manufacturers', details: error.message, success: false },
+      { error: 'Failed to fetch manufacturers', details: (error as any).message, success: false },
       { status: 500 }
     );
   }

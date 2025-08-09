@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Pool } from "pg"
 
+export const dynamic = 'force-dynamic'
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
@@ -16,38 +18,11 @@ export async function GET() {
         SELECT FROM information_schema.tables
         WHERE table_schema = 'public'
         AND table_name = 'form_templates'
-      );
+      ) AS exists;
     `)
 
-    // Если таблица не существует, создаем ее
     if (!tableCheck.rows[0].exists) {
-
-      await pool.query(`
-        CREATE TABLE form_templates (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          characteristics JSONB NOT NULL DEFAULT '[]',
-          is_favorite BOOLEAN DEFAULT false,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-      `)
-
-      // Создаем индексы
-      await pool.query('CREATE INDEX idx_form_templates_name ON form_templates(name);')
-      await pool.query('CREATE INDEX idx_form_templates_created_at ON form_templates(created_at);')
-      await pool.query('CREATE INDEX idx_form_templates_is_favorite ON form_templates(is_favorite);')
-
-      // Добавляем тестовые данные
-      await pool.query(`
-        INSERT INTO form_templates (name, description, characteristics, is_favorite) VALUES
-        ('Базовый шаблон', 'Основные характеристики для протеза',
-         '[{"id":1,"group_id":1,"characteristic_type":"text","label":"Материал","value_text":"Титан"}]', false),
-        ('Расширенный шаблон', 'Подробные характеристики',
-         '[{"id":2,"group_id":1,"characteristic_type":"numeric","label":"Вес","value_numeric":150,"unit_id":1}]', true);
-      `)
-
+      return NextResponse.json({ success: false, error: 'Form templates schema is not initialized' }, { status: 503 })
     }
 
     const result = await pool.query(`
