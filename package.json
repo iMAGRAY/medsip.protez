@@ -50,6 +50,8 @@
     "db:reset": "node scripts/setup/init-db.js",
     "db:status": "node scripts/analysis/check-database-state.js",
     "db:backup": "node scripts/database/backup-full.js",
+    "db:audit": "node scripts/analysis/db-audit.js",
+    "db:audit:out": "mkdir -p database/reports && node scripts/analysis/db-audit.js",
     "redis:test": "node scripts/test-redis-connection.js",
     "prepare": "husky install",
     "format": "prettier --write .",
