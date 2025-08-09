@@ -72,10 +72,6 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     ([_, itemConfig]) => itemConfig.theme || itemConfig.color
   )
 
-  if (!colorConfig.length) {
-    return null
-  }
-
   // Создаем безопасные CSS стили без использования dangerouslySetInnerHTML
   const styles = Object.entries(THEMES)
     .map(([theme, prefix]) => {
@@ -96,6 +92,12 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   React.useEffect(() => {
     if (typeof document === 'undefined') return
 
+    // Если нет цветовых правил — не добавляем пустой стиль
+    const hasRules = styles.some(s => s.cssRules && s.cssRules.length > 0)
+    if (!hasRules) {
+      return
+    }
+
     const styleElement = document.createElement('style')
     styleElement.id = `chart-style-${id}`
 
@@ -114,6 +116,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     }
   }, [id, styles])
 
+  // Всегда ничего не рендерим — эффект управляет стилями
   return null
 }
 
