@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const { spawn } = require('child_process')
 const path = require('path')
+const fetch = require('node-fetch')
 
 async function wait(ms) { return new Promise(r => setTimeout(r, ms)) }
 
@@ -15,13 +16,17 @@ async function run() {
   server.stdout.on('data', (d) => {
     const t = d.toString()
     process.stdout.write(t)
-    if (t.includes('started server on')) ready = true
+    if (t.includes('started server on') || t.includes('Local:')) ready = true
   })
   server.stderr.on('data', (d) => process.stderr.write(d.toString()))
 
-  // Ждём готовность максимум 30с
-  for (let i = 0; i < 30 && !ready; i++) {
+  // Ждём готовность максимум 45с и пингуем /api/health
+  for (let i = 0; i < 45 && !ready; i++) {
     await wait(1000)
+    try {
+      const res = await fetch('http://localhost:3000/api/health')
+      if (res.ok) { ready = true; break }
+    } catch (_) { /* ignore */ }
   }
   if (!ready) {
     console.error('❌ Server did not become ready in time')

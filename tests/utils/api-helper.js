@@ -106,10 +106,19 @@ class ApiHelper {
 
   // Проверка доступности сервера
   async isServerRunning() {
+    // Пытаемся детектировать живой сервер по статике, чтобы не зависеть от БД
     try {
-      const response = await this.get('/api/db-status')
-      return response.ok
-    } catch (error) {
+      let response = await this.get('/')
+      if (response && response.ok) return true
+
+      // fallback: health (может вернуть 503 при проблемах с БД)
+      response = await this.get('/api/health')
+      if (response && (response.ok || response.status === 503)) return true
+
+      // fallback: db-status
+      response = await this.get('/api/db-status')
+      return !!response && response.ok
+    } catch (_) {
       return false
     }
   }
