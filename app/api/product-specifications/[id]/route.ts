@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
 import { getPool } from '@/lib/db-connection'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/product-specifications/[id] - Get specifications for a specific product
 export async function GET(
   request: NextRequest,
@@ -40,7 +42,15 @@ export async function GET(
       success: true,
       data: result.rows
     })
-  } catch (error) {
+  } catch (error: any) {
+    const code = error?.code || error?.original?.code
+    if (code === '42P01') {
+      // Таблица отсутствует — считаем как нет данных
+      return NextResponse.json(
+        { success: false, error: "Product specifications table not found" },
+        { status: 404 }
+      )
+    }
     console.error("Error fetching product specifications:", error)
     return NextResponse.json(
       {
