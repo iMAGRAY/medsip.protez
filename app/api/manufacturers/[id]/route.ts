@@ -38,10 +38,18 @@ export async function GET(
     }
 
     const query = `
-      SELECT *
-      FROM manufacturers
-      WHERE id = $1
-    `;
+      SELECT 
+        m.id, m.name, m.description, m.website_url, m.country, m.founded_year, m.logo_url, m.is_active, m.sort_order,
+        m.created_at, m.updated_at,
+        COUNT(DISTINCT ms.id) as model_lines_count,
+        COUNT(DISTINCT p.id) as products_count,
+        COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
+      FROM manufacturers m
+      LEFT JOIN model_series ms ON m.id = ms.manufacturer_id
+      LEFT JOIN products p ON p.manufacturer_id = m.id
+      WHERE m.id = $1
+      GROUP BY m.id
+    `
 
     const result = await executeQuery(query, [manufacturerId]);
 

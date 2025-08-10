@@ -77,7 +77,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
           SELECT
             c.id as category_id,
             COUNT(DISTINCT p.id) as products_count,
-            COUNT(DISTINCT CASE WHEN p.is_active = true THEN p.id END) as active_products_count
+            COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
           FROM product_categories c
           LEFT JOIN products p ON c.id = p.category_id
           WHERE c.id = ANY($1)

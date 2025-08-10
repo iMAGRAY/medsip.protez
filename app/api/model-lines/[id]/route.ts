@@ -82,7 +82,7 @@ export async function GET(
           p.id,
           p.name,
           p.description,
-          p.is_active,
+          (p.is_deleted = false OR p.is_deleted IS NULL) as is_active,
           p.created_at
         FROM products p
         WHERE p.series_id = $1
