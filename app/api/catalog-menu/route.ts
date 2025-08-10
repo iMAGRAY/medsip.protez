@@ -1,31 +1,26 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 export async function GET() {
 
   const startTime = Date.now()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
 
-    // Проверим доступность ключевых таблиц, чтобы избежать 500 из-за отсутствия
-    const tables = [
+    // Проверим доступность ключевых таблиц
+    const tmap = await tablesExist([
       'catalog_menu_settings',
       'product_categories',
       'characteristics_groups_simple',
       'manufacturers',
       'model_series'
-    ]
-    const checks = await Promise.all(tables.map(t => executeQuery(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables
-        WHERE table_schema='public' AND table_name=$1
-      ) AS exist
-    `, [t])))
-    const existsMap: Record<string, boolean> = {}
-    tables.forEach((t, i) => { existsMap[t] = !!checks[i].rows?.[0]?.exist })
+    ])
 
     // Если нет базовых таблиц меню — возвращаем 503 с сообщением
-    if (!existsMap.catalog_menu_settings) {
+    if (!tmap.catalog_menu_settings) {
       return NextResponse.json({ success: false, error: 'catalog_menu_settings not initialized' }, { status: 503 })
     }
 
@@ -51,13 +46,13 @@ export async function GET() {
           cms.updated_at,
           CASE
             WHEN cms.entity_type = 'category' THEN
-              COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)
+              ${tmap.product_categories ? `COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)` : '0'}
             WHEN cms.entity_type = 'spec_group' THEN
-              COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)
+              ${tmap.characteristics_groups_simple ? `COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)` : '0'}
             WHEN cms.entity_type = 'manufacturer' THEN
-              COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = cms.entity_id::integer), 0)
+              ${tmap.model_series ? `COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = cms.entity_id::integer), 0)` : '0'}
             WHEN cms.entity_type = 'manufacturers_category' THEN
-              COALESCE((SELECT COUNT(*) FROM manufacturers), 0)
+              ${tmap.manufacturers ? `COALESCE((SELECT COUNT(*) FROM manufacturers), 0)` : '0'}
             ELSE 0
           END as children_count
         FROM catalog_menu_settings cms
@@ -108,9 +103,9 @@ export async function GET() {
             null as custom_url,
             cg.created_at,
             cg.updated_at,
-            COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cg.id AND is_active = true), 0) as children_count
-          FROM ${existsMap.characteristics_groups_simple ? 'characteristics_groups_simple' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} cg
-          WHERE ${existsMap.characteristics_groups_simple ? 'cg.is_active = true AND cg.parent_id IS NULL' : '1=0'}
+            ${tmap.characteristics_groups_simple ? `COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cg.id AND is_active = true), 0)` : '0'} as children_count
+          FROM ${tmap.characteristics_groups_simple ? 'characteristics_groups_simple' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} cg
+          WHERE ${tmap.characteristics_groups_simple ? 'cg.is_active = true AND cg.parent_id IS NULL' : '1=0'}
 
           UNION ALL
 
@@ -130,9 +125,9 @@ export async function GET() {
             null as custom_url,
             c.created_at,
             c.updated_at,
-            COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = c.id AND is_active = true), 0) as children_count
-          FROM ${existsMap.product_categories ? 'product_categories' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} c
-          WHERE ${existsMap.product_categories ? 'c.is_active = true AND c.parent_id IS NULL' : '1=0'}
+            ${tmap.product_categories ? `COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = c.id AND is_active = true), 0)` : '0'} as children_count
+          FROM ${tmap.product_categories ? 'product_categories' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} c
+          WHERE ${tmap.product_categories ? 'c.is_active = true AND c.parent_id IS NULL' : '1=0'}
 
           UNION ALL
 
@@ -152,8 +147,8 @@ export async function GET() {
             null as custom_url,
             m.created_at,
             m.updated_at,
-            COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = m.id), 0) as children_count
-          FROM ${existsMap.manufacturers ? 'manufacturers' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} m
+            ${tmap.model_series ? `COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = m.id), 0)` : '0'} as children_count
+          FROM ${tmap.manufacturers ? 'manufacturers' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} m
         ) combined
         ORDER BY sort_order, name
       `;
