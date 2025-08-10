@@ -1,86 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url)
     const groupId = searchParams.get('group_id')
-    const parentId = searchParams.get('parent_id')
-    const hierarchy = searchParams.get('hierarchy') === 'true'
 
-    if (hierarchy) {
-      // Get hierarchical structure
-      const query = `
-        WITH RECURSIVE enum_hierarchy AS (
-          -- Base case: root level enums (parent_id IS NULL)
-          SELECT
-            id, name, value, description, group_id, parent_id,
-            sort_order, is_active, created_at, updated_at,
-            0 as level,
-            ARRAY[sort_order, id] as path
-          FROM characteristic_values
-          WHERE parent_id IS NULL AND is_active = true
-          ${groupId ? 'AND group_id = $1' : ''}
-
-          UNION ALL
-
-          -- Recursive case: child enums
-          SELECT
-            e.id, e.name, e.value, e.description, e.group_id, e.parent_id,
-            e.sort_order, e.is_active, e.created_at, e.updated_at,
-            eh.level + 1,
-            eh.path || ARRAY[e.sort_order, e.id]
-          FROM characteristic_values e
-          INNER JOIN enum_hierarchy eh ON e.parent_id = eh.id
-          WHERE e.is_active = true
-        )
-        SELECT * FROM enum_hierarchy
-        ORDER BY path
-      `
-
-      const params = groupId ? [groupId] : []
-      const result = await getPool().query(query, params)
-
-      return NextResponse.json({
-        success: true,
-        data: result.rows
-      })
-    } else {
-      // Flat query
-      let query = `
-        SELECT
-          cv.*,
-          cg.name as group_name,
-          parent.name as parent_name
-        FROM characteristic_values cv
-        LEFT JOIN characteristic_groups cg ON cv.group_id = cg.id
-        LEFT JOIN characteristic_values parent ON cv.parent_id = parent.id
-        WHERE cv.is_active = true
-      `
-
-      const params = []
-      let paramIndex = 1
-
-      if (groupId) {
-        query += ` AND cv.group_id = $${paramIndex}`
-        params.push(groupId)
-        paramIndex++
-      }
-
-      if (parentId) {
-        query += ` AND cv.parent_id = $${paramIndex}`
-        params.push(parentId)
-      }
-
-      query += ` ORDER BY cv.sort_order, cv.name`
-
-      const result = await getPool().query(query, params)
-
-      return NextResponse.json({
-        success: true,
-        data: result.rows
-      })
+    const need = await tablesExist(['characteristics_values_simple','characteristics_groups_simple'])
+    if (!need.characteristics_values_simple || !need.characteristics_groups_simple) {
+      return NextResponse.json({ success: true, data: [] })
     }
+
+    const pool = getPool()
+
+    let query = `
+      SELECT
+        cv.id,
+        cv.group_id,
+        cv.value,
+        cv.description,
+        cv.color_hex,
+        cv.sort_order,
+        cv.is_active,
+        cg.name as group_name
+      FROM characteristics_values_simple cv
+      LEFT JOIN characteristics_groups_simple cg ON cv.group_id = cg.id
+      WHERE cv.is_active = true
+    `
+    const params: any[] = []
+
+    if (groupId) {
+      query += ` AND cv.group_id = $1`
+      params.push(parseInt(groupId))
+    }
+
+    query += ` ORDER BY cv.sort_order, cv.value`
+
+    const result = await pool.query(query, params)
+    return NextResponse.json({ success: true, data: result.rows })
   } catch (error) {
     console.error('Error fetching spec enums:', error)
     return NextResponse.json(

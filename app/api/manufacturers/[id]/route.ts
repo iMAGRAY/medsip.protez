@@ -79,7 +79,7 @@ export async function GET(
         SELECT
           COUNT(DISTINCT ms.id) as model_lines_count,
           COUNT(DISTINCT p.id) as products_count,
-          COUNT(DISTINCT CASE WHEN p.is_active = true THEN p.id END) as active_products_count
+          COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
         FROM manufacturers m
         LEFT JOIN model_series ms ON m.id = ms.manufacturer_id
         LEFT JOIN products p ON ms.id = p.series_id
@@ -110,12 +110,12 @@ export async function GET(
   } catch (error) {
     console.error('❌ Manufacturer API Error:', error);
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: (error as any).message,
+      stack: (error as any).stack,
+      name: (error as any).name
     });
     return NextResponse.json(
-      { error: 'Failed to fetch manufacturer', success: false, details: error.message },
+      { error: 'Failed to fetch manufacturer', success: false, details: (error as any).message },
       { status: 500 }
     );
   }

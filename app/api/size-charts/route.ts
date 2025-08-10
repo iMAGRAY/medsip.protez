@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
 import { getPool } from '@/lib/db-connection'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export async function GET(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
+    const need = await tablesExist(['size_charts','size_chart_values'])
+    if (!need.size_charts) {
+      return NextResponse.json({ success: true, data: [] })
+    }
+
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const manufacturer = searchParams.get('manufacturer')
 
-    // Base query to get size charts
     let query = `
       SELECT DISTINCT
         sc.id,
         sc.name,
-        sc.category,
-        sc.manufacturer,
+        sc.category_id,
+        sc.manufacturer_id,
         sc.description,
         sc.chart_type,
         sc.created_at,
@@ -23,49 +31,43 @@ export async function GET(request: NextRequest) {
       WHERE sc.is_active = true
     `
 
-    const queryParams = []
+    const queryParams: any[] = []
     let paramIndex = 1
 
     if (category) {
-      query += ` AND sc.category = $${paramIndex}`
-      queryParams.push(category)
-      paramIndex++
+      query += ` AND sc.category_id = $${paramIndex++}`
+      queryParams.push(parseInt(category))
     }
 
     if (manufacturer) {
-      query += ` AND sc.manufacturer = $${paramIndex}`
-      queryParams.push(manufacturer)
-      paramIndex++
+      query += ` AND sc.manufacturer_id = $${paramIndex++}`
+      queryParams.push(parseInt(manufacturer))
     }
 
-    query += ` ORDER BY sc.manufacturer, sc.category, sc.name`
+    query += ` ORDER BY sc.manufacturer_id, sc.category_id, sc.name`
 
     const result = await executeQuery(query, queryParams)
-    const chartIds = result.rows.map(chart => chart.id)
+    const chartIds = result.rows.map((chart: any) => chart.id)
 
-    // Get size values for each chart
-    if (chartIds.length > 0) {
+    if (chartIds.length > 0 && need.size_chart_values) {
       const valuesQuery = `
         SELECT
           sv.*
         FROM size_chart_values sv
-        WHERE sv.chart_id = ANY($1)
-        ORDER BY sv.chart_id, sv.sort_order, sv.size_value
+        WHERE sv.size_chart_id = ANY($1)
+        ORDER BY sv.size_chart_id, sv.sort_order, sv.size_value
       `
 
       const valuesResult = await executeQuery(valuesQuery, [chartIds])
 
-      // Group values by chart_id
-      const valuesByChart = valuesResult.rows.reduce((acc, value) => {
-        if (!acc[value.chart_id]) {
-          acc[value.chart_id] = []
-        }
-        acc[value.chart_id].push(value)
+      const valuesByChart = valuesResult.rows.reduce((acc: any, value: any) => {
+        const key = value.size_chart_id
+        if (!acc[key]) acc[key] = []
+        acc[key].push(value)
         return acc
       }, {})
 
-      // Attach values to charts
-      result.rows.forEach(chart => {
+      result.rows.forEach((chart: any) => {
         chart.values = valuesByChart[chart.id] || []
       })
     }

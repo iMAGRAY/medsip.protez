@@ -27,15 +27,22 @@ export async function GET(
 
     const pool = getPool();
 
+    const selectUnit = need.characteristic_units ? `,
+        cu.code as unit_code,
+        cu.name_ru as unit_name
+      ` : ''
+    const joinUnit = need.characteristic_units ? `
+      LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
+    ` : ''
+
     const templateResult = await pool.query(`
       SELECT
         ct.*,
-        cg.name as group_name,
-        cu.code as unit_code,
-        cu.name_ru as unit_name
+        cg.name as group_name
+        ${selectUnit}
       FROM characteristic_templates ct
       JOIN characteristic_groups cg ON cg.id = ct.group_id
-      LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
+      ${joinUnit}
       WHERE ct.id = $1;
     `, [templateId]);
 

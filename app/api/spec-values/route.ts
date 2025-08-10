@@ -8,48 +8,25 @@ try {
     const client = await pool.connect()
     const { searchParams } = new URL(request.url)
     const productId = searchParams.get('product_id')
-    const variantId = searchParams.get('variant_id')
     const groupId = searchParams.get('group_id')
-    const templateId = searchParams.get('template_id')
 
-    // Основной запрос к новой EAV системе
     let query = `
       SELECT
         pc.product_id,
-        pc.template_id,
-        pc.value_text as raw_value,
-        pc.value_numeric as numeric_value,
-        CASE WHEN pc.value_text = 'true' THEN true ELSE false END as bool_value,
-        pc.value_text as date_value,
-        pc.value_text as file_url,
-        pc.value_preset_id as enum_value_id,
-        pc.created_at,
-        pc.updated_at,
-        -- Информация о шаблоне
-        ct.key as template_key,
-        ct.name as template_name,
-        ct.input_type,
-        ct.validation_rules,
-        ct.default_value,
-        ct.placeholder_text,
-        ct.sort_order as template_sort_order,
-        -- Информация о группе
-        cg.id as group_id,
-        cg.name as group_name,
-        cg.ordering as group_ordering,
-        cg.show_in_main_params,
-        cg.main_params_priority,
-        -- Единица измерения
-        cu.code as unit_code,
-        cu.name_ru as unit_name,
-        -- Enum значения
+        pc.value_id as enum_value_id,
+        pc.additional_value as raw_value,
+        pc.numeric_value as numeric_value,
+        pc.is_primary,
+        pc.display_order,
         cv.value as enum_value,
-        cv.display_name as enum_display_name,
+        cv.description as enum_display_name,
         cv.color_hex as enum_color,
         cv.sort_order as enum_sort_order,
-        -- Информация о продукте
-        null as variant_sku,
-        pc.product_id as product_id,
+        cg.id as group_id,
+        cg.name as group_name,
+        cg.sort_order as group_ordering,
+        cg.show_in_main_params,
+        cg.main_params_priority,
         p.name as product_name
       FROM product_characteristics_simple pc
       JOIN characteristics_values_simple cv ON cv.id = pc.value_id
@@ -58,32 +35,19 @@ try {
       WHERE cg.is_active = true
     `
 
-    const params = []
+    const params: any[] = []
     let paramIndex = 1
 
-    // Фильтрация по продукту
     if (productId) {
       query += ` AND pc.product_id = $${paramIndex}`
       params.push(productId)
       paramIndex++
     }
 
-    // Фильтрация по конкретному варианту (пропускаем, так как работаем с продуктами)
-    if (variantId) {
-      // В новой структуре нет вариантов, пропускаем
-
-    }
-
-    // Фильтрация по группе характеристик
     if (groupId) {
       query += ` AND cg.id = $${paramIndex}`
       params.push(groupId)
       paramIndex++
-    }
-
-    // Фильтрация по шаблону (в новой структуре нет шаблонов)
-    if (templateId) {
-
     }
 
     query += ` ORDER BY cg.sort_order ASC, cv.sort_order ASC, pc.value_id ASC`
@@ -91,122 +55,67 @@ try {
     const result = await client.query(query, params)
     client.release()
 
-    // Обогащаем данные обработанными значениями
     const enrichedData = result.rows.map((row: any) => {
-      // Определяем отображаемое значение
-      let displayValue = '';
-      let formattedValue: any = null;
+      let displayValue = ''
+      let formattedValue: any = null
 
-      switch (row.input_type) {
-        case 'enum':
-          displayValue = row.enum_display_name || row.enum_value || 'Не указано';
-          formattedValue = {
-            type: 'enum',
-            enum_value_id: row.enum_value_id,
-            value: row.enum_value,
-            display: row.enum_display_name,
-            color: row.enum_color
-          };
-          break;
-        case 'boolean':
-          displayValue = row.bool_value ? 'Да' : 'Нет';
-          formattedValue = {
-            type: 'boolean',
-            value: row.bool_value
-          };
-          break;
-        case 'number':
-          displayValue = row.numeric_value ?
-            `${row.numeric_value}${row.unit_code ? ' ' + row.unit_code : ''}` :
-            'Не указано';
-          formattedValue = {
-            type: 'number',
-            value: row.numeric_value,
-            unit: row.unit_code,
-            unit_name: row.unit_name
-          };
-          break;
-        case 'date':
-          displayValue = row.date_value ?
-            new Date(row.date_value).toLocaleDateString() :
-            'Не указано';
-          formattedValue = {
-            type: 'date',
-            value: row.date_value
-          };
-          break;
-        case 'file':
-          displayValue = row.file_url ? 'Файл прикреплен' : 'Файл не прикреплен';
-          formattedValue = {
-            type: 'file',
-            url: row.file_url
-          };
-          break;
-        default: // text и другие типы
-          displayValue = row.raw_value || 'Не указано';
-          formattedValue = {
-            type: 'text',
-            value: row.raw_value
-          };
+      if (row.enum_value) {
+        displayValue = row.enum_display_name || row.enum_value
+        formattedValue = {
+          type: 'enum',
+          enum_value_id: row.enum_value_id,
+          value: row.enum_value,
+          display: row.enum_display_name,
+          color: row.enum_color
+        }
+      } else if (row.numeric_value !== null && row.numeric_value !== undefined) {
+        displayValue = `${row.numeric_value}`
+        formattedValue = { type: 'number', value: row.numeric_value }
+      } else if (row.raw_value === 'true' || row.raw_value === 'false') {
+        const boolVal = row.raw_value === 'true'
+        displayValue = boolVal ? 'Да' : 'Нет'
+        formattedValue = { type: 'boolean', value: boolVal }
+      } else {
+        displayValue = row.raw_value || 'Не указано'
+        formattedValue = { type: 'text', value: row.raw_value }
       }
 
       return {
-        // Основные поля
-        variant_id: row.variant_id,
-        template_id: row.template_id,
+        template_id: null,
         group_id: row.group_id,
-
-        // Информация о шаблоне
-        template_key: row.template_key,
-        template_name: row.template_name,
-        input_type: row.input_type,
-        template_sort_order: row.template_sort_order,
-
-        // Информация о группе
+        template_key: null,
+        template_name: null,
+        input_type: formattedValue?.type || 'text',
+        template_sort_order: null,
         group_name: row.group_name,
         group_ordering: row.group_ordering,
         show_in_main_params: row.show_in_main_params,
         main_params_priority: row.main_params_priority,
-
-        // Единицы измерения
-        unit_code: row.unit_code,
-        unit_name: row.unit_name,
-
-        // Обработанные значения
+        unit_code: null,
+        unit_name: null,
         display_value: displayValue,
         formatted_value: formattedValue,
-
-        // Сырые значения для совместимости
         raw_value: row.raw_value,
         numeric_value: row.numeric_value,
-        bool_value: row.bool_value,
-        date_value: row.date_value,
-        file_url: row.file_url,
         enum_value_id: row.enum_value_id,
-
-        // Информация о продукте и варианте
         product_id: row.product_id,
         product_name: row.product_name,
-        variant_name: row.variant_sku || `Вариант ${row.variant_id}`,
-        variant_sku: row.variant_sku,
-
-        // Метаданные
+        variant_name: null,
+        variant_sku: null,
         created_at: row.created_at,
         updated_at: row.updated_at,
-        source: 'eav_system'
-      };
-    });
+        source: 'simple'
+      }
+    })
 
     return NextResponse.json({
       success: true,
       data: enrichedData,
       total: enrichedData.length,
-      system: 'eav_unified',
+      system: 'eav_simple',
       filters_applied: {
         product_id: productId,
-        variant_id: variantId,
-        group_id: groupId,
-        template_id: templateId
+        group_id: groupId
       }
     })
   } catch (error) {

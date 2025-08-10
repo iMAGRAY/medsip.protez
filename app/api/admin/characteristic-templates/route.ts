@@ -18,6 +18,14 @@ export async function GET(request: NextRequest) {
 
     const pool = getPool();
 
+    const selectUnit = need.characteristic_units ? `,
+        cu.code as unit_code,
+        cu.name_ru as unit_name
+      ` : ''
+    const joinUnit = need.characteristic_units ? `
+      LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
+    ` : ''
+
     let query = `
       SELECT
         ct.id,
@@ -34,13 +42,12 @@ export async function GET(request: NextRequest) {
         ct.is_template,
         ct.created_at,
         ct.updated_at,
-        cg.name as group_name,
-        cu.code as unit_code,
-        cu.name_ru as unit_name,
+        cg.name as group_name
+        ${selectUnit},
         (SELECT COUNT(*) FROM characteristic_preset_values cpv WHERE cpv.template_id = ct.id) as preset_values_count
       FROM characteristic_templates ct
       JOIN characteristic_groups cg ON cg.id = ct.group_id
-      LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
+      ${joinUnit}
     `;
 
     const params: any[] = [];
