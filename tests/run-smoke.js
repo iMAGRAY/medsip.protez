@@ -48,6 +48,9 @@ async function main() {
   env.DB_CONN_TIMEOUT_MS = env.DB_CONN_TIMEOUT_MS || '5000'
   env.DB_QUERY_TIMEOUT_MS = env.DB_QUERY_TIMEOUT_MS || '8000'
   env.DB_STATEMENT_TIMEOUT_MS = env.DB_STATEMENT_TIMEOUT_MS || env.DB_QUERY_TIMEOUT_MS
+  env.TEST_HTTP_TIMEOUT_MS = env.TEST_HTTP_TIMEOUT_MS || '12000'
+  env.SMOKE_CONCURRENCY = env.SMOKE_CONCURRENCY || '4'
+  env.SMOKE_GLOBAL_TIMEOUT_MS = env.SMOKE_GLOBAL_TIMEOUT_MS || '240000'
 
   const buildCode = await runCmd(process.execPath, [path.join('node_modules','next','dist','bin','next'),'build'], env)
   if (buildCode !== 0) process.exit(buildCode)
@@ -61,19 +64,32 @@ async function main() {
   })
   server.stderr.on('data', d => process.stderr.write(d.toString()))
 
+  const killer = () => {
+    try { server.kill('SIGTERM') } catch(_) {}
+    setTimeout(() => { try { server.kill('SIGKILL') } catch(_) {} }, 1500)
+  }
+
+  const globalTimeoutMs = parseInt(env.SMOKE_GLOBAL_TIMEOUT_MS, 10)
+  const guard = setTimeout(() => {
+    console.error(`⏱️ Smoke global timeout ${globalTimeoutMs}ms reached; terminating...`)
+    killer()
+    process.exit(124)
+  }, globalTimeoutMs)
+
   for (let i=0;i<60 && !ready;i++) {
     await wait(1000)
     if (await isUp(baseUrl)) { ready = true; break }
   }
   if (!ready) {
-    try { server.kill('SIGTERM') } catch(_) {}
+    killer()
     console.error('❌ Server did not start for smoke on', baseUrl)
     process.exit(1)
   }
 
   const code = await runCmd(process.execPath, [path.join('tests','api','smoke-all-routes.test.js')], env)
 
-  try { server.kill('SIGTERM') } catch(_) {}
+  clearTimeout(guard)
+  killer()
   process.exit(code)
 }
 

@@ -2,7 +2,8 @@
 const { discoverRoutes } = require('../utils/discover-api-routes')
 const ApiHelper = require('../utils/api-helper')
 
-const CONCURRENCY = parseInt(process.env.SMOKE_CONCURRENCY || '6', 10)
+const CONCURRENCY = parseInt(process.env.SMOKE_CONCURRENCY || '4', 10)
+const GLOBAL_TIMEOUT_MS = parseInt(process.env.SMOKE_GLOBAL_TIMEOUT_MS || '240000', 10)
 
 async function runWithPool(items, worker, concurrency) {
   const results = []
@@ -31,12 +32,17 @@ async function main() {
     process.exit(1)
   }
 
+  const killer = setTimeout(() => {
+    console.error(`⏱️ Smoke script timeout ${GLOBAL_TIMEOUT_MS}ms reached`)
+    try { process.exit(124) } catch(_) {}
+  }, GLOBAL_TIMEOUT_MS)
+
   const routes = discoverRoutes(require('path').join(process.cwd(), 'app', 'api'))
   const stats = { total: 0, ok: 0, fail: 0, errors: [] }
 
   const worker = async (route) => {
-    // Пропуск сложных модифицирующих
-    if (/upload|delete|cleanup|admin\/auth|seed|reset|sync|init/i.test(route)) return null
+    // Пропуск сложных/модифицирующих/долгоиграющих
+    if (/\/(upload|delete|cleanup|admin\/auth|seed|reset|sync|init|register|db-reset|cache\/clear)\b/i.test(route)) return null
     const url = route
     try {
       const start = Date.now()
@@ -60,6 +66,7 @@ async function main() {
 
   await runWithPool(routes, worker, CONCURRENCY)
 
+  clearTimeout(killer)
   console.log('\nSmoke summary:', stats)
   process.exit(stats.fail > 0 ? 1 : 0)
 }
