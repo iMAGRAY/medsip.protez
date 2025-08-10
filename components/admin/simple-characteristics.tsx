@@ -60,11 +60,6 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
   const [characteristicSections, setCharacteristicSections] = useState<CharacteristicSection[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Загрузка характеристик с API
-  useEffect(() => {
-    loadCharacteristics()
-  }, [loadCharacteristics])
-
   const loadCharacteristics = useCallback(async () => {
       try {
         setLoading(true)
@@ -127,6 +122,11 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
         setLoading(false)
       }
     }, [productId])
+
+  // Загрузка характеристик с API
+  useEffect(() => {
+    loadCharacteristics()
+  }, [loadCharacteristics])
 
   // Переключение выбора характеристики
   const toggleCharacteristic = (value: CharacteristicValue, _groupName: string) => {

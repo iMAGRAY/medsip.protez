@@ -294,7 +294,7 @@ export function SelectionTablesEditor({
   const updateTableTitle = (type: string, _title: string) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], title } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], title: _title } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes
@@ -303,7 +303,7 @@ export function SelectionTablesEditor({
   const _updateTableHeaders = (type: string, _headers: string[]) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], headers } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], headers: _headers } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes
@@ -312,7 +312,7 @@ export function SelectionTablesEditor({
   const _updateTableRows = (type: string, _rows: string[][]) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], rows } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], rows: _rows } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes

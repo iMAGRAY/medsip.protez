@@ -83,13 +83,6 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     sort_order: 0
   })
 
-  useEffect(() => {
-    fetchAllTags()
-    if (variantId) {
-      fetchVariantTags()
-    }
-  }, [fetchAllTags])
-
   const fetchAllTags = useCallback(async () => {
       try {
         // Получаем общие теги + личные теги этого варианта
@@ -110,6 +103,13 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
         toast.error('Ошибка загрузки тегов')
       }
     }, [variantId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (variantId) {
+      fetchVariantTags()
+    }
+  }, [fetchAllTags])
 
   const fetchVariantTags = async () => {
     try {
@@ -253,7 +253,7 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
         credentials: 'include',
         body: JSON.stringify({
           ...newTagData,
-          slug,
+          slug: _slug,
           is_active: true,
           variant_id: parseInt(variantId.toString()) // Создаем личный тег для этого варианта
         }),
