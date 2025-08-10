@@ -75,10 +75,6 @@ export function WarehouseSection() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('near')
 
-  useEffect(() => {
-    fetchWarehouseData()
-  }, [fetchWarehouseData])
-
   const fetchWarehouseData = useCallback(async () => {
       try {
         setLoading(true)
@@ -115,6 +111,10 @@ export function WarehouseSection() {
         setLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    fetchWarehouseData()
+  }, [fetchWarehouseData])
 
   const getUtilizationColor = (percentage: number) => {
     if (percentage < 70) return 'text-green-600'
