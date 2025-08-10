@@ -343,8 +343,8 @@ export function useProductForm(product?: any): ProductFormHookReturn {
   }), [setFormData, setValidationErrors, resetForm, validateForm])
 
   return {
-    state,
-    actions,
+    state: _state,
+    actions: _actions,
     data: {
       categories,
       manufacturers,
@@ -355,12 +355,12 @@ export function useProductForm(product?: any): ProductFormHookReturn {
     operations: {
       loadProduct,
       saveProduct,
-      handleSubmit,
-      handleImagesChange,
-      handleCharacteristicsChange,
-      handleConfigurableCharacteristicsChange,
-      handleNewProductSelectionTablesChange,
-      handleExistingProductSelectionTablesChange
+      handleSubmit: _handleSubmit,
+      handleImagesChange: _handleImagesChange,
+      handleCharacteristicsChange: _handleCharacteristicsChange,
+      handleConfigurableCharacteristicsChange: _handleConfigurableCharacteristicsChange,
+      handleNewProductSelectionTablesChange: _handleNewProductSelectionTablesChange,
+      handleExistingProductSelectionTablesChange: _handleExistingProductSelectionTablesChange
     },
     utils: {
       getCategoryById,
