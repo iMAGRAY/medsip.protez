@@ -44,6 +44,19 @@ export function WarehouseStockManager({
   const [saving, setSaving] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
 
+  const fetchWarehouses = useCallback(async () => {
+      try {
+        const response = await fetch('/api/warehouses')
+        if (response.ok) {
+          const data = await response.json()
+          setWarehouses(data)
+        }
+      } catch (error) {
+        console.error('Error fetching warehouses:', error)
+        toast.error('Ошибка загрузки складов')
+      }
+    }, [])
+
   // Загрузка списка складов
   useEffect(() => {
     fetchWarehouses()
@@ -65,19 +78,6 @@ export function WarehouseStockManager({
       })))
     }
   }, [productId, warehouses])
-
-  const fetchWarehouses = useCallback(async () => {
-      try {
-        const response = await fetch('/api/warehouses')
-        if (response.ok) {
-          const data = await response.json()
-          setWarehouses(data)
-        }
-      } catch (error) {
-        console.error('Error fetching warehouses:', error)
-        toast.error('Ошибка загрузки складов')
-      }
-    }, [])
 
   const fetchWarehouseStocks = async () => {
     if (!productId) return
