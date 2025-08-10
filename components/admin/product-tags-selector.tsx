@@ -88,13 +88,6 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
     sort_order: 0
   })
 
-  useEffect(() => {
-    fetchAllTags()
-    if (productId) {
-      fetchProductTags()
-    }
-  }, [fetchAllTags])
-
   const fetchAllTags = useCallback(async () => {
       try {
         // Получаем общие теги + личные теги этого товара
@@ -115,6 +108,13 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
         toast.error('Ошибка загрузки тегов')
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (productId) {
+      fetchProductTags()
+    }
+  }, [fetchAllTags])
 
   const fetchProductTags = async () => {
     try {

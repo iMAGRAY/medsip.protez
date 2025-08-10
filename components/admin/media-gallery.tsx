@@ -167,15 +167,15 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
 
   // Обработчики изменения настроек
   const handleViewModeChange = useCallback((_viewMode: ViewMode) => {
-    saveUserSettings({ viewMode })
+    saveUserSettings({ viewMode: _viewMode })
   }, [userSettings])
 
   const handleSortModeChange = useCallback((_sortMode: SortMode) => {
-    saveUserSettings({ sortMode })
+    saveUserSettings({ sortMode: _sortMode })
   }, [userSettings])
 
   const handleFilterModeChange = useCallback((_filterMode: FilterMode) => {
-    saveUserSettings({ filterMode })
+    saveUserSettings({ filterMode: _filterMode })
   }, [userSettings])
 
   // Загрузка дополнительных файлов (теперь через оптимизированный хук)

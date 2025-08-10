@@ -367,7 +367,7 @@ export function ProductSpecificationsManager({
       const response = await fetch(`/api/spec-groups`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id: _id })
       })
 
       if (response.ok) {

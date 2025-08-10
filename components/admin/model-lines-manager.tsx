@@ -73,16 +73,6 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
     is_active: true
   });
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    if (manufacturerId) {
-      loadModelLinesForManufacturer();
-    }
-  }, [manufacturerId]);
-
   const loadData = useCallback(async () => {
       try {
         setLoading(true);
@@ -106,6 +96,16 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
         setLoading(false);
       }
     }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    if (manufacturerId) {
+      loadModelLinesForManufacturer();
+    }
+  }, [manufacturerId]);
 
   const loadModelLinesForManufacturer = async () => {
     if (!manufacturerId) return;

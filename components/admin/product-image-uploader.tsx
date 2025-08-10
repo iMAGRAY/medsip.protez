@@ -109,7 +109,7 @@ export function ProductImageUploader({
 
   const handleDuplicateChoice = (_file: File, _existingFile: DuplicateFileInfo): Promise<'use-existing' | 'upload-new' | 'cancel'> => {
     return new Promise((_resolve) => {
-      setCurrentDuplicate({ file, existingFile, resolve })
+      setCurrentDuplicate({ file: _file, existingFile: _existingFile, resolve: _resolve })
       setDuplicateDialogOpen(true)
     })
   }
