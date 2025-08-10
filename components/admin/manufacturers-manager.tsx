@@ -56,10 +56,6 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
     logo_url: ''
   });
 
-  useEffect(() => {
-    loadManufacturers();
-  }, [loadManufacturers]);
-
   const loadManufacturers = useCallback(async () => {
       try {
         setLoading(true);
@@ -76,6 +72,10 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
         setLoading(false);
       }
     }, []);
+
+  useEffect(() => {
+    loadManufacturers();
+  }, [loadManufacturers]);
 
   const resetManufacturerForm = () => {
     setManufacturerForm({
