@@ -113,9 +113,9 @@ export const WarehouseAnalyticsDashboard: React.FC<WarehouseAnalyticsDashboardPr
       totalCapacity,
       totalUsed,
       utilizationRate: totalCapacity > 0 ? (totalUsed / totalCapacity) * 100 : 0,
-      avgEfficiency,
-      criticalAlerts,
-      warningAlerts,
+      avgEfficiency: _avgEfficiency,
+      criticalAlerts: _criticalAlerts,
+      warningAlerts: _warningAlerts,
       activeWarehouses: filteredWarehouses.filter(w => w.status === 'active').length,
       maintenanceWarehouses: filteredWarehouses.filter(w => w.status === 'maintenance').length
     }
