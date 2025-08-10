@@ -4,8 +4,13 @@ import { executeQuery } from "@/lib/db-connection"
 export async function GET() {
 
   try {
+    const isDbConfigured = !!process.env.DATABASE_URL || (
+      !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+    )
+    if (!isDbConfigured) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
 
-    // Запрос для получения иерархической структуры: разделы -> группы -> характеристики
     const query = `
       WITH sections AS (
         SELECT

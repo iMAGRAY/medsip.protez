@@ -159,7 +159,7 @@ export async function GET() {
       `;
 
       const fallbackResult = await executeQuery(fallbackQuery)
-      const fallbackHierarchy = buildHierarchy(fallbackResult.rows.map(row => ({
+      const fallbackHierarchy = buildHierarchy(fallbackResult.rows.map((row: any) => ({
         id: row.id,
         entity_type: row.entity_type,
         entity_id: row.entity_id,
@@ -185,7 +185,26 @@ export async function GET() {
       })
     }
 
-    const menuItems = result.rows.map(row => ({
+    type Row = {
+      id: string | number
+      entity_type: string
+      entity_id: string | number
+      name: string
+      description: string | null
+      parent_id: number | null
+      sort_order: number
+      is_visible: boolean
+      is_expanded: boolean
+      show_in_main_menu: boolean
+      icon: string | null
+      css_class: string | null
+      custom_url: string | null
+      created_at: any
+      updated_at: any
+      children_count: number | null
+    }
+
+    const menuItems = (result.rows as Row[]).map((row: Row) => ({
       id: row.id,
       entity_type: row.entity_type,
       entity_id: row.entity_id,
@@ -281,7 +300,7 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error("Error creating menu item:", error)
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // unique violation
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') { // unique violation
       return NextResponse.json(
         { success: false, error: 'Элемент меню для этой сущности уже существует' },
         { status: 409 }
@@ -391,7 +410,6 @@ export async function DELETE(request: Request) {
   }
 }
 
-// Функция для построения иерархии
 function buildHierarchy(items: any[], parentId: number | null = null): any[] {
   return items
     .filter(item => item.parent_id === parentId)
@@ -400,7 +418,6 @@ function buildHierarchy(items: any[], parentId: number | null = null): any[] {
       children: buildHierarchy(items, item.id)
     }))
     .sort((a, b) => {
-      // Сортируем сначала по sort_order, затем по имени
       if (a.sort_order !== b.sort_order) {
         return a.sort_order - b.sort_order
       }
@@ -408,11 +425,6 @@ function buildHierarchy(items: any[], parentId: number | null = null): any[] {
     })
 }
 
-// Функция для автоматического добавления всех производителей в категорию "Производители"
-// ОТКЛЮЧЕНА: теперь используется динамическая загрузка через API catalog-subgroups
 async function expandManufacturersCategories(menuItems: any[]): Promise<any[]> {
-  // Просто возвращаем исходные элементы без статического добавления детей
-  // Дочерние элементы будут загружаться динамически через API catalog-subgroups
-
   return menuItems
 }

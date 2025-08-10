@@ -6,9 +6,18 @@ import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } f
 
 export const dynamic = 'force-dynamic'
 
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 export const GET = withCache(async function GET(request: NextRequest) {
   try {
-    // Проверяем существование таблицы product_categories
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -20,7 +29,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-      // Безопасно возвращаем 503 вместо создания схемы в GET
       return NextResponse.json(
         { success: false, error: 'Categories schema is not initialized' },
         { status: 503 }
@@ -32,11 +40,9 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const includeStats = searchParams.get('include_stats') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
 
-    // Генерируем ключ кеша
     const cacheKey = flat ? cacheKeys.categoryList() : cacheKeys.categoryTree();
-    const ttl = CACHE_TTL.DAILY; // Категории меняются редко
+    const ttl = CACHE_TTL.DAILY;
 
-    // Функция для получения категорий
     const fetchCategories = async () => {
 
     const query = `
@@ -45,21 +51,19 @@ export const GET = withCache(async function GET(request: NextRequest) {
         name,
         description,
         parent_id,
-        is_active,
+        (is_deleted = false OR is_deleted IS NULL) as is_active,
         sort_order as display_order,
         created_at,
         updated_at
       FROM product_categories
-      WHERE is_active = true
+      WHERE (is_deleted = false OR is_deleted IS NULL)
       ORDER BY sort_order, name
     `;
 
     const result = await executeQuery(query);
     let categories = result.rows;
 
-    // Если нужна статистика, загружаем её одним запросом
     if (includeStats && categories.length > 0) {
-      // Проверяем существование таблицы products
       const productsTableQuery = `
         SELECT EXISTS (
           SELECT FROM information_schema.tables
@@ -94,7 +98,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
           });
         });
 
-        // Объединяем данные
         categories.forEach(category => {
           const stats = statsMap.get(category.id) || {
             productsCount: 0,
@@ -103,7 +106,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
           category.stats = stats;
         });
       } else {
-        // Если таблица продуктов не существует, добавляем нулевые статистики
         categories.forEach(category => {
           category.stats = {
             productsCount: 0,
@@ -113,7 +115,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
       }
     }
 
-    // Если не нужна плоская структура, строим дерево категорий
     if (!flat) {
       const categoriesMap = new Map();
       categories.forEach(cat => {
@@ -141,13 +142,11 @@ export const GET = withCache(async function GET(request: NextRequest) {
       };
     };
 
-    // Если nocache=true, не используем кеш
     if (nocache) {
       const data = await fetchCategories();
       return NextResponse.json(data);
     }
 
-    // Получаем данные из кеша или выполняем запрос
     const responseData = await cacheRemember(
       cacheKey,
       ttl,

@@ -3,15 +3,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const pool = getPool();
     const client = await pool.connect();
 
+    // Ранняя проверка наличия необходимых таблиц
+    const exists = await client.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_name = ANY($1)
+    `, [[
+      'characteristics_groups_simple',
+      'characteristics_values_simple',
+      'product_categories'
+    ]])
+    const names = new Set(exists.rows.map((r: any) => r.table_name))
+    if (!names.has('characteristics_groups_simple') || !names.has('characteristics_values_simple')) {
+      client.release()
+      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
+    }
+
     // Получаем иерархическую структуру spec_groups
     const characteristicGroupsQuery = await client.query(`
       WITH RECURSIVE characteristic_tree AS (
-        -- Базовый случай: корневые группы
         SELECT
           sg.id,
           sg.name,
@@ -29,7 +45,6 @@ export async function GET(request: NextRequest) {
 
         UNION ALL
 
-        -- Рекурсивный случай: дочерние группы
         SELECT
           sg.id,
           sg.name,
@@ -70,53 +85,54 @@ export async function GET(request: NextRequest) {
         ) AS enum_values,
         (SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = st.id) as children_count
       FROM characteristic_tree st
-              LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
+      LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
       GROUP BY st.id, st.name, st.description, st.parent_id, st.ordering, st.show_in_main_params, st.main_params_priority, st.main_params_label_override, st.level, st.path
       ORDER BY st.path, st.ordering
     `);
 
     // Получаем производителей из categories с иерархической структурой
-    const manufacturersQuery = await client.query(`
-      WITH RECURSIVE hierarchy AS (
-        -- Корневые узлы производителей
-        SELECT
-          c.id,
-          c.name,
-          c.description,
-          c.parent_id,
-          c.sort_order,
-          0 as level,
-          ARRAY[c.id] as path
-        FROM product_categories c
-        WHERE c.parent_id IS NULL
-          AND c.is_active = true
+    let manufacturersQuery = { rows: [] }
+    if (names.has('product_categories')) {
+      manufacturersQuery = await client.query(`
+        WITH RECURSIVE hierarchy AS (
+          SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.parent_id,
+            c.sort_order,
+            0 as level,
+            ARRAY[c.id] as path
+          FROM product_categories c
+          WHERE c.parent_id IS NULL
+            AND c.is_active = true
 
-        UNION ALL
+          UNION ALL
 
-        -- Дочерние узлы
+          SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.parent_id,
+            c.sort_order,
+            h.level + 1,
+            h.path || c.id
+          FROM product_categories c
+          JOIN hierarchy h ON c.parent_id = h.id
+          WHERE c.is_active = true
+        )
         SELECT
-          c.id,
-          c.name,
-          c.description,
-          c.parent_id,
-          c.sort_order,
-          h.level + 1,
-          h.path || c.id
-        FROM product_categories c
-        JOIN hierarchy h ON c.parent_id = h.id
-        WHERE c.is_active = true
-      )
-      SELECT
-        id,
-        name,
-        description,
-        parent_id,
-        sort_order,
-        level,
-        (SELECT COUNT(*) FROM product_categories WHERE parent_id = hierarchy.id) as children_count
-      FROM hierarchy
-      ORDER BY path, sort_order
-    `);
+          id,
+          name,
+          description,
+          parent_id,
+          sort_order,
+          level,
+          (SELECT COUNT(*) FROM product_categories WHERE parent_id = hierarchy.id) as children_count
+        FROM hierarchy
+        ORDER BY path, sort_order
+      `);
+    }
 
     client.release();
 
@@ -161,7 +177,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Строим иерархическую структуру manufacturers
+    // Строим иерархическую структуру manufacturers (если таблица существует)
     const manufacturersMap = new Map();
     const rootManufacturers = [];
 
@@ -188,7 +204,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Строим дерево manufacturers
     manufacturersQuery.rows.forEach((row: any) => {
       if (row.parent_id !== null) {
         const parent = manufacturersMap.get(`cat_${row.parent_id}`);
@@ -199,7 +214,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Объединяем все данные
     const allData = [
       ...rootCharacteristicGroups,
       ...rootManufacturers

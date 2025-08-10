@@ -4,15 +4,39 @@ import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
   try {
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const { searchParams } = new URL(request.url)
     const categoryId = searchParams.get('category_id')
     const includeChildren = searchParams.get('include_children') === 'true'
     
-    console.log('🎯 API /characteristics/by-category вызван:', { categoryId, includeChildren })
+    const exists = await pool.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_name = ANY($1)
+    `, [[
+      'products',
+      'product_characteristics_simple',
+      'characteristics_values_simple',
+      'characteristics_groups_simple',
+      'product_categories'
+    ]])
+    const names = new Set(exists.rows.map((r: any) => r.table_name))
+    if (!['products','product_characteristics_simple','characteristics_values_simple','characteristics_groups_simple'].every(t => names.has(t))) {
+      return NextResponse.json({ success: false, error: 'Schema is not initialized' }, { status: 503 })
+    }
+    
     logger.info('Loading characteristics by category', { categoryId, includeChildren })
     
     let productQuery = ''
@@ -20,7 +44,6 @@ export async function GET(request: NextRequest) {
     
     if (categoryId && categoryId !== 'all' && categoryId !== 'null') {
       if (includeChildren) {
-        // Получаем все дочерние категории рекурсивно
         productQuery = `
           WITH RECURSIVE category_tree AS (
             SELECT id FROM product_categories WHERE id = $1
@@ -32,7 +55,7 @@ export async function GET(request: NextRequest) {
           SELECT DISTINCT
             cg.id as group_id,
             cg.name as group_name,
-            0 as section_id,
+            COALESCE(cg.parent_id, 0) as section_id,
             NULL as section_name,
             cv.id as value_id,
             cv.value,
@@ -44,17 +67,16 @@ export async function GET(request: NextRequest) {
           INNER JOIN characteristics_values_simple cv ON pcs.value_id = cv.id
           INNER JOIN characteristics_groups_simple cg ON cv.group_id = cg.id
           WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
-          GROUP BY cg.id, cg.name, cv.id, cv.value, cv.color_hex
+          GROUP BY cg.id, cg.name, cg.parent_id, cv.id, cv.value, cv.color_hex
           ORDER BY cg.name, cv.value
         `
         queryParams.push(categoryId)
       } else {
-        // Только товары из указанной категории
         productQuery = `
           SELECT DISTINCT
             cg.id as group_id,
             cg.name as group_name,
-            cg.section_id,
+            COALESCE(cg.parent_id, 0) as section_id,
             NULL as section_name,
             cv.id as value_id,
             cv.value,
@@ -65,18 +87,17 @@ export async function GET(request: NextRequest) {
           INNER JOIN characteristics_values_simple cv ON pcs.value_id = cv.id
           INNER JOIN characteristics_groups_simple cg ON cv.group_id = cg.id
           WHERE p.category_id = $1 AND (p.is_deleted = false OR p.is_deleted IS NULL)
-          GROUP BY cg.id, cg.name, cg.section_id, cv.id, cv.value, cv.color_hex
+          GROUP BY cg.id, cg.name, cg.parent_id, cv.id, cv.value, cv.color_hex
           ORDER BY cg.name, cv.value
         `
         queryParams.push(categoryId)
       }
     } else {
-      // Все характеристики для всех товаров
       productQuery = `
         SELECT DISTINCT
           cg.id as group_id,
           cg.name as group_name,
-          cg.section_id,
+          COALESCE(cg.parent_id, 0) as section_id,
           NULL as section_name,
           cv.id as value_id,
           cv.value,
@@ -87,19 +108,18 @@ export async function GET(request: NextRequest) {
         INNER JOIN characteristics_values_simple cv ON pcs.value_id = cv.id
         INNER JOIN characteristics_groups_simple cg ON cv.group_id = cg.id
         WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
-        GROUP BY cg.id, cg.name, cg.section_id, cv.id, cv.value, cv.color_hex
+        GROUP BY cg.id, cg.name, cg.parent_id, cv.id, cv.value, cv.color_hex
         ORDER BY cg.name, cv.value
       `
     }
     
     const result = await pool.query(productQuery, queryParams)
     
-    // Группируем результаты по секциям и группам
     const sections: any = {}
     
     result.rows.forEach(row => {
-      const sectionName = row.section_name || 'Общие характеристики'
       const sectionId = row.section_id || 0
+      const sectionName = row.section_name || (sectionId === 0 ? 'Общие характеристики' : 'Раздел')
       
       if (!sections[sectionId]) {
         sections[sectionId] = {
@@ -125,7 +145,6 @@ export async function GET(request: NextRequest) {
       })
     })
     
-    // Преобразуем в массивы
     const formattedData = {
       sections: Object.values(sections).map((section: any) => ({
         ...section,
@@ -134,13 +153,6 @@ export async function GET(request: NextRequest) {
     }
     
     const duration = Date.now() - startTime
-    
-    console.log('✅ API результат:', {
-      categoryId,
-      sectionsCount: formattedData.sections.length,
-      totalRows: result.rows.length,
-      firstRows: result.rows.slice(0, 3)
-    })
     
     logger.info('Characteristics loaded by category', { 
       categoryId, 

@@ -3,6 +3,13 @@ import { pool } from "@/lib/db"
 
 export async function GET() {
   try {
+    const isDbConfigured = !!process.env.DATABASE_URL || (
+      !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+    )
+    if (!isDbConfigured) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     // Используем представление characteristic_groups вместо несуществующей spec_groups
     const query = `
       WITH RECURSIVE group_tree AS (
@@ -110,6 +117,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const isDbConfigured = !!process.env.DATABASE_URL || (
+      !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+    )
+    if (!isDbConfigured) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const body = await request.json()
     const { name, description, parent_id } = body
 

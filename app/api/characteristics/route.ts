@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
 
+export const dynamic = 'force-dynamic'
+
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 /**
  * UNIFIED CHARACTERISTICS API
  * Использует реальные таблицы БД и создает ту же структуру разделов,
@@ -9,9 +17,24 @@ import { getPool } from '@/lib/db-connection';
 
 export async function GET(request: NextRequest) {
   try {
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const pool = getPool();
 
-    // Получаем все значения характеристик
+    const exists = await pool.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_name = ANY($1)
+    `, [[
+      'characteristics_groups_simple',
+      'characteristics_values_simple'
+    ]])
+    const names = new Set(exists.rows.map((r: any) => r.table_name))
+    if (!names.has('characteristics_groups_simple') || !names.has('characteristics_values_simple')) {
+      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
+    }
+
     const valuesQuery = `
       SELECT
         g.id as group_id,
@@ -42,20 +65,17 @@ export async function GET(request: NextRequest) {
 
     const valuesResult = await pool.query(valuesQuery);
 
-    // Создаем структуру из реальных разделов БД
     const createSections = (availableGroups: any[]) => {
       const sectionMap = new Map();
-      const processedGroups = new Set(); // Отслеживаем обработанные группы
+      const processedGroups = new Set();
 
-      // 1. Создаем реальные разделы из БД (is_section=true)
       availableGroups.forEach(group => {
         if (group.is_section) {
-          // Находим дочерние группы для этого раздела
           const childGroups: any[] = [];
           availableGroups.forEach(childGroup => {
-            if (childGroup.group_id !== group.group_id && // Не сам раздел
-                !childGroup.is_section && // Не раздел
-                childGroup.parent_id === group.group_id) { // Прямые дочерние группы
+            if (childGroup.group_id !== group.group_id &&
+                !childGroup.is_section &&
+                childGroup.parent_id === group.group_id) {
               childGroups.push({
                 group_id: childGroup.group_id,
                 group_name: childGroup.group_name,
@@ -75,11 +95,10 @@ export async function GET(request: NextRequest) {
             is_real_section: true
           });
 
-          processedGroups.add(group.group_id); // Помечаем раздел как обработанный
+          processedGroups.add(group.group_id);
         }
       });
 
-      // 2. Помещаем оставшиеся группы без раздела в "Дополнительные характеристики"
       const uncategorizedGroups: any[] = [];
       availableGroups.forEach(group => {
         if (!processedGroups.has(group.group_id) && !group.is_section) {
@@ -106,7 +125,6 @@ export async function GET(request: NextRequest) {
       return Array.from(sectionMap.values()).sort((a, b) => a.section_ordering - b.section_ordering);
     };
 
-    // Создаем разделы из реальных данных БД
     const sections = createSections(valuesResult.rows);
 
     return NextResponse.json({
