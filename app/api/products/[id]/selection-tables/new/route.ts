@@ -68,7 +68,7 @@ export async function GET(
     logger.info('New product selection tables loaded', {
       productId,
       tablesCount: Object.keys(tables).length,
-      duration
+      duration: _duration
     })
 
     return NextResponse.json({
@@ -179,7 +179,7 @@ export async function PUT(
         logger.info('New product selection tables updated', {
           productId,
           tablesAdded,
-          duration
+          duration: _duration
         })
 
         return NextResponse.json({

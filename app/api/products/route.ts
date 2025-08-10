@@ -27,7 +27,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
     }
 
     // Генерируем ключ кеша
-    const cacheParams = { fast, limit, detailed };
+    const cacheParams = { fast, limit, detailed: _detailed };
     const cacheKey = cacheKeys.productList(cacheParams);
 
     // Определяем TTL в зависимости от типа запроса
@@ -144,7 +144,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
       logger.info('Products loaded successfully', {
         count: result.rows.length,
         fast,
-        detailed
+        detailed: _detailed
       });
 
       return responseData;

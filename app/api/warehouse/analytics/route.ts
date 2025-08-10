@@ -224,7 +224,7 @@ export async function GET(_request: NextRequest) {
           efficiency: parseFloat(region.efficiency),
           alerts_count: parseInt(region.alerts_count)
         })),
-        warehouseMetrics
+        warehouseMetrics: _warehouseMetrics
       }
     });
 

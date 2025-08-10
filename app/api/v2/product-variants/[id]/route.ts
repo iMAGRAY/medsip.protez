@@ -143,7 +143,7 @@ export async function GET(
         success: false,
         error: 'Failed to load product variant',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )
@@ -294,12 +294,12 @@ export async function PUT(
     }
     
     const _duration = Date.now() - startTime
-    logger.info(`Product variant ${variantId} updated successfully`, { duration }, 'API')
+    logger.info(`Product variant ${variantId} updated successfully`, { duration: _duration }, 'API')
     
     return NextResponse.json({
       success: true,
       data: result.rows[0],
-      duration
+      duration: _duration
     })
     
   } catch (error) {
@@ -311,7 +311,7 @@ export async function PUT(
         success: false,
         error: 'Failed to update product variant',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )
@@ -345,12 +345,12 @@ export async function DELETE(
     await pool.query('COMMIT')
     
     const _duration = Date.now() - startTime
-    logger.info('Product variant deleted', { variantId, duration })
+    logger.info('Product variant deleted', { variantId, duration: _duration })
     
     return NextResponse.json({
       success: true,
       message: 'Product variant deleted successfully',
-      duration
+      duration: _duration
     })
     
   } catch (error) {
@@ -362,7 +362,7 @@ export async function DELETE(
         success: false,
         error: 'Failed to delete product variant',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )

@@ -139,12 +139,12 @@ export async function GET(request: NextRequest) {
     // Если запрашивается конкретный вариант, возвращаем объект
     if (variantId && result.rows.length > 0) {
       const _duration = Date.now() - startTime
-      logger.info('Product variant loaded', { variantId, duration })
+      logger.info('Product variant loaded', { variantId, duration: _duration })
       
       return NextResponse.json({
         success: true,
         data: result.rows[0],
-        duration
+        duration: _duration
       })
     }
     
@@ -153,14 +153,14 @@ export async function GET(request: NextRequest) {
     logger.info('Product variants loaded', { 
       count: result.rows.length, 
       masterId, 
-      duration 
+      duration: _duration 
     })
     
     return NextResponse.json({
       success: true,
       data: result.rows,
       count: result.rows.length,
-      duration
+      duration: _duration
     })
     
   } catch (error) {
@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to load product variants',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )
@@ -322,13 +322,13 @@ export async function POST(request: NextRequest) {
     logger.info('Product variant created', { 
       variantId: result.rows[0].id,
       masterId: master_id,
-      duration 
+      duration: _duration 
     })
     
     return NextResponse.json({
       success: true,
       data: result.rows[0],
-      duration
+      duration: _duration
     }, { status: 201 })
     
   } catch (error) {
@@ -342,7 +342,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to create product variant',
         details: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-        duration
+        duration: _duration
       },
       { status: 500 }
     )

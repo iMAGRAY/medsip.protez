@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
         break
       case 'manufacturer':
         recommendations = engine.getSameManufacturerProducts(currentProduct, limit).map(_product => ({
-          product,
+          product: _product,
           score: 0,
           reasons: ['Тот же производитель']
         }))
         break
       case 'price':
         recommendations = engine.getSimilarPriceProducts(currentProduct, limit).map(_product => ({
-          product,
+          product: _product,
           score: 0,
           reasons: ['Похожая цена']
         }))
@@ -97,8 +97,8 @@ export async function GET(request: NextRequest) {
       data: {
         message: 'Для получения рекомендаций используйте POST метод с данными о всех товарах',
         productId,
-        limit,
-        type
+        limit: _limit,
+        type: _type
       }
     })
 

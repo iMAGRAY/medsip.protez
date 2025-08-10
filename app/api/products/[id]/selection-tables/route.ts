@@ -57,7 +57,7 @@ export async function GET(
     })
 
     const _duration = Date.now() - startTime
-    logger.info('Selection tables loaded', { productId, count: result.rows.length, duration })
+    logger.info('Selection tables loaded', { productId, count: result.rows.length, duration: _duration })
 
     return NextResponse.json({
       success: true,
@@ -206,7 +206,7 @@ export async function PUT(
         await executeQuery('COMMIT')
 
         const _duration = Date.now() - startTime
-        logger.info('Selection tables updated', { productId, tablesCount, duration })
+        logger.info('Selection tables updated', { productId, tablesCount, duration: _duration })
 
         return NextResponse.json({
           success: true,

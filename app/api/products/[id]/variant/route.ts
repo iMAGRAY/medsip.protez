@@ -44,7 +44,7 @@ export async function POST(
       const variant = existingVariantCheck.rows[0]
 
       const _duration = Date.now() - startTime
-      logger.info('Existing product variant returned', { productId, variantId: variant.id, duration })
+      logger.info('Existing product variant returned', { productId, variantId: variant.id, duration: _duration })
 
       return NextResponse.json({
         success: true,
@@ -92,7 +92,7 @@ export async function POST(
       productId,
       variantId: newVariant.id,
       variantSku: newVariant.variant_sku,
-      duration
+      duration: _duration
     })
 
     return NextResponse.json({
@@ -167,7 +167,7 @@ export async function GET(
     logger.info('Product variants loaded', {
       productId,
       variantsCount: result.rows.length,
-      duration
+      duration: _duration
     })
 
     return NextResponse.json({
