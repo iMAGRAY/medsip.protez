@@ -48,10 +48,6 @@ export function ProductTagsDisplay({
   const [isLoading, setIsLoading] = useState(true)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  useEffect(() => {
-    fetchProductTags()
-  }, [fetchProductTags])
-
   const fetchProductTags = useCallback(async () => {
       try {
         const _allTags: ProductTag[] = []
@@ -94,6 +90,10 @@ export function ProductTagsDisplay({
         setIsLoading(false)
       }
     }, [productId, variantId])
+
+  useEffect(() => {
+    fetchProductTags()
+  }, [fetchProductTags])
 
   const getIconComponent = (iconName?: string) => {
     if (!iconName) return null
