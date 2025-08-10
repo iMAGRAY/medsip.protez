@@ -25,6 +25,7 @@ import {
   Star,
   ExternalLink
 } from "lucide-react"
+import { SafeImage } from "@/components/safe-image"
 
 interface Product {
   id: string;
@@ -689,13 +690,12 @@ export function ProductsManager({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {product.image_url && (
-                          <img
+                          <SafeImage
                             src={product.image_url}
                             alt={product.name}
+                            width={32}
+                            height={32}
                             className="h-8 w-8 object-cover rounded flex-shrink-0"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
                           />
                         )}
                         <div className="flex flex-wrap gap-1 flex-1 min-w-0">
@@ -773,13 +773,12 @@ export function ProductsManager({
                       }
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {product.image_url && (
-                          <img
+                          <SafeImage
                             src={product.image_url}
                             alt={product.name}
+                            width={40}
+                            height={40}
                             className="h-10 w-10 object-cover rounded flex-shrink-0"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
                           />
                         )}
                         <div className="flex-1 min-w-0">

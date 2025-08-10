@@ -11,7 +11,7 @@ function isDbConfigured() {
 }
 
 // Add a simple handler for all methods to debug
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
 
   try {
     if (!isDbConfigured()) {
@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  return PUT(request)
+export async function POST(_request: NextRequest) {
+  return new NextResponse(null, { status: 405, headers: corsHeaders() })
 }
 
 export async function PUT(request: NextRequest) {
@@ -171,7 +171,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, { status: 200, headers: corsHeaders() })
 }
 

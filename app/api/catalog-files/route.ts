@@ -12,8 +12,6 @@ function isDbConfigured() {
 
 // GET - получить список каталогов
 export async function GET(request: NextRequest) {
-  const cacheManager = getCacheManager()
-
   try {
     const guard = guardDbOr503Fast()
     if (guard) return guard

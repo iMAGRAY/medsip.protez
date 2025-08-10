@@ -142,6 +142,7 @@ export function SafeImage({
     return (
       <Image
         {...imageProps}
+        alt={alt}
         fill
       />
     )
@@ -150,6 +151,7 @@ export function SafeImage({
   return (
     <Image
       {...imageProps}
+      alt={alt}
       width={width}
       height={height}
     />

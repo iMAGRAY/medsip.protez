@@ -10,6 +10,7 @@ import { CartDrawer } from "@/components/cart-drawer"
 import { useCart } from "@/lib/cart-context"
 import { Badge } from "@/components/ui/badge"
 import { useState, useEffect } from "react"
+import { SafeImage } from "@/components/safe-image"
 
   // Безопасный компонент списка
 function SafeCartButton() {
@@ -84,32 +85,8 @@ export default function Header() {
         <div className="flex-1 flex justify-start">
           <InstantLink href="/" className="flex items-center gap-3 transition-all duration-200 hover:opacity-80">
             <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-              <img
-                src="/logo.webp"
-                alt="МедСИП Протезирование"
-                className="h-7 w-auto max-w-none dark:hidden"
-                style={{
-                  filter: 'brightness(1) contrast(1.1)',
-                  display: 'block'
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/Logo.webp';
-                }}
-              />
-              <img
-                src="/dark_logo.webp"
-                alt="МедСИП Протезирование"
-                className="h-7 w-auto max-w-none hidden dark:block"
-                style={{
-                  filter: 'brightness(1) contrast(1.1)',
-                  display: 'none'
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/dark_logo.webp';
-                }}
-              />
+              <SafeImage src="/logo.webp" alt="МедСИП Протезирование" width={28} height={28} className="h-7 w-auto max-w-none dark:hidden" />
+              <SafeImage src="/dark_logo.webp" alt="МедСИП Протезирование" width={28} height={28} className="h-7 w-auto max-w-none hidden dark:block" />
             </div>
             <span className="text-lg font-semibold text-slate-800 whitespace-nowrap">
               МедСИП&nbsp;<span className="hidden sm:inline">Протезирование</span>
@@ -178,19 +155,7 @@ export default function Header() {
                           target.src = '/Logo.webp';
                         }}
                       />
-                      <img
-                        src="/dark_logo.webp"
-                        alt="МедСИП Протезирование"
-                        className="h-6 w-auto max-w-none hidden dark:block"
-                        style={{
-                          filter: 'brightness(1) contrast(1.1)',
-                          display: 'none'
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/dark_logo.webp';
-                        }}
-                      />
+                      <SafeImage src="/dark_logo.webp" alt="МедСИП Протезирование" width={24} height={24} className="h-6 w-auto max-w-none hidden dark:block" />
                     </div>
                     <span className="text-lg font-semibold text-slate-800">
                       МедСИП

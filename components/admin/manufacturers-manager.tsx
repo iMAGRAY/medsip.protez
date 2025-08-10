@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Building
 } from "lucide-react"
+import { SafeImage } from "@/components/safe-image"
 
 interface Manufacturer {
   id: number;
@@ -347,13 +348,12 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
                     }
                     <div className="flex items-center gap-3">
                       {manufacturer.logo_url && (
-                        <img
+                        <SafeImage
                           src={manufacturer.logo_url}
                           alt={`${manufacturer.name} logo`}
+                          width={32}
+                          height={32}
                           className="h-8 w-8 object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
                         />
                       )}
                       <div>

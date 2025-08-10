@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
-import { logger } from '@/lib/logger'
 import { getCacheManager } from '@/lib/dependency-injection'
 import { invalidateRelated } from '@/lib/cache-manager'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
@@ -15,8 +14,6 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
-
   try {
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
@@ -96,7 +93,6 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
   const productId = parseInt(params.id)
   const cacheManager = getCacheManager()
 
@@ -258,7 +254,6 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
   const cacheManager = getCacheManager()
 
   try {
