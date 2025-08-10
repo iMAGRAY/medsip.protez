@@ -77,7 +77,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
       isInitializing,
       specGroupsLoaded,
       characteristicsLoaded,
-      canOperate
+      canOperate: _canOperate
     }
   }, [isLoading, isInitializing, specGroups.length, productCharacteristics.length, productId])
 
@@ -342,7 +342,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
     // Actions
     setSelectedCharacteristicIds,
     setProductCharacteristics,
-    saveCharacteristicsToAPI,
+    saveCharacteristicsToAPI: _saveCharacteristicsToAPI,
     loadProductCharacteristics,
 
     // Computed
