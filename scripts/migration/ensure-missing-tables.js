@@ -159,6 +159,200 @@ async function createProductTags(pool) {
   }
 }
 
+async function createManufacturers(pool) {
+  const name = 'manufacturers'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE manufacturers (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL UNIQUE,
+      description TEXT,
+      website_url VARCHAR(500),
+      country VARCHAR(100),
+      founded_year INTEGER,
+      logo_url VARCHAR(500),
+      is_active BOOLEAN DEFAULT true,
+      sort_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS manufacturers_active_idx ON manufacturers(is_active);`)
+}
+
+async function createModelSeries(pool) {
+  const name = 'model_series'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE model_series (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      manufacturer_id INTEGER NOT NULL REFERENCES manufacturers(id) ON DELETE CASCADE,
+      category_id INTEGER NULL REFERENCES product_categories(id) ON DELETE SET NULL,
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS model_series_manufacturer_idx ON model_series(manufacturer_id);`)
+  await pool.query(`CREATE INDEX IF NOT EXISTS model_series_active_idx ON model_series(is_active);`)
+}
+
+async function createProducts(pool) {
+  const name = 'products'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE products (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      short_name VARCHAR(255),
+      description TEXT,
+      sku VARCHAR(100) UNIQUE,
+      article_number VARCHAR(100),
+      price NUMERIC(12,2),
+      discount_price NUMERIC(12,2),
+      image_url TEXT,
+      images JSONB,
+      series_id INTEGER NULL REFERENCES model_series(id) ON DELETE SET NULL,
+      manufacturer_id INTEGER NULL REFERENCES manufacturers(id) ON DELETE SET NULL,
+      category_id INTEGER NULL REFERENCES product_categories(id) ON DELETE SET NULL,
+      in_stock BOOLEAN DEFAULT true,
+      stock_quantity INTEGER DEFAULT 0,
+      stock_status VARCHAR(32) DEFAULT 'in_stock',
+      weight VARCHAR(64),
+      battery_life VARCHAR(64),
+      warranty VARCHAR(255),
+      show_price BOOLEAN DEFAULT true,
+      is_deleted BOOLEAN DEFAULT false,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS products_category_idx ON products(category_id);`)
+  await pool.query(`CREATE INDEX IF NOT EXISTS products_manufacturer_idx ON products(manufacturer_id);`)
+  await pool.query(`CREATE INDEX IF NOT EXISTS products_deleted_idx ON products(is_deleted);`)
+}
+
+async function createProductImages(pool) {
+  const name = 'product_images'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE product_images (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      image_url TEXT NOT NULL,
+      is_main BOOLEAN DEFAULT false,
+      image_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS product_images_product_idx ON product_images(product_id);`)
+  await pool.query(`CREATE INDEX IF NOT EXISTS product_images_order_idx ON product_images(product_id, image_order);`)
+}
+
+async function createProductSizes(pool) {
+  const name = 'product_sizes'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE product_sizes (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      size_name VARCHAR(64),
+      price NUMERIC(12,2),
+      discount_price NUMERIC(12,2),
+      is_available BOOLEAN DEFAULT true,
+      sort_order INTEGER DEFAULT 0
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS product_sizes_product_idx ON product_sizes(product_id);`)
+}
+
+async function createMediaFiles(pool) {
+  const name = 'media_files'
+  if (await tableExists(pool, name)) { console.log(`Skip: table ${name} already exists`); return }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE media_files (
+      id SERIAL PRIMARY KEY,
+      file_key TEXT NOT NULL,
+      file_url TEXT NOT NULL,
+      mime_type VARCHAR(128),
+      size_bytes BIGINT,
+      width INTEGER,
+      height INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS media_files_key_idx ON media_files(file_key);`)
+}
+
+async function createCharacteristicsSimple(pool) {
+  // groups
+  if (!(await tableExists(pool, 'characteristics_groups_simple'))) {
+    console.log('Creating table characteristics_groups_simple ...')
+    await pool.query(`
+      CREATE TABLE characteristics_groups_simple (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        parent_id INTEGER NULL REFERENCES characteristics_groups_simple(id) ON DELETE SET NULL,
+        is_active BOOLEAN DEFAULT true,
+        sort_order INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `)
+    await pool.query(`CREATE INDEX IF NOT EXISTS char_groups_parent_idx ON characteristics_groups_simple(parent_id);`)
+    await pool.query(`CREATE INDEX IF NOT EXISTS char_groups_active_idx ON characteristics_groups_simple(is_active);`)
+  } else {
+    console.log('Skip: table characteristics_groups_simple already exists')
+  }
+  // values
+  if (!(await tableExists(pool, 'characteristics_values_simple'))) {
+    console.log('Creating table characteristics_values_simple ...')
+    await pool.query(`
+      CREATE TABLE characteristics_values_simple (
+        id SERIAL PRIMARY KEY,
+        group_id INTEGER NOT NULL REFERENCES characteristics_groups_simple(id) ON DELETE CASCADE,
+        value VARCHAR(255) NOT NULL,
+        color_hex VARCHAR(16),
+        is_active BOOLEAN DEFAULT true,
+        sort_order INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `)
+    await pool.query(`CREATE INDEX IF NOT EXISTS char_values_group_idx ON characteristics_values_simple(group_id);`)
+    await pool.query(`CREATE INDEX IF NOT EXISTS char_values_active_idx ON characteristics_values_simple(is_active);`)
+  } else {
+    console.log('Skip: table characteristics_values_simple already exists')
+  }
+  // product_characteristics_simple
+  if (!(await tableExists(pool, 'product_characteristics_simple'))) {
+    console.log('Creating table product_characteristics_simple ...')
+    await pool.query(`
+      CREATE TABLE product_characteristics_simple (
+        id SERIAL PRIMARY KEY,
+        product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        value_id INTEGER NOT NULL REFERENCES characteristics_values_simple(id) ON DELETE CASCADE,
+        additional_value VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `)
+    await pool.query(`CREATE INDEX IF NOT EXISTS pcs_product_idx ON product_characteristics_simple(product_id);`)
+    await pool.query(`CREATE INDEX IF NOT EXISTS pcs_value_idx ON product_characteristics_simple(value_id);`)
+  } else {
+    console.log('Skip: table product_characteristics_simple already exists')
+  }
+}
+
 async function createWarehouseCore(pool) {
   async function ensure(name, ddl, indexes = []) {
     if (await tableExists(pool, name)) {
@@ -320,12 +514,19 @@ async function main() {
   const pool = buildPool()
   try {
     await createProductCategories(pool)
-    await createProductSpecifications(pool)
+    await createManufacturers(pool)
+    await createModelSeries(pool)
+    await createProducts(pool)
+    await createProductImages(pool)
+    await createProductSizes(pool)
     await createFormTemplates(pool)
     await createWarehouseSettings(pool)
     await createProductTags(pool)
     await createWarehouseCore(pool)
     await createCatalogMenuSettings(pool)
+    await createMediaFiles(pool)
+    await createProductSpecifications(pool)
+    await createCharacteristicsSimple(pool)
     console.log('✅ ensure-missing-tables completed')
   } catch (e) {
     console.error('❌ ensure-missing-tables failed:', e.message)
