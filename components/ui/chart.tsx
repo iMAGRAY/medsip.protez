@@ -85,7 +85,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
         .filter(Boolean)
         .join(' ')
 
-      return { prefix, cssRules }
+      return { prefix, cssRules: _cssRules }
     })
 
   // Применяем стили через style объект вместо HTML
