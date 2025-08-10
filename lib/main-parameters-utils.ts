@@ -53,7 +53,7 @@ export function extractMainParameters(groups: CharacteristicGroup[]): MainParame
           id: characteristic.id,
           label: characteristic.label || displayName,
           value: value.trim(),
-          priority,
+          priority: _priority,
           group_name: group.group_name,
           display_name: displayName
         });

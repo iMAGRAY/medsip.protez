@@ -142,7 +142,7 @@ export async function cacheMiddleware(
       })
       
       // Сохраняем в кеш
-      await apiCache.set(cacheKey, { data, headers }, config.ttl)
+      await apiCache.set(cacheKey, { data: _data, headers }, config.ttl)
       logger.debug(`API Cache set: ${pathname}, TTL: ${config.ttl}s`)
       
       // Добавляем заголовок

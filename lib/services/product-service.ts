@@ -104,7 +104,7 @@ export class ProductService {
   // Сохранение изображений продукта
   async saveProductImages(productId: string, _images: string[]): Promise<void> {
     try {
-      const result = await this.api.put(`/products/${productId}/images`, { images })
+      const result = await this.api.put(`/products/${productId}/images`, { images: _images })
       if (!result.success) throw new Error(result.error || 'Images save failed')
     } catch (error) {
       console.error('Error saving product images:', error)
@@ -161,7 +161,7 @@ export class ProductService {
   // Сохранение характеристик продукта
   async saveCharacteristics(productId: string, _characteristics: any[]): Promise<void> {
     try {
-      const result = await this.api.post(`/products/${productId}/characteristics-simple`, { characteristics })
+      const result = await this.api.post(`/products/${productId}/characteristics-simple`, { characteristics: _characteristics })
       if (!result.success) throw new Error(result.error || 'Characteristics save failed')
     } catch (error) {
       console.error('Error saving characteristics:', error)
@@ -186,7 +186,7 @@ export class ProductService {
   // Сохранение конфигурируемых характеристик продукта
   async saveConfigurableCharacteristics(productId: string, _configurableCharacteristics: any[]): Promise<void> {
     try {
-      const result = await this.api.post(`/products/${productId}/configurable-characteristics`, { configurableCharacteristics })
+      const result = await this.api.post(`/products/${productId}/configurable-characteristics`, { configurableCharacteristics: _configurableCharacteristics })
       if (!result.success) throw new Error(result.error || 'Configurable characteristics save failed')
     } catch (error) {
       console.error('Error saving configurable characteristics:', error)

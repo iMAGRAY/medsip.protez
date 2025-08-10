@@ -277,9 +277,9 @@ export class WarehouseService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation,
-          itemIds,
-          params
+          operation: _operation,
+          itemIds: _itemIds,
+          params: _params
         })
       })
 

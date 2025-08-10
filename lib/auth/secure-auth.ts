@@ -92,11 +92,11 @@ export function createSession(
 
   const session: AdminSession = {
     id: sessionId,
-    username,
+    username: _username,
     loginTime: now,
     lastActivity: now,
     ipAddress,
-    userAgent,
+    userAgent: _userAgent,
     csrfToken: generateSecureToken(AUTH_CONFIG.csrfTokenLength),
     rememberMe,
     expiresAt: now + sessionTTL
@@ -108,7 +108,7 @@ export function createSession(
   loginAttempts.delete(ipAddress)
 
   logger.info('Admin session created', {
-    username,
+    username: _username,
     ipAddress,
     sessionId,
     rememberMe,
@@ -176,7 +176,7 @@ export async function authenticateAdmin(
   // Создание сессии с учетом "запомнить меня"
   const _sessionId = createSession(username, ipAddress, userAgent, rememberMe)
 
-  return { success: true, sessionId, rememberMe }
+  return { success: true, sessionId: _sessionId, rememberMe }
 }
 
 // Middleware для проверки аутентификации

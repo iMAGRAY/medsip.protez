@@ -201,7 +201,7 @@ container.register('cacheManager', () => {
 
     set(key: string, _data: any, ttl: number = 300000): void {
       this.cache.set(key, {
-        data,
+        data: _data,
         expires: Date.now() + ttl
       });
     }

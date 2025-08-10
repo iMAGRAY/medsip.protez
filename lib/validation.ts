@@ -24,7 +24,7 @@ export class Validator<T = any> {
   required(_message: string = 'This field is required'): this {
     return this.addRule({
       name: 'required',
-      message,
+      message: _message,
       validate: (value) => value !== null && value !== undefined && value !== ''
     })
   }
@@ -32,7 +32,7 @@ export class Validator<T = any> {
   string(_message: string = 'Must be a string'): this {
     return this.addRule({
       name: 'string',
-      message,
+      message: _message,
       validate: (value) => typeof value === 'string'
     })
   }
@@ -40,7 +40,7 @@ export class Validator<T = any> {
   number(_message: string = 'Must be a number'): this {
     return this.addRule({
       name: 'number',
-      message,
+      message: _message,
       validate: (value) => typeof value === 'number' && !isNaN(value)
     })
   }
@@ -48,7 +48,7 @@ export class Validator<T = any> {
   email(_message: string = 'Must be a valid email'): this {
     return this.addRule({
       name: 'email',
-      message,
+      message: _message,
       validate: (value) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return typeof value === 'string' && emailRegex.test(value)
@@ -59,7 +59,7 @@ export class Validator<T = any> {
   url(_message: string = 'Must be a valid URL'): this {
     return this.addRule({
       name: 'url',
-      message,
+      message: _message,
       validate: (value) => {
         try {
           if (typeof value !== 'string') return false
@@ -107,17 +107,17 @@ export class Validator<T = any> {
   pattern(regex: RegExp, _message: string): this {
     return this.addRule({
       name: 'pattern',
-      message,
+      message: _message,
       validate: (value) => typeof value === 'string' && regex.test(value)
     })
   }
 
   custom(_name: string, _validate: (value: T) => boolean, _message: string, _severity: 'error' | 'warning' = 'error'): this {
     return this.addRule({
-      name,
-      message,
-      validate,
-      severity
+      name: _name,
+      message: _message,
+      validate: _validate,
+      severity: _severity
     })
   }
 
@@ -242,7 +242,7 @@ export function validateArray<T>(items: T[], validator: Validator<T>): {
 } {
   const results = items.map(item => validator.validate(item))
   const errors = results
-    .map((result, _index) => ({ index, errors: result.errors }))
+    .map((result, _index) => ({ index: _index, errors: result.errors }))
     .filter(item => item.errors.length > 0)
 
   return {

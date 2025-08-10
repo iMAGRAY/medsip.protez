@@ -92,7 +92,7 @@ export class SecureCacheManager {
 
       return success
     } catch (_error) {
-      logger.error('Cache set failed', { key, error })
+      logger.error('Cache set failed', { key, error: _error })
       return false
     }
   }
@@ -125,7 +125,7 @@ export class SecureCacheManager {
 
       return parsed as T
     } catch (_error) {
-      logger.error('Cache get failed', { key, error })
+      logger.error('Cache get failed', { key, error: _error })
       return null
     }
   }
@@ -151,7 +151,7 @@ export class SecureCacheManager {
 
       return result
     } catch (_error) {
-      logger.error('Cache delete failed', { key, error })
+      logger.error('Cache delete failed', { key, error: _error })
       return false
     }
   }
@@ -173,7 +173,7 @@ export class SecureCacheManager {
       const result = await redis.exists(cacheKey)
       return result
     } catch (_error) {
-      logger.error('Cache exists check failed', { key, error })
+      logger.error('Cache exists check failed', { key, error: _error })
       return false
     }
   }
@@ -201,7 +201,7 @@ export class SecureCacheManager {
 
       return deleted
     } catch (_error) {
-      logger.error('Cache clear failed', { prefix: this.config.prefix, error })
+      logger.error('Cache clear failed', { prefix: this.config.prefix, error: _error })
       return 0
     }
   }
@@ -215,7 +215,7 @@ export class SecureCacheManager {
         body: JSON.stringify({
           action: 'set',
           key: this.generateKey(key),
-          value,
+          value: _value,
           ttl: ttl || this.config.ttl
         })
       })
@@ -223,7 +223,7 @@ export class SecureCacheManager {
       const result = await response.json()
       return result.success
     } catch (_error) {
-      logger.error('Cache API set failed', { key, error })
+      logger.error('Cache API set failed', { key, error: _error })
       return false
     }
   }
@@ -239,7 +239,7 @@ export class SecureCacheManager {
       const result = await response.json()
       return result.data || null
     } catch (_error) {
-      logger.error('Cache API get failed', { key, error })
+      logger.error('Cache API get failed', { key, error: _error })
       return null
     }
   }
@@ -257,7 +257,7 @@ export class SecureCacheManager {
       const result = await response.json()
       return result.success
     } catch (_error) {
-      logger.error('Cache API delete failed', { key, error })
+      logger.error('Cache API delete failed', { key, error: _error })
       return false
     }
   }
@@ -288,11 +288,11 @@ export class SecureCacheManager {
 
       return {
         totalKeys: keys.length,
-        memoryUsage,
-        hitRate
+        memoryUsage: _memoryUsage,
+        hitRate: _hitRate
       }
     } catch (_error) {
-      logger.error('Cache stats failed', { prefix: this.config.prefix, error })
+      logger.error('Cache stats failed', { prefix: this.config.prefix, error: _error })
       return { totalKeys: 0, memoryUsage: '0B' }
     }
   }
@@ -320,7 +320,7 @@ export async function cacheWithRefresh<T>(
 
     return data
   } catch (_error) {
-    logger.error('Cache with refresh failed', { key, error })
+    logger.error('Cache with refresh failed', { key, error: _error })
     // В случае ошибки кеша возвращаем данные напрямую
     return await fetcher()
   }
@@ -346,7 +346,7 @@ export async function invalidateRelated(patterns: string[]): Promise<void> {
       }
     }
   } catch (_error) {
-    logger.error('Cache invalidation failed', { patterns, error })
+    logger.error('Cache invalidation failed', { patterns, error: _error })
   }
 }
 
@@ -370,7 +370,7 @@ export async function warmupCache(
           await cacheManager.set(key, data, ttl)
           logger.debug('Cache warmed up', { key })
         } catch (_error) {
-          logger.error('Cache warmup failed for key', { key, error })
+          logger.error('Cache warmup failed for key', { key, error: _error })
         }
       })
     )

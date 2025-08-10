@@ -40,7 +40,7 @@ class PerformanceMonitor {
 
     if (duration > this.slowQueryThreshold) {
       this.metrics.slowQueries++
-      logger.warn('Slow query detected', { query, duration, threshold: this.slowQueryThreshold })
+      logger.warn('Slow query detected', { query: _query, duration, threshold: this.slowQueryThreshold })
     }
 
     if (!success) {
@@ -49,11 +49,11 @@ class PerformanceMonitor {
 
     // Store recent query
     const queryMetric: QueryMetric = {
-      query,
+      query: _query,
       duration,
       timestamp: new Date(),
       success,
-      error
+      error: _error
     }
 
     this.recentQueries.push(queryMetric)
@@ -130,10 +130,10 @@ export const performanceMonitor = new PerformanceMonitor()
 export function measureTime<T>(fn: () => Promise<T>): Promise<{ result: T; duration: number }> {
   const start = Date.now()
   return fn().then(
-    _result => ({ result, duration: Date.now() - start }),
-    _error => {
+    (_result) => ({ result: _result, duration: Date.now() - start }),
+    (_error) => {
       const _duration = Date.now() - start
-      throw { error, duration }
+      throw { error: _error, duration: _duration }
     }
   )
 }
@@ -147,7 +147,7 @@ export function timed<T extends (...args: any[]) => Promise<any>>(fn: T): T {
       const _duration = Date.now() - start
       logger.debug('Function execution completed', {
         function: fn.name,
-        duration,
+        duration: _duration,
         args: args.length
       })
       return result
@@ -155,7 +155,7 @@ export function timed<T extends (...args: any[]) => Promise<any>>(fn: T): T {
       const _duration = Date.now() - start
       logger.error('Function execution failed', {
         function: fn.name,
-        duration,
+        duration: _duration,
         args: args.length,
         error
       })

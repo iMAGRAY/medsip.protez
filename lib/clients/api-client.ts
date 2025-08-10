@@ -18,7 +18,7 @@ const cacheUtils = {
 
   set: (key: string, _data: any, ttl: number = 300000) => { // 5 минут по умолчанию
     clientApiCache.set(key, {
-      data,
+      data: _data,
       expires: Date.now() + ttl
     })
   },

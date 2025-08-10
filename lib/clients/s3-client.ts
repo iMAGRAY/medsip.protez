@@ -150,7 +150,7 @@ export class MediaManager {
         isDuplicate: result.isDuplicate,
         existingFile: result.existingFile,
         hash,
-        metadata
+        metadata: _metadata
       }
     } catch (error) {
 
@@ -172,8 +172,8 @@ export class MediaManager {
           extension: metadata.extension,
           fileSize: metadata.size,
           mimeType: metadata.mimeType,
-          s3Key,
-          s3Url,
+          s3Key: _s3Key,
+          s3Url: _s3Url,
           width: metadata.width,
           height: metadata.height,
           metadata: {
@@ -211,7 +211,7 @@ export class MediaManager {
     let uploadOptions: UploadOptions
     if (typeof options === 'string') {
       const _folder = options
-      uploadOptions = { folder, onProgress: legacyOnProgress, checkDuplicates: true }
+      uploadOptions = { folder: _folder, onProgress: legacyOnProgress, checkDuplicates: true }
     } else {
       uploadOptions = { folder: "products", checkDuplicates: true, ...options }
     }
@@ -412,7 +412,7 @@ export class MediaManager {
         Key: key,
       })
 
-      const signedUrl = await getSignedUrl(this.s3Client, command, { expiresIn })
+      const signedUrl = await getSignedUrl(this.s3Client, command, { expiresIn: _expiresIn })
       return signedUrl
     } catch (_error) {
 

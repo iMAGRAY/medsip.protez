@@ -158,13 +158,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <CartContext.Provider
       value={{
         items,
-        addItem,
+        addItem: _addItem,
         removeItem,
-        updateQuantity,
-        updateCustomPrice,
-        clearCart,
-        totalItems,
-        totalPrice
+        updateQuantity: _updateQuantity,
+        updateCustomPrice: _updateCustomPrice,
+        clearCart: _clearCart,
+        totalItems: _totalItems,
+        totalPrice: _totalPrice
       }}
     >
       {children}
