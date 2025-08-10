@@ -43,7 +43,7 @@ export function InstantNavigationProvider({ children }: InstantNavigationProvide
   }, [pathname])
 
   const value: InstantNavigationContextType = {
-    navigate,
+    navigate: _navigate,
     isNavigating,
     targetPath
   }
