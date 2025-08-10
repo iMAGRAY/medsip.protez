@@ -2,6 +2,7 @@
 const { spawn } = require('child_process')
 const path = require('path')
 const dotenv = require('dotenv')
+const net = require('net')
 
 dotenv.config({ path: '.env.local' })
 dotenv.config({ path: 'database.env' })
@@ -23,9 +24,24 @@ async function isUp(baseUrl) {
   } catch (_) { return false }
 }
 
+async function findFreePort(start = 3010, attempts = 20) {
+  for (let p = start; p < start + attempts; p++) {
+    const can = await new Promise((resolve) => {
+      const srv = net.createServer()
+      srv.once('error', () => resolve(false))
+      srv.listen(p, () => {
+        srv.close(() => resolve(true))
+      })
+    })
+    if (can) return p
+  }
+  return start
+}
+
 async function main() {
   const env = { ...process.env }
-  const port = String(process.env.TEST_PORT || 3010)
+  let port = Number(process.env.TEST_PORT || 3010)
+  port = await findFreePort(port, 50)
   const baseUrl = `http://localhost:${port}`
   env.TEST_BASE_URL = baseUrl
   env.READONLY_SQL = env.READONLY_SQL || 'true'
@@ -36,7 +52,7 @@ async function main() {
   const buildCode = await runCmd(process.execPath, [path.join('node_modules','next','dist','bin','next'),'build'], env)
   if (buildCode !== 0) process.exit(buildCode)
 
-  const server = spawn(process.execPath, [path.join('node_modules','next','dist','bin','next'),'start','-p',port], { env, stdio: ['ignore','pipe','pipe'] })
+  const server = spawn(process.execPath, [path.join('node_modules','next','dist','bin','next'),'start','-p',String(port)], { env, stdio: ['ignore','pipe','pipe'] })
   let ready = false
   server.stdout.on('data', d => {
     const t = d.toString()
@@ -51,7 +67,7 @@ async function main() {
   }
   if (!ready) {
     try { server.kill('SIGTERM') } catch(_) {}
-    console.error('❌ Server did not start for smoke')
+    console.error('❌ Server did not start for smoke on', baseUrl)
     process.exit(1)
   }
 
