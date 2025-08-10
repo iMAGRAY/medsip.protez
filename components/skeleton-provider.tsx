@@ -144,10 +144,10 @@ export function SkeletonProvider({
   const contextValue: SkeletonContextType = {
     isPageLoading,
     loadingComponents,
-    registerPageSkeleton,
-    getPageSkeleton,
-    setComponentLoading,
-    isComponentLoading
+    registerPageSkeleton: _registerPageSkeleton,
+    getPageSkeleton: _getPageSkeleton,
+    setComponentLoading: _setComponentLoading,
+    isComponentLoading: _isComponentLoading
   }
 
   return (
