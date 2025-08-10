@@ -75,10 +75,6 @@ export function WarehouseSettings() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    loadSettings()
-  }, [loadSettings])
-
   const loadSettings = useCallback(async () => {
       setLoading(true)
       try {
@@ -95,6 +91,10 @@ export function WarehouseSettings() {
         setLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     setSaving(true)
