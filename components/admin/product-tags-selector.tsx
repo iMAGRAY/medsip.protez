@@ -253,7 +253,7 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
         credentials: 'include',
         body: JSON.stringify({
           ...newTagData,
-          slug,
+          slug: _slug,
           is_active: true,
           product_id: parseInt(productId.toString()) // Создаем личный тег для этого товара
         }),
