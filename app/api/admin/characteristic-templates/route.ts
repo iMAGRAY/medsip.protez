@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const cols = await columnsExist('characteristic_templates', [
-      'group_id','unit_id','input_type','is_required','sort_order','validation_rules','default_value','placeholder_text','is_template'
+      'group_id','unit_id','input_type','is_required','sort_order','validation_rules','default_value','placeholder_text','is_template','description'
     ])
 
     const hasGroupId = !!cols.group_id
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       'ct.id',
       hasGroupId ? 'ct.group_id' : 'NULL as group_id',
       'ct.name',
-      'ct.description',
+      cols.description ? 'ct.description' : 'NULL as description',
       cols.input_type ? 'ct.input_type' : `'text'::varchar as input_type`,
       cols.is_required ? 'ct.is_required' : 'false as is_required',
       cols.sort_order ? 'ct.sort_order' : '0 as sort_order',
@@ -75,7 +75,8 @@ export async function GET(request: NextRequest) {
 
     const orderParts: string[] = []
     if (canJoinGroups) orderParts.push('cg.ordering')
-    orderParts.push('sort_order', 'ct.name')
+    if (cols.sort_order) orderParts.push('ct.sort_order')
+    orderParts.push('ct.name')
 
     query += ` ORDER BY ${orderParts.join(', ')} LIMIT 200`;
 
@@ -128,18 +129,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
     }
 
-    const cols = await columnsExist('characteristic_templates', ['unit_id','validation_rules','placeholder_text','default_value','input_type','is_required','sort_order'])
+    const cols = await columnsExist('characteristic_templates', ['unit_id','validation_rules','placeholder_text','default_value','input_type','is_required','sort_order','description'])
 
     const pool = getPool();
 
     await pool.query('BEGIN');
 
     try {
-      const insertCols: string[] = ['group_id','name','description']
-      const insertVals: string[] = ['$1','$2','$3']
-      const insertParams: any[] = [group_id, name, description]
-      let idx = 4
-
+      const insertCols: string[] = ['group_id','name']
+      const insertVals: string[] = ['$1','$2']
+      const insertParams: any[] = [group_id, name]
+      let idx = 3
+      if (cols.description) { insertCols.push('description'); insertVals.push(`$${idx++}`); insertParams.push(description ?? null) }
       if (cols.input_type) { insertCols.push('input_type'); insertVals.push(`$${idx++}`); insertParams.push(input_type) }
       if (cols.unit_id) { insertCols.push('unit_id'); insertVals.push(`$${idx++}`); insertParams.push(unit_id || null) }
       if (cols.is_required) { insertCols.push('is_required'); insertVals.push(`$${idx++}`); insertParams.push(!!is_required) }
