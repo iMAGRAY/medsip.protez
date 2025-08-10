@@ -81,10 +81,6 @@ export function ProductVariantSelectorV2({
   const [comparisonMode, setComparisonMode] = useState(false)
   const [compareVariants, setCompareVariants] = useState<number[]>([])
 
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -122,6 +118,10 @@ export function ProductVariantSelectorV2({
         setLoading(false)
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
 
   const handleVariantSelect = (variant: ProductVariantV2) => {
     setImageLoading(true)
