@@ -182,9 +182,9 @@ export function useProductFormData() {
     loadModelLines,
 
     // Вспомогательные методы
-    getModelLinesByManufacturer,
-    getCategoryById,
-    getManufacturerById,
-    getModelLineById
+    getModelLinesByManufacturer: _getModelLinesByManufacturer,
+    getCategoryById: _getCategoryById,
+    getManufacturerById: _getManufacturerById,
+    getModelLineById: _getModelLineById
   }
 }
