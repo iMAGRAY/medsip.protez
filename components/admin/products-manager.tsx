@@ -107,16 +107,6 @@ export function ProductsManager({
 
   const [attemptedSave, setAttemptedSave] = useState(false)
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    if (modelLineId) {
-      loadProductsForModelLine();
-    }
-  }, [modelLineId]);
-
   const loadData = useCallback(async () => {
       try {
         setLoading(true);
@@ -140,6 +130,16 @@ export function ProductsManager({
         setLoading(false);
       }
     }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    if (modelLineId) {
+      loadProductsForModelLine();
+    }
+  }, [modelLineId]);
 
   const loadProductsForModelLine = async () => {
     if (!modelLineId) return;
