@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
+import { guardDbOr503 } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,9 +15,8 @@ function isDbConfigured() {
 export async function GET(request: NextRequest) {
   try {
 
-    if (!isDbConfigured()) {
-      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
-    }
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
     const exists = await executeQuery(`
       SELECT EXISTS (
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       ) as exist
     `)
     if (!exists.rows[0]?.exist) {
-      return NextResponse.json({ success: false, error: 'Categories schema is not initialized' }, { status: 503 })
+      return NextResponse.json({ success: true, data: [], total: 0, flat: true }, { status: 200 })
     }
 
     const query = `
@@ -116,13 +116,8 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Categories Flat API Error:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch categories',
-        details: error instanceof Error ? error.message : String(error)
-      },
+      { success: false, error: 'Failed to fetch categories', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { executeQuery, getPool } from "@/lib/db-connection"
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,8 +12,12 @@ function isDbConfigured() {
 
 export async function GET() {
   try {
-    if (!isDbConfigured()) {
-      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
+    const need = await tablesExist(['characteristics_groups_simple'])
+    if (!need.characteristics_groups_simple) {
+      return NextResponse.json({ success: true, data: [], total: 0 })
     }
 
     const query = `
@@ -72,7 +77,6 @@ export async function GET() {
     })
 
   } catch (error) {
-    console.error("Database error in spec-groups GET:", error)
     return NextResponse.json(
       {
         success: false,
@@ -86,9 +90,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isDbConfigured()) {
-      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
-    }
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
     const { name, description, parent_id } = await request.json()
 
@@ -97,6 +100,11 @@ export async function POST(request: NextRequest) {
         { success: false, error: "Name is required" },
         { status: 400 }
       )
+    }
+
+    const need = await tablesExist(['characteristics_groups_simple'])
+    if (!need.characteristics_groups_simple) {
+      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
     }
 
     const result = await executeQuery(
@@ -112,7 +120,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Database error in spec-groups POST:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create spec group" },
       { status: 500 }
@@ -124,9 +131,8 @@ export async function PUT(request: NextRequest) {
   const pool = getPool()
 
   try {
-    if (!isDbConfigured()) {
-      return NextResponse.json({ error: 'Database config is not provided' }, { status: 503 })
-    }
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -230,17 +236,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(result.rows[0])
   } catch (error) {
-    console.error('❌ Error updating spec group:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      // @ts-ignore
-      code: (error as any).code,
-      // @ts-ignore
-      detail: (error as any).detail,
-      // @ts-ignore
-      stack: (error as any).stack
-    })
-
     if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
       return NextResponse.json(
         { error: 'Группа с таким названием уже существует' },
@@ -257,9 +252,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    if (!isDbConfigured()) {
-      return NextResponse.json({ error: 'Database config is not provided' }, { status: 503 })
-    }
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -411,8 +405,6 @@ export async function DELETE(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка удаления группы характеристик:', error)
-
     if ((error as any).code === '23503') {
       const detail = (error as any).detail || ''
       const match = detail.match(/Key \(id\)=\((\d+)\) is still referenced from table "(\w+)"/)

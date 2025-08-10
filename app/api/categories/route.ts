@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,9 +15,8 @@ function isDbConfigured() {
 
 export const GET = withCache(async function GET(request: NextRequest) {
   try {
-    if (!isDbConfigured()) {
-      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
-    }
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
     const tableCheckQuery = `
       SELECT EXISTS (
@@ -30,8 +30,8 @@ export const GET = withCache(async function GET(request: NextRequest) {
 
     if (!tableExists.rows[0].exists) {
       return NextResponse.json(
-        { success: false, error: 'Categories schema is not initialized' },
-        { status: 503 }
+        { success: true, data: [] },
+        { status: 200 }
       )
     }
 
@@ -64,17 +64,8 @@ export const GET = withCache(async function GET(request: NextRequest) {
     let categories = result.rows;
 
     if (includeStats && categories.length > 0) {
-      const productsTableQuery = `
-        SELECT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-          AND table_name = 'products'
-        )
-      `
-
-      const productsTableExists = await executeQuery(productsTableQuery)
-
-      if (productsTableExists.rows[0].exists) {
+      const need = await tablesExist(['products'])
+      if (need.products) {
         const categoryIds = categories.map(c => c.id);
 
         const statsQuery = `
@@ -107,11 +98,8 @@ export const GET = withCache(async function GET(request: NextRequest) {
         });
       } else {
         categories.forEach(category => {
-          category.stats = {
-            productsCount: 0,
-            activeProductsCount: 0
-          };
-        });
+          category.stats = { productsCount: 0, activeProductsCount: 0 };
+        })
       }
     }
 
@@ -157,12 +145,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
     return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('❌ Categories API Error:', error);
-    console.error('Error details:', {
-      message: (error as any).message,
-      stack: (error as any).stack,
-      name: (error as any).name
-    });
     return NextResponse.json(
       { error: 'Failed to fetch categories', success: false, details: (error as any).message },
       { status: 500 }

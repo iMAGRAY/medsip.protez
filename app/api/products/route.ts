@@ -4,17 +4,27 @@ import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { logger } from '@/lib/logger'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
+import { guardDbOr503, tablesExist, okEmpty } from '@/lib/api-guards'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export const GET = withCache(async function GET(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url);
     const fast = searchParams.get('fast') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     const detailed = searchParams.get('detailed') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
+
+    // Если нет нужных таблиц — возвращаем пустой успешный ответ, не 500
+    const needed = await tablesExist(['products'])
+    if (!needed.products) {
+      return okEmpty('data', { success: true, count: 0 })
+    }
 
     // Генерируем ключ кеша
     const cacheParams = { fast, limit, detailed };
@@ -26,7 +36,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
     // Используем cacheRemember для автоматического кеширования
     const fetchProducts = async () => {
       let query;
-      let queryParams = [];
+      let queryParams: any[] = [];
 
     if (fast) {
       // Быстрый запрос без JOIN'ов
@@ -36,7 +46,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
           p.image_url, p.in_stock, p.stock_quantity, p.stock_status, p.show_price,
           p.category_id, p.manufacturer_id, p.series_id,
           p.created_at, p.updated_at,
-          -- Проверяем, является ли товар основным (не вариантом), исключая стандартные варианты
           CASE 
             WHEN EXISTS (
               SELECT 1 FROM product_variants pv 
@@ -45,7 +54,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
             ) THEN true
             ELSE false
           END as has_variants,
-          -- Получаем количество активных вариантов, исключая стандартные
           (
             SELECT COUNT(*) 
             FROM product_variants pv 
@@ -70,29 +78,18 @@ export const GET = withCache(async function GET(request: NextRequest) {
       `;
     } else {
       // Полный запрос с JOIN'ами включая характеристики из простой системы
+      // Если нет таблиц характеристик — падать не должны. Проверим отдельно.
+      const charTables = await tablesExist(['product_characteristics_simple','characteristics_values_simple','characteristics_groups_simple'])
+
+      const joinSimple = charTables.product_characteristics_simple && charTables.characteristics_values_simple && charTables.characteristics_groups_simple
+
       query = `
         SELECT
           p.*,
           ms.name as model_line_name,
           m.name as manufacturer_name,
           pc.name as category_name,
-          -- Проверяем, является ли товар основным (не вариантом), исключая стандартные варианты
-          CASE 
-            WHEN EXISTS (
-              SELECT 1 FROM product_variants pv 
-              WHERE pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
-              AND (pv.name IS NULL OR pv.name NOT ILIKE '%standard%')
-            ) THEN true
-            ELSE false
-          END as has_variants,
-          -- Получаем количество активных вариантов, исключая стандартные
-          (
-            SELECT COUNT(*) 
-            FROM product_variants pv 
-            WHERE pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
-            AND (pv.name IS NULL OR pv.name NOT ILIKE '%standard%')
-          )::int as variants_count,
-          COALESCE(
+          ${joinSimple ? `COALESCE(
             JSON_AGG(
               CASE WHEN prch.id IS NOT NULL THEN
                 JSON_BUILD_OBJECT(
@@ -105,7 +102,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
               END
             ) FILTER (WHERE prch.id IS NOT NULL),
             '[]'::json
-          ) as specifications,
+          ) as specifications,` : `('[]'::json) as specifications,`}
           (
             SELECT json_agg(
               json_build_object(
@@ -122,14 +119,11 @@ export const GET = withCache(async function GET(request: NextRequest) {
         LEFT JOIN model_series ms ON p.series_id = ms.id
         LEFT JOIN manufacturers m ON p.manufacturer_id = m.id
         LEFT JOIN product_categories pc ON p.category_id = pc.id
-        LEFT JOIN product_characteristics_simple prch ON p.id = prch.product_id
+        ${joinSimple ? `LEFT JOIN product_characteristics_simple prch ON p.id = prch.product_id
         LEFT JOIN characteristics_values_simple cv ON prch.value_id = cv.id AND cv.is_active = true
-        LEFT JOIN characteristics_groups_simple cg ON cv.group_id = cg.id AND cg.is_active = true
+        LEFT JOIN characteristics_groups_simple cg ON cv.group_id = cg.id AND cg.is_active = true` : ''}
         WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
-        GROUP BY p.id, p.name, p.description, p.sku, p.article_number, p.price, p.discount_price,
-                 p.image_url, p.images, p.weight, p.battery_life, p.warranty, p.in_stock,
-                 p.stock_quantity, p.stock_status, p.category_id, p.manufacturer_id, p.series_id,
-                 p.created_at, p.updated_at, p.is_deleted, ms.name, m.name, pc.name
+        ${joinSimple ? `GROUP BY p.id, ms.name, m.name, pc.name` : ''}
         ORDER BY p.created_at DESC
       `;
     }
@@ -177,8 +171,8 @@ export const GET = withCache(async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to fetch products',
-        details: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: (error as any).message,
+        stack: process.env.NODE_ENV === 'development' ? (error as any).stack : undefined
       },
       { status: 500 }
     );
