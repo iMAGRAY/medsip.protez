@@ -1,6 +1,19 @@
 const fetch = require('node-fetch')
 const config = require('./test-config')
 
+const DEFAULT_TIMEOUT_MS = parseInt(process.env.TEST_HTTP_TIMEOUT_MS || '8000', 10)
+
+async function fetchWithTimeout(resource, options = {}) {
+  const { timeout = DEFAULT_TIMEOUT_MS, ...rest } = options
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  try {
+    return await fetch(resource, { ...rest, signal: controller.signal })
+  } finally {
+    clearTimeout(id)
+  }
+}
+
 class ApiHelper {
   constructor() {
     this.baseUrl = config.api.baseUrl
@@ -13,7 +26,8 @@ class ApiHelper {
       method,
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      timeout: DEFAULT_TIMEOUT_MS,
     }
 
     if (body) {
@@ -21,16 +35,14 @@ class ApiHelper {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}${url}`, options)
+      const response = await fetchWithTimeout(`${this.baseUrl}${url}`, options)
 
-      // Проверяем Content-Type для определения формата ответа
       const contentType = response.headers.get('content-type') || ''
       let data
 
       if (contentType.includes('application/json')) {
         data = await response.json()
       } else {
-        // Для HTML страниц просто возвращаем текст
         data = await response.text()
       }
 
@@ -124,7 +136,7 @@ class ApiHelper {
   }
 
   // Ожидание запуска сервера
-  async waitForServer(maxAttempts = 3, delay = 1000) {
+  async waitForServer(maxAttempts = 20, delay = 1000) {
     for (let i = 0; i < maxAttempts; i++) {
       if (await this.isServerRunning()) {
         return true
