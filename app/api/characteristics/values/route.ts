@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * API для работы со значениями характеристик в упрощенной системе
@@ -8,6 +11,14 @@ import { getPool } from '@/lib/db-connection';
 
 export async function GET(request: NextRequest) {
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    const need = await tablesExist(['characteristics_values_simple','characteristics_groups_simple'])
+    if (!need.characteristics_values_simple || !need.characteristics_groups_simple) {
+      return NextResponse.json({ success: true, data: [] })
+    }
+
     const { searchParams } = new URL(request.url)
     const groupId = searchParams.get('group_id')
 
@@ -20,14 +31,14 @@ export async function GET(request: NextRequest) {
       WHERE cv.is_active = true
     `
 
-    const params = []
+    const params: any[] = []
 
     if (groupId) {
       query += ` AND cv.group_id = $1`
       params.push(groupId)
     }
 
-    query += ` ORDER BY cv.sort_order, cv.value`
+    query += ` ORDER BY cv.sort_order, cv.value LIMIT 500`
 
     const pool = getPool()
     const result = await pool.query(query, params)

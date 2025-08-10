@@ -220,7 +220,7 @@ export async function PUT(
         'products:*',
         'product:*'
       ])
-      getCacheManager().clearAll()
+      getCacheManager().clear()
     } catch {}
 
     return NextResponse.json({ success: true, data: result.rows[0], message: 'Product updated successfully' })
@@ -358,7 +358,7 @@ export async function DELETE(
 
       try {
         await invalidateRelated(['medsip:products:*','products:*','product:*','products-fast:*','products-full:*','products-detailed:*','products-basic:*'])
-        cacheManager.clearAll()
+        cacheManager.clear()
         try { const { redisClient } = await import('@/lib/redis-client'); await redisClient.flushPattern('products-*'); await redisClient.flushPattern('product-*'); await redisClient.flushPattern('medsip:products-*') } catch {}
       } catch {}
 

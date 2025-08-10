@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
-import { guardDbOr503 } from '@/lib/api-guards'
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +15,7 @@ function isDbConfigured() {
 export async function GET(request: NextRequest) {
   try {
 
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const exists = await executeQuery(`

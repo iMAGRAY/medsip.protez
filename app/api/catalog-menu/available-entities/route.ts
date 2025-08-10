@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -12,6 +13,9 @@ function isDbConfigured() {
 
 export async function GET(request: Request) {
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
     }

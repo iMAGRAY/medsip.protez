@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
                 'inventory:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
             console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
@@ -298,7 +298,7 @@ export async function PUT(request: NextRequest) {
                 'inventory:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
             console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { getCacheManager } from '@/lib/dependency-injection'
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 // GET - получить информацию о каталоге
 export async function GET(
@@ -9,6 +10,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     const catalogId = parseInt(params.id)
 
     if (isNaN(catalogId)) {
@@ -58,6 +62,9 @@ export async function PUT(
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     // Проверяем аутентификацию
     const session = await requireAuth(request)
     if (!session) {
@@ -152,6 +159,9 @@ export async function DELETE(
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     // Проверяем аутентификацию
     const session = await requireAuth(request)
     if (!session) {

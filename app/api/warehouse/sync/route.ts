@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
                 'product:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
             console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);

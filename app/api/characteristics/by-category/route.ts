@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { pool } from '@/lib/db'
 import { logger } from '@/lib/logger'
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,9 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
     }
@@ -22,18 +26,14 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get('category_id')
     const includeChildren = searchParams.get('include_children') === 'true'
     
-    const exists = await pool.query(`
-      SELECT table_name FROM information_schema.tables
-      WHERE table_schema='public' AND table_name = ANY($1)
-    `, [[
+    const need = await tablesExist([
       'products',
       'product_characteristics_simple',
       'characteristics_values_simple',
       'characteristics_groups_simple',
       'product_categories'
-    ]])
-    const names = new Set(exists.rows.map((r: any) => r.table_name))
-    if (!['products','product_characteristics_simple','characteristics_values_simple','characteristics_groups_simple'].every(t => names.has(t))) {
+    ])
+    if (!need.products || !need.product_characteristics_simple || !need.characteristics_values_simple || !need.characteristics_groups_simple) {
       return NextResponse.json({ success: false, error: 'Schema is not initialized' }, { status: 503 })
     }
     

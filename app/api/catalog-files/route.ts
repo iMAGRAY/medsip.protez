@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { getCacheManager } from '@/lib/dependency-injection'
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 function isDbConfigured() {
   return !!process.env.DATABASE_URL || (
@@ -14,6 +15,9 @@ export async function GET(request: NextRequest) {
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
     }
@@ -30,13 +34,6 @@ export async function GET(request: NextRequest) {
     `)
     if (!tableCheck.rows[0]?.exist) {
       return NextResponse.json({ success: false, error: 'catalog_files schema is not initialized' }, { status: 503 })
-    }
-
-    const cacheKey = `catalog-files:${activeOnly}:${year || 'all'}`
-    const cached = cacheManager.get(cacheKey)
-
-    if (cached && !searchParams.get('nocache')) {
-      return NextResponse.json(cached)
     }
 
     let query = `
@@ -72,8 +69,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     }
 
-    cacheManager.set(cacheKey, responseData, 5 * 60 * 1000)
-
     return NextResponse.json(responseData)
   } catch (error) {
     console.error('Error fetching catalog files:', error)
@@ -89,6 +84,9 @@ export async function POST(request: NextRequest) {
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
     }

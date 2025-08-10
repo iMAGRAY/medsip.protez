@@ -214,6 +214,10 @@ container.register('cacheManager', () => {
       this.cache.clear();
     }
 
+    clearAll(): void {
+      this.clear();
+    }
+
     getStats() {
       return {
         size: this.cache.size,

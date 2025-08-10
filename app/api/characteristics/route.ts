@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,19 +22,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
     }
 
-    const pool = getPool();
+    const fast = guardDbOr503Fast()
+    if (fast) return fast
 
-    const exists = await pool.query(`
-      SELECT table_name FROM information_schema.tables
-      WHERE table_schema='public' AND table_name = ANY($1)
-    `, [[
-      'characteristics_groups_simple',
-      'characteristics_values_simple'
-    ]])
-    const names = new Set(exists.rows.map((r: any) => r.table_name))
-    if (!names.has('characteristics_groups_simple') || !names.has('characteristics_values_simple')) {
+    const need = await tablesExist(['characteristics_groups_simple','characteristics_values_simple'])
+    if (!need.characteristics_groups_simple || !need.characteristics_values_simple) {
       return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
     }
+
+    const pool = getPool();
 
     const valuesQuery = `
       SELECT

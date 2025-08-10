@@ -8,6 +8,25 @@ let pool: Pool | null = null
 // Add legacy synchronous availability flag for existing routes
 let connectionFailed = false
 
+// Helper to detect real connection-level issues
+function isConnectionError(err: any): boolean {
+  if (!err) return true
+  const code = err.code || err.errno || err.name
+  const msg = (err.message || '').toLowerCase()
+  // pg/sqlstate classes for connection issues and admin shutdown
+  const pgCodes = new Set([
+    '08000','08001','08003','08004','08006','08007', // connection exceptions
+    '57P01','57P02','57P03', // admin shutdown, crash, cannot connect now
+  ])
+  const nodeNet = new Set([
+    'ECONNREFUSED','ECONNRESET','ETIMEDOUT','EHOSTUNREACH','ENETUNREACH','EPIPE','PROTOCOL_CONNECTION_LOST'
+  ])
+  if (typeof code === 'string' && (pgCodes.has(code) || nodeNet.has(code))) return true
+  if (msg.includes('timeout acquiring a client')) return true
+  if (msg.includes('failed to connect') || msg.includes('connect ECONN')) return true
+  return false
+}
+
 // Environment validation
 function validateEnvironment(): void {
   const hasDatabaseUrl = !!process.env.DATABASE_URL
@@ -68,7 +87,7 @@ export function getPool(): Pool {
     pool = createPool()
     pool.on("error", (err) => {
       logger.error("PostgreSQL Pool error", err)
-      connectionFailed = true
+      if (isConnectionError(err)) connectionFailed = true
     })
     pool.on("connect", () => {
       logger.debug("New database connection established")
@@ -104,7 +123,7 @@ export async function testConnection(): Promise<boolean> {
     const duration = Date.now() - startTime
     logger.error("Database connection test failed", error, 'DATABASE')
     performanceMonitor.recordQuery("SELECT 1", duration, false, (error as Error).message)
-    connectionFailed = true
+    connectionFailed = isConnectionError(error)
     return false
   }
 }
@@ -180,7 +199,7 @@ export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
 
     logger.dbError(query, error as Error, params)
     performanceMonitor.recordQuery(query, duration, false, errorMessage)
-    connectionFailed = true
+    if (isConnectionError(error)) connectionFailed = true
     throw error
   }
 }

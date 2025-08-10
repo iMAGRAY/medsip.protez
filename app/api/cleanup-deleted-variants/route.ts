@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // 4. Очищаем кеш
     try {
       // Очищаем через cache manager
-      cacheManager.clearAll();
+      cacheManager.clear();
       
       // Принудительно очищаем Redis кеш
       try {
