@@ -253,7 +253,7 @@ export function useOptimizedMedia(options: UseOptimizedMediaOptions = {}): UseOp
         setNextToken(data.nextContinuationToken)
         setPerformance({
           ...data.performance,
-          clientTime
+          clientTime: _clientTime
         })
 
         requestCountRef.current++
@@ -330,8 +330,8 @@ export function useOptimizedMedia(options: UseOptimizedMediaOptions = {}): UseOp
     hasMore,
     performance,
     error,
-    loadMore,
-    refresh,
-    clearCache
+    loadMore: _loadMore,
+    refresh: _refresh,
+    clearCache: _clearCache
   }
 }
