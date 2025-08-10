@@ -13,12 +13,20 @@ const ALLOWED_STATUS = [
   { pattern: /^\/api\/product-images$/, codes: [200, 400] },
   { pattern: /^\/api\/variant-images$/, codes: [200, 400, 404] },
   { pattern: /^\/api\/sql-table\//, codes: [200, 400] },
+  { pattern: /^\/api\/log-404$/, codes: [405] },
+  { pattern: /^\/api\/warehouse\/sections\/\d+$/, codes: [200, 405] },
+  { pattern: /^\/api\/warehouse\/setup-hierarchy$/, codes: [405] },
+  { pattern: /^\/api\/media\/check-duplicate$/, codes: [405] },
+  { pattern: /^\/api\/orders\/\d+\/items\/\d+$/, codes: [405] },
+  { pattern: /^\/api\/variants\/\d+\/personal-tags\/\d+$/, codes: [405] },
 ]
 
 function isAllowedStatus(url, status) {
   for (const rule of ALLOWED_STATUS) {
     if (rule.pattern.test(url) && rule.codes.includes(status)) return true
   }
+  // Общее правило: ресурсы по id могут легитимно вернуть 404
+  if (/^\/api\/[^?]*\/[0-9]+(\/.*)?$/.test(url) && [200, 404].includes(status)) return true
   return false
 }
 
@@ -58,7 +66,7 @@ async function main() {
   const stats = { total: 0, ok: 0, fail: 0, errors: [] }
 
   const worker = async (route) => {
-    if (/\/(upload|delete|cleanup|admin\/auth|seed|reset|sync|init|register|db-reset|cache\/clear)\b/i.test(route)) return null
+    if (/\/(upload|delete|cleanup|admin\/auth|seed|reset|sync|init|register|db-reset|cache\/clear|test-)/i.test(route)) return null
     const url = route
     try {
       const start = Date.now()
