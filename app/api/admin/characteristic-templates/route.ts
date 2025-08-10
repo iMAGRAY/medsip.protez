@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/characteristic-templates - создать новый шаблон характеристики
 export async function POST(request: NextRequest) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const body = await request.json();
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/admin/characteristic-templates - обновить несколько шаблонов
 export async function PUT(request: NextRequest) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const body = await request.json();
