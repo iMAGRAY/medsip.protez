@@ -157,13 +157,13 @@ export async function GET(request: NextRequest) {
     logger.info('Characteristics loaded by category', { 
       categoryId, 
       sectionsCount: formattedData.sections.length,
-      duration 
+      duration: _duration 
     })
     
     return NextResponse.json({
       success: true,
       data: formattedData,
-      duration
+      duration: _duration
     })
     
   } catch (error) {
@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to load characteristics',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )

@@ -25,7 +25,7 @@ export async function GET(_request: NextRequest) {
       connected: isConnected,
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || '6379',
-      cacheStats,
+      cacheStats: _cacheStats,
       timestamp: new Date().toISOString()
     }
 

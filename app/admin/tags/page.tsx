@@ -70,10 +70,6 @@ export default function ProductTagsPage() {
     sort_order: 0
   })
 
-  useEffect(() => {
-    fetchTags()
-  }, [fetchTags])
-
   const fetchTags = useCallback(async () => {
       try {
         const response = await fetch('/api/product-tags?include_inactive=true', {
@@ -88,11 +84,15 @@ export default function ProductTagsPage() {
         }
       } catch (error) {
         console.error('Error fetching tags:', error)
-        toast.error('Ошибка загрузки тегов')
+        toast.error('Ошибка соединения с сервером')
       } finally {
         setIsLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    fetchTags()
+  }, [fetchTags])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -104,7 +104,7 @@ export default function ProductTagsPage() {
         : formData
       
       const response = await fetch('/api/product-tags', {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },

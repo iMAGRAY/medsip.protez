@@ -228,7 +228,7 @@ export async function GET(request: Request) {
       success: true,
       data: entity_type ? getEntitiesByType(entity_type) : entitiesByType,
       flat: allEntities,
-      stats,
+      stats: _stats,
       entity_types: ['spec_group', 'category', 'manufacturer', 'model_line', 'manufacturers_category']
     })
 

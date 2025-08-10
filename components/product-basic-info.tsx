@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, Building, Shield, FileText, ChevronDown } from "lucide-react"

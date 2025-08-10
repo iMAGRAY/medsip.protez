@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
@@ -112,7 +112,7 @@ export default function CategoriesAdmin() {
         : categoryFormData
 
       const res = await fetch('/api/categories', {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',

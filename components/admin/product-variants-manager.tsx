@@ -1,5 +1,5 @@
-import { SafeImage } from "@/components/safe-image"
 "use client"
+import { SafeImage } from "@/components/safe-image"
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'

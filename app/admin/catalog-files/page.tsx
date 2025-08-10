@@ -154,7 +154,7 @@ export default function CatalogFilesPage() {
       const _method = editingCatalog ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },

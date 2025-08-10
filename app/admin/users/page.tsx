@@ -465,7 +465,7 @@ function UserForm({
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(formData)

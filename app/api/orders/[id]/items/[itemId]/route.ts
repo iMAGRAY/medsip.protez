@@ -143,7 +143,7 @@ export async function PUT(
         data: {
           item: updateItemResult.rows[0],
           newTotal: custom_price !== undefined ? newTotal : undefined,
-          message
+          message: _message
         }
       })
 

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
@@ -241,10 +241,6 @@ export default function CatalogMenuPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
   const loadData = useCallback(async () => {
       setLoading(true)
       try {
@@ -286,7 +282,11 @@ export default function CatalogMenuPage() {
       } finally {
         setLoading(false)
       }
-    }, [])
+    }, [toast])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const handleToggleVisibility = async (item: CatalogMenuItem) => {
     if (!item.id) return

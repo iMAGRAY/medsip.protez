@@ -1,5 +1,5 @@
-import { SafeImage } from "@/components/safe-image"
 "use client"
+import { SafeImage } from "@/components/safe-image"
 
 import React, { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
@@ -69,10 +69,6 @@ export default function ManufacturerModelLinesPage() {
     is_active: true
   })
 
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
   const loadData = useCallback(async () => {
       try {
         setIsLoading(true)
@@ -91,6 +87,10 @@ export default function ManufacturerModelLinesPage() {
         setIsLoading(false)
       }
     }, [manufacturerId])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const handleDeleteModelLine = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить модельный ряд "${name}"?`)) {

@@ -91,6 +91,31 @@ export default function ModelLineProductsPage() {
     image_url: ''
   })
 
+  const loadData = useCallback(async () => {
+      try {
+        setIsLoading(true)
+
+        const response = await fetch(`/api/model-lines/${modelLineId}/products`)
+
+        const data = await response.json()
+
+        if (data.success) {
+          setModelLine(data.data.modelLine)
+          setProducts(data.data.products || [])
+          setFilteredProducts(data.data.products || [])
+
+        } else {
+          console.error('Ошибка API:', data.error)
+          setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
+      }
+    }, [modelLineId])
+
   useEffect(() => {
     loadData()
   }, [loadData])
@@ -125,31 +150,6 @@ export default function ModelLineProductsPage() {
   useEffect(() => {
     loadCategories()
   }, [loadCategories])
-
-  const loadData = useCallback(async () => {
-      try {
-        setIsLoading(true)
-
-        const response = await fetch(`/api/model-lines/${modelLineId}/products`)
-
-        const data = await response.json()
-
-        if (data.success) {
-          setModelLine(data.data.modelLine)
-          setProducts(data.data.products || [])
-          setFilteredProducts(data.data.products || [])
-
-        } else {
-          console.error('Ошибка API:', data.error)
-          setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
-        }
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error)
-        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-      } finally {
-        setIsLoading(false)
-      }
-    }, [modelLineId])
 
   const handleDeleteProduct = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить товар "${name}"? Это действие нельзя отменить.`)) {

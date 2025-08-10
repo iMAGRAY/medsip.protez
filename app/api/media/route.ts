@@ -366,7 +366,7 @@ export async function GET(request: Request) {
       performance: {
         totalTime,
         s3Time,
-        sortTime,
+        sortTime: _sortTime,
         fileCount: sortedFiles.length,
         requestId
       }
@@ -402,7 +402,7 @@ export async function GET(request: Request) {
       {
         error: 'Failed to load media files',
         details: error instanceof Error ? error.message : String(error),
-        performance: { totalTime, error: true, requestId }
+        performance: { totalTime: _totalTime, error: true, requestId }
       },
       { status: 500 }
     )

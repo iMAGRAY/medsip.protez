@@ -121,7 +121,7 @@ export async function GET(
 
     return NextResponse.json({
       variant_id: parseInt(variantId),
-      characteristics,
+      characteristics: _characteristics,
       locale
     });
 

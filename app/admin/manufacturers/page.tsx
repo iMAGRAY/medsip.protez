@@ -66,10 +66,6 @@ export default function ManufacturersAdminPage() {
     logo_url: ''
   })
 
-  useEffect(() => {
-    loadManufacturers()
-  }, [loadManufacturers])
-
   const loadManufacturers = useCallback(async () => {
       try {
         setIsLoading(true)
@@ -87,6 +83,10 @@ export default function ManufacturersAdminPage() {
         setIsLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    loadManufacturers()
+  }, [loadManufacturers])
 
   const resetForm = () => {
     setFormData({
@@ -142,7 +142,7 @@ export default function ManufacturersAdminPage() {
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },

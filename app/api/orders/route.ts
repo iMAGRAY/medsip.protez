@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: {
           orderId,
-          createdAt,
+          createdAt: _createdAt,
           message: 'Заказ успешно создан'
         }
       })

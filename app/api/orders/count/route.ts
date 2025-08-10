@@ -22,13 +22,13 @@ export async function GET(_request: NextRequest) {
 
     const responseData = {
       success: true,
-      data: { total }
+      data: { total: _total }
     }
 
     // Кэшируем результат на 1 минуту
     cacheManager.set(cacheKey, responseData, 60000)
 
-    logger.info('Orders count loaded successfully', { total })
+    logger.info('Orders count loaded successfully', { total: _total })
 
     return NextResponse.json(responseData)
 

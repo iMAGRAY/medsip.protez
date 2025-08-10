@@ -1,6 +1,7 @@
-'use client'
+"use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -69,6 +70,7 @@ interface Unit {
 }
 
 export default function CharacteristicTemplatesAdmin() {
+  const { toast } = useToast()
   const [groups, setGroups] = useState<CharacteristicGroup[]>([])
   const [templates, setTemplates] = useState<CharacteristicTemplate[]>([])
   const [units, setUnits] = useState<Unit[]>([])
@@ -91,11 +93,6 @@ export default function CharacteristicTemplatesAdmin() {
     preset_values: []
   })
 
-  // Загрузка данных
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
   const loadData = useCallback(async () => {
       try {
         setLoading(true)
@@ -108,25 +105,30 @@ export default function CharacteristicTemplatesAdmin() {
 
         if (groupsRes.ok) {
           const groupsData = await groupsRes.json()
-          setGroups(groupsData.data || [])
+          setGroups(groupsData.data || groupsData.groups || [])
         }
 
         if (templatesRes.ok) {
           const templatesData = await templatesRes.json()
-          setTemplates(templatesData.data || [])
+          setTemplates(templatesData.data || templatesData.templates || [])
         }
 
         if (unitsRes.ok) {
           const unitsData = await unitsRes.json()
-          setUnits(unitsData.data || [])
+          setUnits(unitsData.data || unitsData.units || [])
         }
-
       } catch (error) {
         console.error('Ошибка загрузки данных:', error)
+        toast({ title: 'Ошибка', description: 'Не удалось загрузить данные', variant: 'destructive' })
       } finally {
         setLoading(false)
       }
-    }, [])
+    }, [toast])
+
+  // Загрузка данных
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   // Фильтруем шаблоны по выбранной группе
   const filteredTemplates = selectedGroupId
@@ -181,7 +183,7 @@ export default function CharacteristicTemplatesAdmin() {
       const _method = editingTemplate ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(templateForm)
       })

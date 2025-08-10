@@ -73,7 +73,7 @@ const client = getDbConnection()
 
       return NextResponse.json({
         success: true,
-        roles
+        roles: _roles
       })
     } catch (error) {
       console.error('Database error getting roles:', error)

@@ -304,11 +304,6 @@ export default function ProductVariantsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingVariant, setEditingVariant] = useState<any | undefined>(undefined)
 
-  useEffect(() => {
-    fetchProduct()
-    fetchVariants()
-  }, [fetchProduct])
-
   const fetchProduct = useCallback(async () => {
       try {
         const response = await fetch(`/api/products/${productId}`)
@@ -321,6 +316,14 @@ export default function ProductVariantsPage() {
         toast.error('Не удалось загрузить информацию о товаре')
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchProduct()
+  }, [fetchProduct])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [productId])
 
   const fetchVariants = async () => {
     try {
@@ -377,7 +380,7 @@ export default function ProductVariantsPage() {
 
       console.log('💾 Финальный payload для API:', {
         url,
-        method,
+        method: _method,
         images: payload.images,
         imagesCount: payload.images?.length || 0,
         hasImages: !!payload.images?.length
@@ -386,7 +389,7 @@ export default function ProductVariantsPage() {
       // Debug logging
       console.log('Saving variant:', {
         url,
-        method,
+        method: _method,
         formData,
         transformedPayload: payload,
         imagesField: payload.images,
@@ -423,7 +426,7 @@ export default function ProductVariantsPage() {
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })

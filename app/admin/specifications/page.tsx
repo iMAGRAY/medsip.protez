@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
@@ -465,7 +465,7 @@ if (group.children && group.children.length > 0) {
       }
 
       const res = await fetch(url, {
-        method,
+        method: _method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       })
@@ -672,7 +672,7 @@ if (group.children && group.children.length > 0) {
       const _method = editingEnum ? "PUT" : "POST"
 
       const res = await fetch(url, {
-        method,
+        method: _method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           group_id: enumFormData.groupId,
@@ -1036,7 +1036,7 @@ if (group.children && group.children.length > 0) {
                   const _groupId = typeof group.id === 'string' && group.id.startsWith('spec_')
                     ? parseInt(group.id.replace('spec_', ''))
                     : typeof group.id === 'number' ? group.id : 0;
-                  setEnumFormData(prev => ({ ...prev, groupId }));
+                  setEnumFormData(prev => ({ ...prev, groupId: _groupId }));
                   setIsEnumDialogOpen(true);
                 }}
                 className="h-6 w-6 p-0 text-gray-400 hover:text-green-600"

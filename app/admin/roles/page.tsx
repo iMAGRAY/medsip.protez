@@ -98,11 +98,6 @@ export default function RolesPage() {
   // Проверяем, является ли текущий пользователь главным администратором
   const isSuperAdmin = authStatus.user?.id === 1
 
-  useEffect(() => {
-    loadRoles()
-    loadPermissions()
-  }, [loadRoles])
-
   const loadRoles = useCallback(async () => {
       try {
         setLoading(true)
@@ -122,6 +117,11 @@ export default function RolesPage() {
         setLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    loadRoles()
+    loadPermissions()
+  }, [loadRoles])
 
   const loadPermissions = async () => {
     try {

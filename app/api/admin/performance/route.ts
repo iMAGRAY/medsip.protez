@@ -46,10 +46,10 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        metrics,
-        recentQueries,
-        slowQueries,
-        failedQueries,
+        metrics: _metrics,
+        recentQueries: _recentQueries,
+        slowQueries: _slowQueries,
+        failedQueries: _failedQueries,
         timestamp: new Date().toISOString()
       }
     })
