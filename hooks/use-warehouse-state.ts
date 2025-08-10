@@ -200,7 +200,7 @@ export function useWarehouseState() {
   }, [])
 
   const setDialog = useCallback((_type: keyof WarehouseState['dialogs'], _open: boolean) => {
-      dispatch({ type: 'SET_DIALOG', payload: { type, open } })
+      dispatch({ type: 'SET_DIALOG', payload: { type: _type, open: _open } })
   }, [])
 
   const setEditingItem = useCallback((item: any | null) => {
@@ -208,7 +208,7 @@ export function useWarehouseState() {
   }, [])
 
   const setSelectedId = useCallback((_type: keyof WarehouseState['selectedIds'], _id: number) => {
-      dispatch({ type: 'SET_SELECTED_ID', payload: { type, id } })
+      dispatch({ type: 'SET_SELECTED_ID', payload: { type: _type, id: _id } })
   }, [])
 
   const setBulkData = useCallback((data: BulkItem[]) => {
@@ -266,5 +266,5 @@ export function useWarehouseState() {
     resetSelectedIds
   ])
 
-  return { state, actions }
+  return { state, actions: _actions }
 }
