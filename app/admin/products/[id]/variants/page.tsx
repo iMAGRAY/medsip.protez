@@ -323,44 +323,44 @@ export default function ProductVariantsPage() {
 
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
-      console.log('🔍 VARIANTS PAGE - Запрос:', url)
-      
-      const response = await fetch(url)
-      const data = await response.json()
-      
-      console.log('📊 VARIANTS PAGE - Ответ:', {
-        success: data.success,
-        totalCount: data.data?.length || 0,
-        variants: data.data?.map((v: any) => ({
-          id: v.id,
-          name: v.name,
-          is_active: v.is_active,
-          master_id: v.master_id
-        }))
-      })
-      
-      if (data.success) {
-        console.log('📊 VARIANTS PAGE - Загруженные варианты с show_price:', data.data.map((v: any) => ({
-          id: v.id,
-          name: v.name,
-          show_price: v.show_price,
-          show_price_type: typeof v.show_price
-        })))
-        setVariants(data.data)
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
+        console.log('🔍 VARIANTS PAGE - Запрос:', url)
+        
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        console.log('📊 VARIANTS PAGE - Ответ:', {
+          success: data.success,
+          totalCount: data.data?.length || 0,
+          variants: data.data?.map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            is_active: v.is_active,
+            master_id: v.master_id
+          }))
+        })
+        
+        if (data.success) {
+          console.log('📊 VARIANTS PAGE - Загруженные варианты с show_price:', data.data.map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            show_price: v.show_price,
+            show_price_type: typeof v.show_price
+          })))
+          setVariants(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты')
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [productId])
 
   const handleSaveVariant = async (formData: any) => {
     try {
