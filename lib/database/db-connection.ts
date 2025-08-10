@@ -10,7 +10,6 @@ let connectionFailed = false
 
 // Environment validation
 function validateEnvironment(): void {
-  // Разрешаем: либо DATABASE_URL, либо набор POSTGRESQL_HOST/USER/DBNAME
   const hasDatabaseUrl = !!process.env.DATABASE_URL
   const hasPgParts = !!(process.env.POSTGRESQL_HOST && process.env.POSTGRESQL_USER && process.env.POSTGRESQL_DBNAME)
   if (!hasDatabaseUrl && !hasPgParts) {
@@ -23,8 +22,12 @@ function validateEnvironment(): void {
 }
 
 function createPool(): Pool {
-  // Validate environment first
   validateEnvironment()
+
+  const max = parseInt(process.env.DB_POOL_MAX || '20', 10)
+  const idleTimeoutMillis = parseInt(process.env.DB_IDLE_TIMEOUT_MS || '30000', 10)
+  const connectionTimeoutMillis = parseInt(process.env.DB_CONN_TIMEOUT_MS || '15000', 10)
+  const query_timeout = parseInt(process.env.DB_QUERY_TIMEOUT_MS || '30000', 10)
 
   const config: PoolConfig = {
     connectionString: process.env.DATABASE_URL || undefined,
@@ -33,11 +36,12 @@ function createPool(): Pool {
     user: process.env.DB_USER || process.env.POSTGRESQL_USER || "postgres",
     password: process.env.DB_PASSWORD || process.env.POSTGRESQL_PASSWORD || "",
     database: process.env.DB_NAME || process.env.POSTGRESQL_DBNAME || "medsip_protez",
-    max: 20,
-    idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 15_000,
-    query_timeout: 30_000,
+    max,
+    idleTimeoutMillis,
+    connectionTimeoutMillis,
+    query_timeout,
     ssl: (process.env.PGSSL === "true" || process.env.DATABASE_SSL === "true" || process.env.DATABASE_URL?.includes("sslmode=require")) ? { rejectUnauthorized: false } : undefined,
+    keepAlive: true,
   }
 
   logger.info('Connecting to database', {
@@ -47,7 +51,16 @@ function createPool(): Pool {
     ssl: !!config.ssl
   })
 
-  return new Pool(config)
+  const p = new Pool(config)
+  const stmtTimeout = parseInt(process.env.DB_STATEMENT_TIMEOUT_MS || String(query_timeout), 10)
+  p.on('connect', (client) => {
+    client.query(`SET application_name TO 'medsip-protez-app'`).catch(() => {})
+    if (stmtTimeout > 0) {
+      client.query(`SET statement_timeout TO ${stmtTimeout}`).catch(() => {})
+      client.query(`SET idle_in_transaction_session_timeout TO ${stmtTimeout}`).catch(() => {})
+    }
+  })
+  return p
 }
 
 export function getPool(): Pool {
@@ -68,7 +81,6 @@ export function isDatabaseAvailableSync(): boolean {
   return !connectionFailed
 }
 
-// Force reset connection function
 export function forceResetConnection(): void {
   connectionFailed = false
   if (pool) {
@@ -78,7 +90,6 @@ export function forceResetConnection(): void {
   logger.info("Database connection reset")
 }
 
-// Test connection function
 export async function testConnection(): Promise<boolean> {
   const startTime = Date.now()
   try {
@@ -98,24 +109,19 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Типы для параметров запросов (включая массивы)
 export type QueryParam = string | number | boolean | null | undefined | QueryParam[]
 
-// Простая защита от записывающих запросов в режиме READONLY_SQL
 function isWriteQuery(sql: string): boolean {
   const q = sql.trim().toUpperCase()
-  // Разрешаем SELECT/VALUES/SHOW/EXPLAIN/WITH (без DML) и CALL? По умолчанию блокируем типичные DML/DDL
   if (/^(INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|REPLACE|GRANT|REVOKE|VACUUM|ANALYZE|LOCK|MERGE|UPSERT)\b/.test(q)) {
     return true
   }
-  // WITH ... INSERT/UPDATE - грубая проверка на вхождение операций
   if (q.startsWith('WITH') && /(INSERT|UPDATE|DELETE)\b/.test(q)) {
     return true
   }
   return false
 }
 
-// Улучшенная типизация для executeQuery
 export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
   query: string,
   params: QueryParam[] = []
@@ -179,10 +185,8 @@ export async function executeQuery<T extends QueryResultRow = QueryResultRow>(
   }
 }
 
-// Legacy alias used in routes (synchronous)
 export const isDatabaseAvailable = isDatabaseAvailableSync;
 
-// Asynchronous deep health-check (can be used in cron/monitoring)
 export async function checkDatabaseConnection(): Promise<boolean> {
   try {
     const db = getPool()
@@ -194,7 +198,6 @@ export async function checkDatabaseConnection(): Promise<boolean> {
   }
 }
 
-// Graceful shutdown (useful for tests / Vercel edge)
 export async function closePool() {
   if (pool) {
     await pool.end()
@@ -203,17 +206,14 @@ export async function closePool() {
   }
 }
 
-// Get performance metrics
 export function getDatabaseMetrics() {
   return performanceMonitor.getMetrics()
 }
 
-// Get performance report
 export function getDatabaseReport(): string {
   return performanceMonitor.generateReport()
 }
 
-// Database service interface for backward compatibility
 export interface DbSiteSettings {
   id: number
   site_name: string
@@ -265,7 +265,6 @@ export interface DatabaseProduct {
   updated_at: Date
 }
 
-// Экспорт pool для совместимости (ленивая инициализация через Proxy)
 export const db = new Proxy({} as Pool, {
   get(_target, prop) {
     const real = getPool() as any
