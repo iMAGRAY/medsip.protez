@@ -167,7 +167,7 @@ function toast({ ...props }: Toast) {
   return {
     id: id,
     dismiss,
-    update,
+    update: _update,
   }
 }
 
@@ -187,7 +187,7 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (_toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss: (_toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId: _toastId }),
   }
 }
 
