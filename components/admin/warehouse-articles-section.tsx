@@ -90,10 +90,6 @@ export function WarehouseArticlesSection() {
     expiry_date: ''
   })
 
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
-
   const fetchData = useCallback(async () => {
       try {
         setLoading(true)
@@ -118,6 +114,10 @@ export function WarehouseArticlesSection() {
         setLoading(false)
       }
     }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const handleCreateArticle = async () => {
     if (!selectedProduct || !form.sku || !form.section_id || form.quantity === undefined) {
