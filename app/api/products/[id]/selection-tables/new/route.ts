@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export async function GET(
   request: NextRequest,
@@ -9,6 +10,9 @@ export async function GET(
   const startTime = Date.now()
 
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const productId = parseInt(params.id)
 
     if (isNaN(productId) || productId <= 0) {
@@ -20,7 +24,11 @@ export async function GET(
 
     logger.info('New product selection tables GET request', { productId })
 
-    // Загружаем таблицы подбора для новых товаров
+    const need = await tablesExist(['selection_tables'])
+    if (!need.selection_tables) {
+      return NextResponse.json({ success: true, data: {} })
+    }
+
     const query = `
       SELECT
         st.*,
@@ -35,7 +43,6 @@ export async function GET(
 
     const result = await executeQuery(query, [productId])
 
-    // Преобразуем данные в нужный формат
     const tables = result.rows.reduce((acc: any, row: any) => {
       try {
         const tableData = typeof row.table_data === 'string'
@@ -51,7 +58,7 @@ export async function GET(
           createdAt: row.created_at,
           updatedAt: row.updated_at
         }
-      } catch (parseError) {
+      } catch (parseError: any) {
         logger.warn('Failed to parse table data', { tableId: row.id, error: parseError.message })
       }
       return acc
@@ -71,7 +78,7 @@ export async function GET(
 
   } catch (error) {
     const duration = Date.now() - startTime
-    logger.error('Error loading new product selection tables', error, 'API')
+    logger.error('Error loading new product selection tables', error as any, 'API')
 
     return NextResponse.json({
       success: false,
@@ -88,6 +95,9 @@ export async function PUT(
   const startTime = Date.now()
 
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const productId = parseInt(params.id)
 
     if (isNaN(productId) || productId <= 0) {
@@ -101,7 +111,7 @@ export async function PUT(
     try {
       data = await request.json()
     } catch (parseError) {
-      logger.error('Failed to parse request body', parseError)
+      logger.error('Failed to parse request body', parseError as any)
       return NextResponse.json(
         { success: false, error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -110,7 +120,14 @@ export async function PUT(
 
     logger.info('New product selection tables PUT request', { productId })
 
-    // Проверяем существование продукта
+    const need = await tablesExist(['selection_tables', 'products'])
+    if (!need.products) {
+      return NextResponse.json({ success: false, error: 'Products table not found' }, { status: 503 })
+    }
+    if (!need.selection_tables) {
+      return NextResponse.json({ success: false, error: 'Selection tables schema not initialized' }, { status: 503 })
+    }
+
     const productCheck = await executeQuery(
       'SELECT id FROM products WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL)',
       [productId]
@@ -123,13 +140,10 @@ export async function PUT(
       )
     }
 
-    // Если переданы таблицы, обновляем/создаем их
     if (data.tables && typeof data.tables === 'object') {
-      // Начинаем транзакцию
       await executeQuery('BEGIN')
 
       try {
-        // Удаляем существующие таблицы new_product для этого продукта
         await executeQuery(
           `UPDATE selection_tables
            SET is_deleted = true
@@ -137,7 +151,6 @@ export async function PUT(
           [productId]
         )
 
-        // Добавляем новые таблицы
         let tablesAdded = 0
         for (const [tableName, tableInfo] of Object.entries(data.tables)) {
           if (tableInfo && typeof tableInfo === 'object') {
@@ -188,7 +201,7 @@ export async function PUT(
 
   } catch (error) {
     const duration = Date.now() - startTime
-    logger.error('New product selection tables PUT error', error, 'API')
+    logger.error('New product selection tables PUT error', error as any, 'API')
 
     return NextResponse.json({
       success: false,

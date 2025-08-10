@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -112,6 +113,9 @@ const COLUMN_TITLES: Record<string, Record<string, string>> = {
 
 export async function GET(request: Request) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const url = new URL(request.url)
     const tablesParam = url.searchParams.get('tables') || 'products'
     const requested = tablesParam.split(',').map((t) => t.trim()).filter(Boolean)
@@ -121,14 +125,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No valid tables requested' }, { status: 400 })
     }
 
-    // dynamic import exceljs only here
     const Excel = await import('exceljs')
     const workbook = new Excel.Workbook()
 
+    // Проверим наличие всех таблиц разом
+    const existingMap = await tablesExist(tables)
+
     for (const table of tables) {
+      if (!existingMap[table]) {
+        // Пропускаем несуществующие таблицы
+        continue
+      }
+
       let rows: any[] = []
       if (table === 'products') {
-        // Обновленный запрос для новой EAV системы
         const query = `
           SELECT
             p.id,
@@ -155,7 +165,7 @@ export async function GET(request: Request) {
                   END,
                   'Не указано'
                 ),
-                CASE WHEN pv.sku IS NOT NULL AND pv.sku != '' THEN CONCAT(' (', pv.sku, ')') ELSE '' END
+                CASE WHEN pv.variant_sku IS NOT NULL AND pv.variant_sku != '' THEN CONCAT(' (', pv.variant_sku, ')') ELSE '' END
               ),
               ' | '
               ORDER BY cg.ordering NULLS LAST, ct.sort_order NULLS LAST
@@ -164,39 +174,36 @@ export async function GET(request: Request) {
             p.updated_at
           FROM products p
           LEFT JOIN product_categories c ON c.id = p.category_id
-          LEFT JOIN product_variants pv ON pv.master_id = p.id
+          LEFT JOIN product_variants pv ON pv.master_id = p.id AND (pv.is_deleted = false OR pv.is_deleted IS NULL)
           LEFT JOIN product_characteristics pc ON pc.product_id = p.id
           LEFT JOIN characteristic_templates ct ON ct.id = pc.template_id
             AND (ct.is_deleted = FALSE OR ct.is_deleted IS NULL)
           LEFT JOIN characteristic_groups cg ON cg.id = ct.group_id
             AND (cg.is_deleted = FALSE OR cg.is_deleted IS NULL)
             AND cg.is_active = true
-          LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
           LEFT JOIN characteristic_values cv ON cv.id = pc.value_preset_id
             AND (cv.is_active = TRUE OR cv.is_active IS NULL)
           GROUP BY p.id, c.name
           ORDER BY p.id`
         const result = await executeQuery(query)
-        rows = result.rows.map((r: any) => {
-          return {
-            id: r.id,
-            name: r.name,
-            category: r.category,
-            weight: r.weight,
-            battery_life: r.battery_life,
-            warranty: r.warranty,
-            in_stock: r.in_stock,
-            price: r.price,
-            sku: r.sku,
-            variants_count: r.variants_count,
-            characteristics: r.characteristics || 'Нет характеристик',
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-            system: 'eav_unified'
-          }
-        })
+        rows = result.rows.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          category: r.category,
+          weight: r.weight,
+          battery_life: r.battery_life,
+          warranty: r.warranty,
+          in_stock: r.in_stock,
+          price: r.price,
+          sku: r.sku,
+          variants_count: r.variants_count,
+          characteristics: r.characteristics || 'Нет характеристик',
+          created_at: r.created_at,
+          updated_at: r.updated_at,
+          system: 'eav_unified'
+        }))
       } else {
-        // generic select * for other tables
+        // generic select * for other tables (уже whitelisted, существование проверено)
         const result = await executeQuery(`SELECT * FROM ${table} ORDER BY 1 LIMIT 1000`)
         rows = result.rows
       }
@@ -206,11 +213,8 @@ export async function GET(request: Request) {
 
       const headers = Object.keys(rows[0])
       sheet.columns = headers.map((h) => ({ header: COLUMN_TITLES[table]?.[h] || h, key: h }))
-      rows.forEach((row) => {
-        sheet.addRow(row)
-      })
+      rows.forEach((row) => { sheet.addRow(row) })
 
-      // Auto column width based on content
       const sheetColumns = (sheet.columns || []) as any[]
       sheetColumns.forEach((col) => {
         let maxLength = col.header ? String(col.header).length : 10
@@ -221,30 +225,15 @@ export async function GET(request: Request) {
         col.width = Math.min(Math.max(maxLength + 2, 12), 50)
       })
 
-      // Header styling
       const headerRow = sheet.getRow(1)
       headerRow.font = { bold: true }
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
       headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFEFEFEF' },
-        }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFEFEF' } }
       })
 
-      // Freeze header row and enable filters
       sheet.views = [{ state: 'frozen', ySplit: 1 }]
-      sheet.autoFilter = {
-        from: {
-          row: 1,
-          column: 1,
-        },
-        to: {
-          row: 1,
-          column: headers.length,
-        },
-      }
+      sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: headers.length } }
     }
 
     const buffer = await workbook.xlsx.writeBuffer()

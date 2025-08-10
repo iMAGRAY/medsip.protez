@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 // GET /api/admin/characteristic-templates - получить все шаблоны характеристик
 export async function GET(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('group_id');
+
+    const need = await tablesExist(['characteristic_templates','characteristic_groups','characteristic_units','characteristic_preset_values'])
+    if (!need.characteristic_templates || !need.characteristic_groups) {
+      return NextResponse.json({ success: true, data: [] })
+    }
 
     const pool = getPool();
 
@@ -34,7 +43,7 @@ export async function GET(request: NextRequest) {
       LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
     `;
 
-    const params = [];
+    const params: any[] = [];
 
     if (groupId) {
       query += ` WHERE ct.group_id = $1`;
@@ -51,7 +60,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка получения шаблонов характеристик:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения шаблонов характеристик' },
       { status: 500 }
@@ -62,6 +70,9 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/characteristic-templates - создать новый шаблон характеристики
 export async function POST(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const body = await request.json();
     const {
       group_id,
@@ -84,13 +95,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const need = await tablesExist(['characteristic_templates','characteristic_preset_values'])
+    if (!need.characteristic_templates) {
+      return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
+    }
+
     const pool = getPool();
 
-    // Начинаем транзакцию
     await pool.query('BEGIN');
 
     try {
-      // Создаем шаблон характеристики
       const templateResult = await pool.query(`
         INSERT INTO characteristic_templates (
           group_id, name, description, input_type, unit_id,
@@ -113,8 +127,7 @@ export async function POST(request: NextRequest) {
 
       const template = templateResult.rows[0];
 
-      // Создаем предустановленные значения, если они есть
-      if (preset_values && preset_values.length > 0) {
+      if (preset_values && preset_values.length > 0 && need.characteristic_preset_values) {
         for (let i = 0; i < preset_values.length; i++) {
           const presetValue = preset_values[i];
           await pool.query(`
@@ -124,10 +137,10 @@ export async function POST(request: NextRequest) {
             VALUES ($1, $2, $3, $4, $5);
           `, [
             template.id,
-            presetValue.value || presetValue,
-            presetValue.display_text || presetValue.value || presetValue,
-            presetValue.sort_order || i,
-            presetValue.is_default || false
+            (presetValue as any).value || presetValue,
+            (presetValue as any).display_text || (presetValue as any).value || presetValue,
+            (presetValue as any).sort_order || i,
+            (presetValue as any).is_default || false
           ]);
         }
       }
@@ -146,7 +159,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка создания шаблона характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка создания шаблона характеристики' },
       { status: 500 }
@@ -157,6 +169,9 @@ export async function POST(request: NextRequest) {
 // PUT /api/admin/characteristic-templates - обновить несколько шаблонов
 export async function PUT(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const body = await request.json();
     const { templates } = body;
 
@@ -165,6 +180,11 @@ export async function PUT(request: NextRequest) {
         { success: false, error: 'Ожидается массив шаблонов' },
         { status: 400 }
       );
+    }
+
+    const need = await tablesExist(['characteristic_templates'])
+    if (!need.characteristic_templates) {
+      return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
     }
 
     const pool = getPool();
@@ -227,7 +247,6 @@ export async function PUT(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка обновления шаблонов характеристик:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления шаблонов характеристик' },
       { status: 500 }

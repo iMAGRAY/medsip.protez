@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 // GET /api/admin/characteristic-templates/[id] - получить шаблон с предустановленными значениями
 export async function GET(
@@ -7,6 +8,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const templateId = parseInt(params.id);
 
     if (isNaN(templateId)) {
@@ -16,9 +20,13 @@ export async function GET(
       );
     }
 
+    const need = await tablesExist(['characteristic_templates','characteristic_groups','characteristic_units','characteristic_preset_values'])
+    if (!need.characteristic_templates) {
+      return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
+    }
+
     const pool = getPool();
 
-    // Получаем шаблон
     const templateResult = await pool.query(`
       SELECT
         ct.*,
@@ -40,15 +48,17 @@ export async function GET(
 
     const template = templateResult.rows[0];
 
-    // Получаем предустановленные значения
-    const presetValuesResult = await pool.query(`
-      SELECT *
-      FROM characteristic_preset_values
-      WHERE template_id = $1
-      ORDER BY sort_order, value;
-    `, [templateId]);
-
-    template.preset_values = presetValuesResult.rows;
+    if (need.characteristic_preset_values) {
+      const presetValuesResult = await pool.query(`
+        SELECT *
+        FROM characteristic_preset_values
+        WHERE template_id = $1
+        ORDER BY sort_order, value;
+      `, [templateId]);
+      template.preset_values = presetValuesResult.rows;
+    } else {
+      template.preset_values = []
+    }
 
     return NextResponse.json({
       success: true,
@@ -56,7 +66,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Ошибка получения шаблона характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения шаблона характеристики' },
       { status: 500 }
@@ -70,6 +79,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const templateId = parseInt(params.id);
 
     if (isNaN(templateId)) {
@@ -93,12 +105,16 @@ export async function PUT(
       preset_values = []
     } = body;
 
+    const need = await tablesExist(['characteristic_templates','characteristic_preset_values'])
+    if (!need.characteristic_templates) {
+      return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
+    }
+
     const pool = getPool();
 
     await pool.query('BEGIN');
 
     try {
-      // Обновляем шаблон
       const templateResult = await pool.query(`
         UPDATE characteristic_templates
         SET
@@ -135,28 +151,28 @@ export async function PUT(
         );
       }
 
-      // Удаляем старые предустановленные значения
-      await pool.query(`
-        DELETE FROM characteristic_preset_values
-        WHERE template_id = $1;
-      `, [templateId]);
+      if (need.characteristic_preset_values) {
+        await pool.query(`
+          DELETE FROM characteristic_preset_values
+          WHERE template_id = $1;
+        `, [templateId]);
 
-      // Создаем новые предустановленные значения
-      if (preset_values && preset_values.length > 0) {
-        for (let i = 0; i < preset_values.length; i++) {
-          const presetValue = preset_values[i];
-          await pool.query(`
-            INSERT INTO characteristic_preset_values (
-              template_id, value, display_text, sort_order, is_default
-            )
-            VALUES ($1, $2, $3, $4, $5);
-          `, [
-            templateId,
-            presetValue.value || presetValue,
-            presetValue.display_text || presetValue.value || presetValue,
-            presetValue.sort_order || i,
-            presetValue.is_default || false
-          ]);
+        if (preset_values && preset_values.length > 0) {
+          for (let i = 0; i < preset_values.length; i++) {
+            const presetValue = preset_values[i];
+            await pool.query(`
+              INSERT INTO characteristic_preset_values (
+                template_id, value, display_text, sort_order, is_default
+              )
+              VALUES ($1, $2, $3, $4, $5);
+            `, [
+              templateId,
+              (presetValue as any).value || presetValue,
+              (presetValue as any).display_text || (presetValue as any).value || presetValue,
+              (presetValue as any).sort_order || i,
+              (presetValue as any).is_default || false
+            ]);
+          }
         }
       }
 
@@ -174,7 +190,6 @@ export async function PUT(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка обновления шаблона характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления шаблона характеристики' },
       { status: 500 }
@@ -188,6 +203,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const templateId = parseInt(params.id);
 
     if (isNaN(templateId)) {
@@ -197,33 +215,38 @@ export async function DELETE(
       );
     }
 
-    const pool = getPool();
-
-    // Проверяем, используется ли шаблон в характеристиках товаров
-    const usageResult = await pool.query(`
-      SELECT COUNT(*) as usage_count
-      FROM product_characteristics_simple
-      WHERE value_id IN (
-        SELECT id FROM characteristics_values_simple
-        WHERE group_id IN (
-          SELECT group_id FROM characteristic_templates WHERE id = $1
-        )
-      );
-    `, [templateId]);
-
-    const usageCount = parseInt(usageResult.rows[0].usage_count);
-
-    if (usageCount > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Шаблон используется в ${usageCount} характеристиках товаров. Удаление невозможно.`
-        },
-        { status: 400 }
-      );
+    const need = await tablesExist(['characteristic_templates','product_characteristics_simple','characteristics_values_simple'])
+    if (!need.characteristic_templates) {
+      return NextResponse.json({ success: false, error: 'Templates schema is not initialized' }, { status: 503 })
     }
 
-    // Удаляем шаблон (предустановленные значения удалятся автоматически благодаря CASCADE)
+    const pool = getPool();
+
+    if (need.product_characteristics_simple && need.characteristics_values_simple) {
+      const usageResult = await pool.query(`
+        SELECT COUNT(*) as usage_count
+        FROM product_characteristics_simple
+        WHERE value_id IN (
+          SELECT id FROM characteristics_values_simple
+          WHERE group_id IN (
+            SELECT group_id FROM characteristic_templates WHERE id = $1
+          )
+        );
+      `, [templateId]);
+
+      const usageCount = parseInt(usageResult.rows[0].usage_count);
+
+      if (usageCount > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Шаблон используется в ${usageCount} характеристиках товаров. Удаление невозможно.`
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const deleteResult = await pool.query(`
       DELETE FROM characteristic_templates
       WHERE id = $1
@@ -245,7 +268,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('❌ Ошибка удаления шаблона характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления шаблона характеристики' },
       { status: 500 }
