@@ -411,7 +411,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
                     {variant.images && variant.images.length > 0 && (
                       <div className="flex gap-2 mt-2">
                         {variant.images.slice(0, 4).map((image, index) => (
-                          <SafeImage src={{image}} alt="{`${variant.sizeName} ${index + 1}`}" width={48} height={48} className="w-12 h-12 object-cover rounded border" />
+                          <SafeImage key={index} src={image} alt={`${variant.sizeName} ${index + 1}`} width={48} height={48} className="w-12 h-12 object-cover rounded border" />
                         ))}
                         {variant.images.length > 4 && (
                           <div className="w-12 h-12 bg-slate-100 rounded border flex items-center justify-center text-xs text-slate-600">
