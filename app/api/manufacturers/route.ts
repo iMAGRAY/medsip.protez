@@ -3,13 +3,21 @@ import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export const dynamic = 'force-dynamic'
 
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 export async function GET(request: NextRequest) {
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturers GET")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
@@ -19,7 +27,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const includeStats = searchParams.get('include_stats') === 'true';
 
-    // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -43,7 +50,7 @@ export async function GET(request: NextRequest) {
         m.country,
         m.founded_year,
         m.logo_url,
-        m.is_active,
+        true as is_active,
         m.sort_order,
         m.created_at,
         m.updated_at,
@@ -63,12 +70,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Manufacturers API Error:', error);
-    console.error('Error details:', {
-      message: (error as any).message,
-      stack: (error as any).stack,
-      name: (error as any).name
-    });
     return NextResponse.json(
       { error: 'Failed to fetch manufacturers', details: (error as any).message, success: false },
       { status: 500 }
@@ -79,20 +80,20 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturers POST")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    // Получаем данные из запроса
     const data = await request.json()
 
-    // Валидация
     if (!data.name || typeof data.name !== 'string' || data.name.trim() === '') {
       return NextResponse.json(
         { error: 'Name is required', success: false },
@@ -100,7 +101,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -112,26 +112,9 @@ export async function POST(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE manufacturers (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL UNIQUE,
-          description TEXT,
-          website_url VARCHAR(500),
-          country VARCHAR(100),
-          founded_year INTEGER,
-          logo_url VARCHAR(500),
-          is_active BOOLEAN DEFAULT true,
-          sort_order INTEGER DEFAULT 0,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ success: false, error: 'Manufacturers schema is not initialized' }, { status: 503 })
     }
 
-    // Проверяем, существует ли производитель с таким именем
     const checkQuery = `SELECT id FROM manufacturers WHERE name = $1`
     const checkResult = await executeQuery(checkQuery, [data.name.trim()])
 
@@ -142,7 +125,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Создаем нового производителя
     const query = `
       INSERT INTO manufacturers (
         name,
@@ -177,14 +159,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('❌ Manufacturers API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-
-    // Проверяем, является ли ошибка нарушением уникальности
     if ((error as any).code === '23505') {
       return NextResponse.json(
         { error: 'Manufacturer with this name already exists', success: false },
@@ -193,7 +167,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to create manufacturer', details: error.message, success: false },
+      { error: 'Failed to create manufacturer', details: (error as any).message, success: false },
       { status: 500 }
     );
   }
