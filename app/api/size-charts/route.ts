@@ -15,14 +15,12 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
-    const manufacturer = searchParams.get('manufacturer')
 
     let query = `
       SELECT DISTINCT
         sc.id,
         sc.name,
         sc.category_id,
-        sc.manufacturer_id,
         sc.description,
         sc.chart_type,
         sc.created_at,
@@ -39,12 +37,7 @@ export async function GET(request: NextRequest) {
       queryParams.push(parseInt(category))
     }
 
-    if (manufacturer) {
-      query += ` AND sc.manufacturer_id = $${paramIndex++}`
-      queryParams.push(parseInt(manufacturer))
-    }
-
-    query += ` ORDER BY sc.manufacturer_id, sc.category_id, sc.name`
+    query += ` ORDER BY sc.category_id, sc.name`
 
     const result = await executeQuery(query, queryParams)
     const chartIds = result.rows.map((chart: any) => chart.id)

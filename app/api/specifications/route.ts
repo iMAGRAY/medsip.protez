@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
           sg.sort_order,
           sg.show_in_main_params,
           sg.main_params_priority,
-          sg.main_params_label_override,
           sg.is_active,
           0 as level,
           ARRAY[sg.sort_order, sg.id] as path
@@ -55,7 +54,6 @@ export async function GET(request: NextRequest) {
           sg.sort_order,
           sg.show_in_main_params,
           sg.main_params_priority,
-          sg.main_params_label_override,
           sg.is_active,
           st.level + 1,
           st.path || ARRAY[sg.sort_order, sg.id]
@@ -71,7 +69,6 @@ export async function GET(request: NextRequest) {
         st.sort_order as ordering,
         st.show_in_main_params,
         st.main_params_priority,
-        st.main_params_label_override,
         st.level,
         COALESCE(
           JSON_AGG(
@@ -88,7 +85,7 @@ export async function GET(request: NextRequest) {
         (SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = st.id) as children_count
       FROM characteristic_tree st
       LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
-      GROUP BY st.id, st.name, st.description, st.parent_id, st.sort_order, st.show_in_main_params, st.main_params_priority, st.main_params_label_override, st.level, st.path
+      GROUP BY st.id, st.name, st.description, st.parent_id, st.sort_order, st.show_in_main_params, st.main_params_priority, st.level, st.path
       ORDER BY st.path, st.sort_order
       LIMIT 1000
     `);
@@ -151,7 +148,6 @@ export async function GET(request: NextRequest) {
         ordering: row.ordering,
         show_in_main_params: row.show_in_main_params,
         main_params_priority: row.main_params_priority,
-        main_params_label_override: row.main_params_label_override,
         level: row.level,
         source_type: 'characteristic_group',
         original_id: row.id,

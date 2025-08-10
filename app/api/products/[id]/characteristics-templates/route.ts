@@ -31,7 +31,6 @@ export async function GET(
         cg.sort_order AS group_ordering,
         cg.show_in_main_params,
         cg.main_params_priority,
-        cg.main_params_label_override,
         cv.value AS enum_value,
         cv.description AS enum_display_text,
         cv.color_hex AS value_color,
@@ -73,7 +72,6 @@ export async function GET(
           group_ordering: row.group_ordering,
           show_in_main_params: row.show_in_main_params,
           main_params_priority: row.main_params_priority,
-          main_params_label_override: row.main_params_label_override,
           characteristics: []
         };
       }
