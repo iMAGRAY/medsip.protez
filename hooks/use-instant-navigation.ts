@@ -193,22 +193,22 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
 
   return {
     // Основные функции
-    navigateInstantly,
-    handlePrefetch,
-    cancelPrefetch,
+    navigateInstantly: _navigateInstantly,
+    handlePrefetch: _handlePrefetch,
+    cancelPrefetch: _cancelPrefetch,
 
     // Состояние
     isNavigating: navigationState.isNavigating,
     targetPath: navigationState.targetPath,
-    isLoading,
+    isLoading: _isLoading,
 
     // Skeleton управление
-    registerSkeleton,
-    getSkeleton,
+    registerSkeleton: _registerSkeleton,
+    getSkeleton: _getSkeleton,
 
     // Состояния загрузки
-    addLoadingState,
-    removeLoadingState,
+    addLoadingState: _addLoadingState,
+    removeLoadingState: _removeLoadingState,
     loadingStates: navigationState.loadingStates,
 
     // Утилиты
