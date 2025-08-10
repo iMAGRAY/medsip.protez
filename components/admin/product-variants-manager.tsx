@@ -54,10 +54,6 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingVariant, setEditingVariant] = useState<ProductVariant | undefined>(undefined)
 
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -168,6 +164,10 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
       }
     }, [productId])
 
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
+
   const handleOpenForm = (variant?: ProductVariant) => {
     console.log('Opening variant form:', {
       variant,
@@ -236,7 +236,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
       // Детальное логирование перед отправкой
       console.log('Sending variant data:', {
         url,
-        method,
+        method: _method,
         variantId: variant.id,
         images: variantData.images,
         imagesType: typeof variantData.images,
@@ -245,7 +245,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
       })
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(variantData)
       })
