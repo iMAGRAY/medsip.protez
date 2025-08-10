@@ -17,7 +17,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const fast = searchParams.get('fast') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
-    const detailed = searchParams.get('detailed') === 'true';
+    const _detailed = searchParams.get('detailed') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
 
     // Если нет нужных таблиц — возвращаем пустой успешный ответ, не 500

@@ -92,4 +92,4 @@ export const PROSTHETIC_FALLBACK_IMAGE = `data:image/svg+xml;base64,${Buffer.fro
   </svg>
   `.trim()).toString('base64')}`;
 
-  export const getFallbackImage = (width = 400, height = 300) => PROSTHETIC_FALLBACK_IMAGE;
+  export const getFallbackImage = (_width = 400, _height = 300) => PROSTHETIC_FALLBACK_IMAGE;

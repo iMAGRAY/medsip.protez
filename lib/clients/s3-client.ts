@@ -97,7 +97,7 @@ export class MediaManager {
         lastModified: response.LastModified,
         contentType: response.ContentType,
       }
-    } catch (error) {
+    } catch (_error) {
       return { exists: false }
     }
   }
@@ -112,7 +112,7 @@ export class MediaManager {
 
       const response = await this.s3Client.send(command)
       return response.Contents?.map(obj => obj.Key || "") || []
-    } catch (error) {
+    } catch (_error) {
 
       return []
     }
@@ -124,7 +124,7 @@ export class MediaManager {
 
       // Calculate file hash
       const hash = await calculateFileHashClient(file)
-      const metadata = await createFileMetadata(file, hash)
+      const _metadata = await createFileMetadata(file, hash)
 
       // Check in database
       const response = await fetch('/api/media/check-duplicate', {
@@ -159,7 +159,7 @@ export class MediaManager {
   }
 
   // Register new file in deduplication system
-  async registerFile(metadata: FileMetadata, s3Key: string, s3Url: string): Promise<number> {
+  async registerFile(metadata: FileMetadata, _s3Key: string, _s3Url: string): Promise<number> {
     try {
       const response = await fetch('/api/media/register', {
         method: 'POST',
@@ -210,7 +210,7 @@ export class MediaManager {
     // Support legacy signature (file, folder, onProgress)
     let uploadOptions: UploadOptions
     if (typeof options === 'string') {
-      const folder = options
+      const _folder = options
       uploadOptions = { folder, onProgress: legacyOnProgress, checkDuplicates: true }
     } else {
       uploadOptions = { folder: "products", checkDuplicates: true, ...options }
@@ -291,7 +291,7 @@ export class MediaManager {
       this.uploadQueue.delete(fileKey)
 
       return result
-    } catch (error) {
+    } catch (_error) {
 
       return { success: false, error: "Upload failed. Please try again." }
     }
@@ -315,7 +315,7 @@ export class MediaManager {
           const fileId = await this.registerFile(metadata, key, uploadResult.url!)
           uploadResult.fileId = fileId
           uploadResult.hash = metadata.hash
-        } catch (error) {
+        } catch (_error) {
 
           // Не прерываем загрузку из-за ошибки регистрации
         }
@@ -328,7 +328,7 @@ export class MediaManager {
     }
   }
 
-  private async performUpload(file: File, key: string, onProgress?: (progress: number) => void): Promise<UploadResult> {
+  private async performUpload(file: File, _key: string, onProgress?: (progress: number) => void): Promise<UploadResult> {
     try {
       // Real S3 upload with progress tracking
       if (onProgress) {
@@ -359,7 +359,7 @@ export class MediaManager {
               errorMessage += ` (${errorData.details})`
             }
           }
-        } catch (e) {
+        } catch (_e) {
           // Fallback if response is not JSON
           const textError = await response.text()
           if (textError) {
@@ -398,14 +398,14 @@ export class MediaManager {
       await this.s3Client.send(command)
 
       return true
-    } catch (error) {
+    } catch (_error) {
 
       return false
     }
   }
 
   // Get signed URL for private access
-  async getSignedUrl(key: string, expiresIn = RUNTIME_CONFIG.MEDIA.S3.SIGNED_URL_EXPIRES): Promise<string> {
+  async getSignedUrl(key: string, _expiresIn = RUNTIME_CONFIG.MEDIA.S3.SIGNED_URL_EXPIRES): Promise<string> {
     try {
       const command = new GetObjectCommand({
         Bucket: this.config.bucket,
@@ -414,7 +414,7 @@ export class MediaManager {
 
       const signedUrl = await getSignedUrl(this.s3Client, command, { expiresIn })
       return signedUrl
-    } catch (error) {
+    } catch (_error) {
 
       // Fallback to public URL
       return this.getPublicUrl(key)

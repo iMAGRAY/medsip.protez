@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     })
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: "Failed to create spec group" },
       { status: 500 }
@@ -342,7 +342,7 @@ export async function DELETE(request: NextRequest) {
           )
         }
       } else {
-        const deletedCharacteristics = await client.query(`
+        const _deletedCharacteristics = await client.query(`
           DELETE FROM product_characteristics_simple
           WHERE value_id IN (
             SELECT id FROM characteristics_values_simple WHERE group_id = $1

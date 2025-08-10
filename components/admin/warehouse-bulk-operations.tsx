@@ -184,7 +184,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
     return filteredItems.length > 0 && filteredItems.every(item => selectedItems.has(item.id))
   }, [filteredItems, selectedItems])
 
-  const isPartiallySelected = useMemo(() => {
+  const _isPartiallySelected = useMemo(() => {
     return selectedItems.size > 0 && !isAllSelected
   }, [selectedItems.size, isAllSelected])
 
@@ -249,7 +249,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   }
 
   // Группировка выбранных элементов по типам
-  const groupSelectedByType = () => {
+  const _groupSelectedByType = () => {
     const groups: Record<string, string[]> = {}
     selectedItems.forEach(itemId => {
       const item = items.find(i => i.id === itemId)

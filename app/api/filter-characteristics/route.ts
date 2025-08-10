@@ -7,7 +7,7 @@ import { getPool } from '@/lib/db-connection';
  * Использует таблицы characteristic_groups, characteristic_values, product_characteristics_simple
  */
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
 
     const pool = getPool();

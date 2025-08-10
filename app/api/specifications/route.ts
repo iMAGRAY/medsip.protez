@@ -6,7 +6,7 @@ import { guardDbOr503Fast } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const fast = guardDbOr503Fast()
     if (fast) return fast

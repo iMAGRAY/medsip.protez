@@ -73,7 +73,7 @@ interface UserSettings {
   filterMode: FilterMode
 }
 
-export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
+export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [enableVirtualization, setEnableVirtualization] = useState(true)
@@ -138,7 +138,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
       // Кешируем настройки по умолчанию
       settingsCache.set('media-gallery-settings', defaultSettings)
 
-    } catch (error) {
+    } catch (_error) {
 
       // Используем настройки по умолчанию в случае ошибки
       setUserSettings({
@@ -159,22 +159,22 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
       // Сохраняем в кеш для быстрого доступа
       settingsCache.set('media-gallery-settings', updatedSettings)
 
-    } catch (error) {
+    } catch (_error) {
 
       toast.error('Ошибка сохранения настроек')
     }
   }
 
   // Обработчики изменения настроек
-  const handleViewModeChange = useCallback((viewMode: ViewMode) => {
+  const handleViewModeChange = useCallback((_viewMode: ViewMode) => {
     saveUserSettings({ viewMode })
   }, [userSettings])
 
-  const handleSortModeChange = useCallback((sortMode: SortMode) => {
+  const handleSortModeChange = useCallback((_sortMode: SortMode) => {
     saveUserSettings({ sortMode })
   }, [userSettings])
 
-  const handleFilterModeChange = useCallback((filterMode: FilterMode) => {
+  const handleFilterModeChange = useCallback((_filterMode: FilterMode) => {
     saveUserSettings({ filterMode })
   }, [userSettings])
 
@@ -277,7 +277,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
   }, [])
 
   // Удаление одного изображения с мгновенным исчезновением
-  const handleDeleteImage = useCallback(async (url: string, imageType?: string) => {
+  const handleDeleteImage = useCallback(async (url: string, _imageType?: string) => {
     try {
       if (!confirm("Вы уверены, что хотите удалить это изображение?")) {
         return
@@ -303,7 +303,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const _result = await response.json()
 
         // Обновляем уведомление об успехе
         toast.success("Изображение удалено")
@@ -330,7 +330,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
           return newDeleted
         })
       }
-    } catch (error) {
+    } catch (_error) {
 
       toast.error("Ошибка при удалении изображения")
 
@@ -383,7 +383,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
             failedImages.push(imageUrl)
 
           }
-        } catch (error) {
+        } catch (_error) {
           errorCount++
           failedImages.push(imageUrl)
 
@@ -421,7 +421,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
         })
       }, 500)
 
-    } catch (error) {
+    } catch (_error) {
 
       toast.error("Ошибка при массовом удалении")
 

@@ -17,7 +17,7 @@ class Logger {
   private isDev = process.env.NODE_ENV !== 'production'
   private logLevel = this.isDev ? LogLevel.DEBUG : LogLevel.INFO
 
-  private formatMessage(level: string, message: string, data?: any, context?: string): LogEntry {
+  private formatMessage(_level: string, _message: string, data?: any, context?: string): LogEntry {
     return {
       timestamp: new Date().toISOString(),
       level,
@@ -80,29 +80,29 @@ class Logger {
   }
 
   // Database specific logging
-  dbQuery(query: string, params?: any[], duration?: number): void {
+  dbQuery(_query: string, _params?: any[], _duration?: number): void {
     this.debug('Database query executed', { query, params, duration }, 'DATABASE')
   }
 
-  dbError(query: string, error: Error, params?: any[]): void {
+  dbError(_query: string, error: Error, _params?: any[]): void {
     this.error('Database query failed', { query, params, error: error.message }, 'DATABASE')
   }
 
   // API specific logging
-  apiRequest(method: string, url: string, userId?: string): void {
+  apiRequest(_method: string, _url: string, _userId?: string): void {
     this.info('API request', { method, url, userId }, 'API')
   }
 
-  apiResponse(method: string, url: string, status: number, duration?: number): void {
+  apiResponse(_method: string, _url: string, _status: number, _duration?: number): void {
     this.info('API response', { method, url, status, duration }, 'API')
   }
 
-  apiError(method: string, url: string, error: Error, userId?: string): void {
+  apiError(_method: string, _url: string, error: Error, _userId?: string): void {
     this.error('API error', { method, url, error: error.message, userId }, 'API')
   }
 
   // Security logging
-  securityEvent(event: string, data?: any, userId?: string): void {
+  securityEvent(_event: string, _data?: any, _userId?: string): void {
     this.warn('Security event', { event, data, userId }, 'SECURITY')
   }
 

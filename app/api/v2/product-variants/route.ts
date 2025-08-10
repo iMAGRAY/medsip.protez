@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const masterId = searchParams.get('master_id')
     const variantId = searchParams.get('variant_id')
     const includeCharacteristics = searchParams.get('include_characteristics') === 'true'
-    const includeImages = searchParams.get('include_images') === 'true'
+    const _includeImages = searchParams.get('include_images') === 'true'
     const onlyActive = searchParams.get('only_active') !== 'false'
     
     // Базовый запрос - выбираем поля напрямую из таблицы product_variants
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     
     // Если запрашивается конкретный вариант, возвращаем объект
     if (variantId && result.rows.length > 0) {
-      const duration = Date.now() - startTime
+      const _duration = Date.now() - startTime
       logger.info('Product variant loaded', { variantId, duration })
       
       return NextResponse.json({
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Иначе возвращаем массив
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variants loaded', { 
       count: result.rows.length, 
       masterId, 
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading product variants', error, 'API')
     
     return NextResponse.json(
@@ -318,7 +318,7 @@ export async function POST(request: NextRequest) {
       // Продолжаем выполнение, так как отсутствие характеристик не является критичной ошибкой
     }
     
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variant created', { 
       variantId: result.rows[0].id,
       masterId: master_id,
@@ -332,7 +332,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     console.error('Error creating product variant:', error)
     logger.error('Error creating product variant', error, 'API')
     

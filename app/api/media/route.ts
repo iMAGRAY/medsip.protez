@@ -295,7 +295,7 @@ export async function GET(request: Request) {
         dbSemaphore.release()
       }
 
-      const dbTime = Date.now() - dbStartTime
+      const _dbTime = Date.now() - dbStartTime
     }
 
     // Получаем файлы из S3 (если конфиги заданы)
@@ -323,7 +323,7 @@ export async function GET(request: Request) {
             processFilesInParallel(response.Contents, BATCH_SIZE)
           ])
 
-          const processTime = Date.now() - processStartTime
+          const _processTime = Date.now() - processStartTime
 
           const registeredUrls = new Set(registeredFiles.map(f => f.url))
           s3Files = processedFiles.filter(file => !registeredUrls.has(file.url))
@@ -332,9 +332,9 @@ export async function GET(request: Request) {
             try {
               const enrichStartTime = Date.now()
               s3Files = await enrichWithProductData(s3Files)
-              const enrichTime = Date.now() - enrichStartTime
+              const _enrichTime = Date.now() - enrichStartTime
 
-            } catch (dbErr) {}
+            } catch (_dbErr) {}
           }
         }
 
@@ -350,7 +350,7 @@ export async function GET(request: Request) {
 
     const sortStartTime = Date.now()
     const sortedFiles = allFiles.length > 0 ? quickSortWithTimeout(allFiles, 100) : allFiles
-    const sortTime = Date.now() - sortStartTime
+    const _sortTime = Date.now() - sortStartTime
 
     const totalTime = Date.now() - startTime
     const responseData = {
@@ -396,7 +396,7 @@ export async function GET(request: Request) {
     })
 
   } catch (error) {
-    const totalTime = Date.now() - startTime
+    const _totalTime = Date.now() - startTime
 
     return NextResponse.json(
       {

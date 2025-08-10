@@ -342,7 +342,7 @@ export function ProductCharacteristicsManager({
     return rootGroups
   }
 
-  const processApiCharacteristics = (apiData: any): ProductCharacteristic[] => {
+  const _processApiCharacteristics = (apiData: any): ProductCharacteristic[] => {
     if (!apiData || !Array.isArray(apiData)) return []
 
     return apiData.map((char: any, index: number) => ({
@@ -422,7 +422,7 @@ export function ProductCharacteristicsManager({
 
   // Функция handleGroupToggle больше не нужна, так как группы активируются автоматически
 
-  const handleAddCharacteristic = (groupId: number, groupName: string) => {
+  const handleAddCharacteristic = (groupId: number, _groupName: string) => {
     setCharacteristicFormData({
       group_id: groupId,
       label: "",

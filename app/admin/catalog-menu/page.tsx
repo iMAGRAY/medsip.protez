@@ -518,7 +518,7 @@ export default function CatalogMenuPage() {
   const parentOptions = menuSettings.filter(setting => setting.id !== editingId)
 
   // Типы сущностей
-  const entityTypes = [
+  const _entityTypes = [
     { value: 'spec_group', label: 'Группа характеристик', icon: Layers, color: 'text-blue-600' },
     { value: 'category', label: 'Категория', icon: Folder, color: 'text-green-600' },
     { value: 'manufacturer', label: 'Производитель', icon: Building, color: 'text-purple-600' },

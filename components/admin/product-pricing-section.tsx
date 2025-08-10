@@ -35,7 +35,7 @@ export function ProductPricingSection({
     onChange({ [field]: numericValue })
   }
 
-  const handleShowPriceChange = (checked: boolean) => {
+  const _handleShowPriceChange = (checked: boolean) => {
 
     onChange({ show_price: checked })
   }

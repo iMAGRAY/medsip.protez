@@ -58,7 +58,7 @@ const HeroVideo = () => {
               setIsVideoLoaded(true)
               if (loadTimeout) clearTimeout(loadTimeout)
             })
-            .catch((error) => {
+            .catch((_error) => {
 
               // Не сразу показываем ошибку, пользователь может кликнуть
               setTimeout(() => {

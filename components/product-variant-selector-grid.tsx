@@ -160,8 +160,8 @@ export function ProductVariantSelectorGrid({
 
   // Определяем, сколько элементов показывать изначально на мобильных устройствах
   const mobileInitialCount = 6
-  const itemsToShow = showAll ? allItems : allItems.slice(0, mobileInitialCount)
-  const hasMoreItems = allItems.length > mobileInitialCount
+  const _itemsToShow = showAll ? allItems : allItems.slice(0, mobileInitialCount)
+  const _hasMoreItems = allItems.length > mobileInitialCount
 
   return (
     <div className={cn("space-y-3", className)}>

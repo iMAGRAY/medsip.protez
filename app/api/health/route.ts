@@ -110,7 +110,7 @@ export async function GET() {
         }
 
         // Проверяем пустые таблицы
-        const emptyTables = await pool.query(`
+        const _emptyTables = await pool.query(`
           SELECT table_name
           FROM information_schema.tables t
           WHERE table_schema = 'public'

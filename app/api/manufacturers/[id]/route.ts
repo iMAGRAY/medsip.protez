@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
 
@@ -229,7 +229,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
 
@@ -327,7 +327,7 @@ export async function DELETE(
 
     // Удаляем производителя
     const deleteQuery = 'DELETE FROM manufacturers WHERE id = $1 RETURNING id';
-    const result = await executeQuery(deleteQuery, [manufacturerId]);
+    const _result = await executeQuery(deleteQuery, [manufacturerId]);
 
     return NextResponse.json({
       message: 'Manufacturer deleted successfully',

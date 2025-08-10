@@ -68,7 +68,7 @@ export default function ExportImportAdminPage() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    } catch (error) {
+    } catch (_error) {
       alert('Ошибка экспорта')
     }
   }
@@ -87,7 +87,7 @@ export default function ExportImportAdminPage() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    } catch (error) {
+    } catch (_error) {
       alert('Ошибка экспорта')
     }
   }

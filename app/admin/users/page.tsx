@@ -138,7 +138,7 @@ export default function UsersPage() {
       } else {
         setError('Ошибка загрузки пользователей')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     } finally {
       setLoading(false)
@@ -190,7 +190,7 @@ export default function UsersPage() {
       } else {
         setError('Ошибка изменения статуса пользователя')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     }
   }
@@ -456,7 +456,7 @@ function UserForm({
 
     try {
       const url = user ? `/api/admin/users/${user.id}` : '/api/admin/users'
-      const method = user ? 'PATCH' : 'POST'
+      const _method = user ? 'PATCH' : 'POST'
 
       // Запрещаем изменение статуса главного администратора
       if (user?.id === 1 && formData.status !== 'active') {
@@ -478,7 +478,7 @@ function UserForm({
         const data = await response.json()
         setError(data.error || 'Ошибка сохранения пользователя')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     } finally {
       setLoading(false)

@@ -75,7 +75,7 @@ export function useCharacteristicsCreator(
   }, [specGroups])
 
   // Create characteristics list from selection state
-  const createCharacteristicsFromSelection = useCallback((selectedIds: Set<string>): ProductCharacteristic[] => {
+  const _createCharacteristicsFromSelection = useCallback((selectedIds: Set<string>): ProductCharacteristic[] => {
     // Safety check: ensure specGroups are loaded
     if (specGroups.length === 0) {
       return []

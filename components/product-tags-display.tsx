@@ -54,7 +54,7 @@ export function ProductTagsDisplay({
 
   const fetchProductTags = async () => {
     try {
-      const allTags: ProductTag[] = []
+      const _allTags: ProductTag[] = []
       const tagMap = new Map<number, ProductTag>()
       
       // Загружаем теги товара

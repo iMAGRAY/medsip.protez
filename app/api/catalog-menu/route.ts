@@ -62,7 +62,7 @@ export async function GET() {
 
       result = await executeQuery(optimizedQuery);
 
-    } catch (error) {
+    } catch (_error) {
       result = { rows: [] } as any
     }
 

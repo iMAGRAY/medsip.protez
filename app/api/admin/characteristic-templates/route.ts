@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Ошибка создания шаблона характеристики' },
       { status: 500 }
@@ -273,7 +273,7 @@ export async function PUT(request: NextRequest) {
       throw error;
     }
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления шаблонов характеристик' },
       { status: 500 }

@@ -200,7 +200,7 @@ export async function GET(request: Request) {
       ...entitiesByType.manufacturers_category
     ]
 
-    const stats = {
+    const _stats = {
       total: allEntities.length,
       in_menu: allEntities.filter(entity => entity.in_menu).length,
       not_in_menu: allEntities.filter(entity => !entity.in_menu).length,

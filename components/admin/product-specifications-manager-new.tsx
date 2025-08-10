@@ -257,7 +257,7 @@ export function ProductSpecificationsManagerNew({
   }
 
   const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    const processGroup = (group: any, index: number): SpecGroup | null => {
+    const processGroup = (group: any, _index: number): SpecGroup | null => {
       let groupId: number;
 
       // Обрабатываем разные форматы ID
@@ -462,7 +462,7 @@ export function ProductSpecificationsManagerNew({
       })
 
       if (res.ok) {
-        const savedTemplate = await res.json()
+        const _savedTemplate = await res.json()
 
         toast.success('Шаблон сохранён')
         setIsTemplateDialogOpen(false)

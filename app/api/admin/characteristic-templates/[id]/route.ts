@@ -4,7 +4,7 @@ import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 // GET /api/admin/characteristic-templates/[id] - получить шаблон с предустановленными значениями
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -73,7 +73,7 @@ export async function GET(
       data: template
     });
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Ошибка получения шаблона характеристики' },
       { status: 500 }
@@ -197,7 +197,7 @@ export async function PUT(
       throw error;
     }
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления шаблона характеристики' },
       { status: 500 }
@@ -207,7 +207,7 @@ export async function PUT(
 
 // DELETE /api/admin/characteristic-templates/[id] - удалить шаблон
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -275,7 +275,7 @@ export async function DELETE(
       message: `Шаблон характеристики "${deletedName}" успешно удален`
     });
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления шаблона характеристики' },
       { status: 500 }

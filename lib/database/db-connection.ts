@@ -43,9 +43,9 @@ function validateEnvironment(): void {
 function createPool(): Pool {
   validateEnvironment()
 
-  const max = parseInt(process.env.DB_POOL_MAX || '20', 10)
-  const idleTimeoutMillis = parseInt(process.env.DB_IDLE_TIMEOUT_MS || '30000', 10)
-  const connectionTimeoutMillis = parseInt(process.env.DB_CONN_TIMEOUT_MS || '15000', 10)
+  const _max = parseInt(process.env.DB_POOL_MAX || '20', 10)
+  const _idleTimeoutMillis = parseInt(process.env.DB_IDLE_TIMEOUT_MS || '30000', 10)
+  const _connectionTimeoutMillis = parseInt(process.env.DB_CONN_TIMEOUT_MS || '15000', 10)
   const query_timeout = parseInt(process.env.DB_QUERY_TIMEOUT_MS || '30000', 10)
 
   const config: PoolConfig = {

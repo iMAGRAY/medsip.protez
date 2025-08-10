@@ -80,7 +80,7 @@ export function useWarehouse() {
   }, [actions, warehouseService])
 
   // Создание элементов
-  const createRegion = useCallback(async (data: any) => {
+  const _createRegion = useCallback(async (data: any) => {
     try {
       await warehouseService.createRegion(data)
       await loadAllData()
@@ -92,7 +92,7 @@ export function useWarehouse() {
     }
   }, [actions, loadAllData, warehouseService])
 
-  const createCity = useCallback(async (data: any) => {
+  const _createCity = useCallback(async (data: any) => {
     try {
       await warehouseService.createCity(data)
       await loadAllData()
@@ -104,7 +104,7 @@ export function useWarehouse() {
     }
   }, [actions, loadAllData, warehouseService])
 
-  const createWarehouse = useCallback(async (data: any) => {
+  const _createWarehouse = useCallback(async (data: any) => {
     try {
       await warehouseService.createWarehouse(data)
       await loadAllData()
@@ -116,7 +116,7 @@ export function useWarehouse() {
     }
   }, [actions, loadAllData, warehouseService])
 
-  const createZone = useCallback(async (data: any) => {
+  const _createZone = useCallback(async (data: any) => {
     try {
       await warehouseService.createZone(data)
       await loadAllData()
@@ -128,7 +128,7 @@ export function useWarehouse() {
     }
   }, [actions, loadAllData, warehouseService])
 
-  const createSection = useCallback(async (data: any) => {
+  const _createSection = useCallback(async (data: any) => {
     try {
       await warehouseService.createSection(data)
       await loadAllData()
@@ -153,7 +153,7 @@ export function useWarehouse() {
   }, [loadAllData, warehouseService])
 
   // Массовые операции
-  const executeBulkOperation = useCallback(async (
+  const _executeBulkOperation = useCallback(async (
     operation: string,
     itemIds: string[],
     params?: any
@@ -196,11 +196,11 @@ export function useWarehouse() {
   }, [state.bulkOperationsData, warehouseService, loadAllData, loadBulkOperationsData])
 
   // Хендлеры для управления узлами
-  const handleNodeSelect = useCallback((node: TreeNode | null) => {
+  const _handleNodeSelect = useCallback((node: TreeNode | null) => {
     actions.setSelectedNode(node)
   }, [actions])
 
-  const handleNodeCreate = useCallback((parentId: string, type: string) => {
+  const _handleNodeCreate = useCallback((parentId: string, type: string) => {
     // Извлекаем ID родительского элемента
     const [parentType, id] = parentId.split('-')
     const parentIdNum = parseInt(id)
@@ -228,24 +228,24 @@ export function useWarehouse() {
     }
   }, [actions])
 
-  const handleNodeEdit = useCallback((node: TreeNode) => {
+  const _handleNodeEdit = useCallback((node: TreeNode) => {
     actions.setEditingItem(node.data)
     actions.setDialog('edit', true)
   }, [actions])
 
-  const handleNodeDelete = useCallback(async (node: TreeNode) => {
+  const _handleNodeDelete = useCallback(async (node: TreeNode) => {
     if (confirm(`Вы уверены, что хотите удалить ${node.name}?`)) {
       await deleteNode(node)
     }
   }, [deleteNode])
 
-  const handleNodeMove = useCallback(async (nodeId: string, newParentId: string) => {
+  const _handleNodeMove = useCallback(async (_nodeId: string, _newParentId: string) => {
 
     toast.info('Функция перемещения в разработке')
   }, [])
 
   // Иерархические данные для дерева
-  const treeData = useMemo(() => {
+  const _treeData = useMemo(() => {
     const buildTreeData = () => {
       return stableRegions.map(region => ({
         id: `region-${region.id}`,
@@ -292,7 +292,7 @@ export function useWarehouse() {
   }, [stableRegions, stableCities, stableWarehouses])
 
   // Операции для массовых действий
-  const bulkOperations: BulkOperation[] = useMemo(() => [
+  const _bulkOperations: BulkOperation[] = useMemo(() => [
     {
       id: 'edit',
       type: 'edit',

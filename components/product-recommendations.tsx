@@ -178,7 +178,7 @@ export function ProductRecommendations({
               {currentRecommendation.products
                 .filter(product => String(product.id) !== String(currentProduct.id)) // Дополнительная защита
                 .slice(0, 4)
-                .map((product, index) => {
+                .map((product, _index) => {
                   return (
                     <ProductCardSimple
                       key={product.id}

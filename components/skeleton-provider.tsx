@@ -73,13 +73,13 @@ export function SkeletonProvider({
   })
 
   // Регистрация skeleton компонента для пути
-  const registerPageSkeleton = (path: string, component: React.ComponentType) => {
+  const _registerPageSkeleton = (path: string, component: React.ComponentType) => {
     setCustomSkeletonMap(prev => new Map(prev).set(path, component))
     registerNavigationSkeleton(path, component)
   }
 
   // Получение skeleton компонента для пути
-  const getPageSkeleton = (path: string): React.ComponentType | null => {
+  const _getPageSkeleton = (path: string): React.ComponentType | null => {
     // Сначала проверяем кастомные skeleton
     if (customSkeletonMap.has(path)) {
       return customSkeletonMap.get(path)!
@@ -102,7 +102,7 @@ export function SkeletonProvider({
   }
 
   // Управление состоянием загрузки компонентов
-  const setComponentLoading = (key: string, loading: boolean) => {
+  const _setComponentLoading = (key: string, loading: boolean) => {
     setLoadingComponents(prev => {
       const newSet = new Set(prev)
       if (loading) {
@@ -114,7 +114,7 @@ export function SkeletonProvider({
     })
   }
 
-  const isComponentLoading = (key: string) => {
+  const _isComponentLoading = (key: string) => {
     return loadingComponents.has(key)
   }
 

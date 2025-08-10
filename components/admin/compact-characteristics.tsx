@@ -475,7 +475,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
     }
   }
 
-  const updateAdditionalValue = useCallback((valueId: number, additionalValue: string) => {
+  const _updateAdditionalValue = useCallback((valueId: number, additionalValue: string) => {
     // Если сейчас идет inline-редактирование, пропускаем
     if (editingCharacteristic !== null) {
       return
@@ -642,7 +642,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
       } else {
         setGroupDialogError(data.error || 'Ошибка создания группы')
       }
-    } catch (e) {
+    } catch (_e) {
       setGroupDialogError('Ошибка соединения с сервером')
     } finally {
       setGroupDialogLoading(false)
@@ -695,7 +695,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
       } else {
         setValueDialogError(data.error || 'Ошибка создания характеристики')
       }
-    } catch (e) {
+    } catch (_e) {
       setValueDialogError('Ошибка соединения с сервером')
     } finally {
       setValueDialogLoading(false)
@@ -720,7 +720,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
     }).filter(section => section.groups.length > 0)
   }, [characteristicSections, selectedCharacteristics])
 
-  const groupedSelected = useMemo(() => Array.isArray(selectedCharacteristics) ? selectedCharacteristics.reduce((acc, char) => {
+  const _groupedSelected = useMemo(() => Array.isArray(selectedCharacteristics) ? selectedCharacteristics.reduce((acc, char) => {
     const groupName = char.group_name
     if (!acc[groupName]) acc[groupName] = []
     acc[groupName].push(char)

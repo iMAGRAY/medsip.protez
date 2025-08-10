@@ -372,7 +372,7 @@ export default function ProductVariantsPage() {
         ? `/api/v2/product-variants/${formData.id}`
         : '/api/v2/product-variants'
       
-      const method = formData.id ? 'PUT' : 'POST'
+      const _method = formData.id ? 'PUT' : 'POST'
       const payload = transformFormDataToVariant(formData)
 
       console.log('💾 Финальный payload для API:', {

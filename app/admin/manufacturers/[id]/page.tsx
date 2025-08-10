@@ -1,3 +1,4 @@
+import { SafeImage } from "@/components/safe-image"
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -84,7 +85,7 @@ export default function ManufacturerModelLinesPage() {
       } else {
         setMessage({ type: 'error', text: 'Ошибка загрузки данных' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     } finally {
       setIsLoading(false)
@@ -109,7 +110,7 @@ export default function ManufacturerModelLinesPage() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Ошибка удаления' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     }
   }
@@ -182,15 +183,7 @@ export default function ManufacturerModelLinesPage() {
             {manufacturer && (
               <div className="flex items-center gap-4">
                 {manufacturer.logo_url && (
-                  <img
-                    src={manufacturer.logo_url}
-                    alt={manufacturer.name}
-                    className="w-12 h-12 object-contain rounded-lg bg-slate-50 p-2"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                    }}
-                  />
+                  <SafeImage src={manufacturer.logo_url} alt={manufacturer.name} width={48} height={48} className="w-12 h-12 object-contain rounded-lg bg-slate-50 p-2" />
                 )}
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900">

@@ -240,7 +240,7 @@ export function useOptimizedMedia(options: UseOptimizedMediaOptions = {}): UseOp
           signal: abortControllerRef.current.signal
         })
 
-        const clientTime = Date.now() - startTime
+        const _clientTime = Date.now() - startTime
 
         // Обновляем состояние
         if (isLoadMore) {
@@ -276,19 +276,19 @@ export function useOptimizedMedia(options: UseOptimizedMediaOptions = {}): UseOp
   }, [pageSize, nextToken, throttleMs])
 
   // Оптимизированные функции
-  const loadMore = useCallback(async () => {
+  const _loadMore = useCallback(async () => {
     if (loadingMore || !hasMore) return
     await throttledLoadMedia(true)
   }, [loadingMore, hasMore, throttledLoadMedia])
 
-  const refresh = useCallback(async () => {
+  const _refresh = useCallback(async () => {
     // Очищаем кэш перед обновлением для получения актуальных данных
     requestCache.clear()
     setNextToken(null)
     await throttledLoadMedia(false)
   }, [throttledLoadMedia])
 
-  const clearCache = useCallback(() => {
+  const _clearCache = useCallback(() => {
     requestCache.clear()
   }, [])
 

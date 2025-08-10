@@ -42,7 +42,7 @@ export function extractMainParameters(groups: CharacteristicGroup[]): MainParame
 
   mainParamsGroups.forEach(group => {
     const displayName = group.main_params_label_override || group.group_name;
-    const priority = group.main_params_priority || 999;
+    const _priority = group.main_params_priority || 999;
 
     group.characteristics.forEach(characteristic => {
       const value = formatCharacteristicValue(characteristic);

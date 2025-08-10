@@ -116,7 +116,7 @@ export default function RolesPage() {
       } else {
         setError('Ошибка загрузки ролей')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     } finally {
       setLoading(false)
@@ -154,7 +154,7 @@ export default function RolesPage() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const _data = await response.json()
 
         loadRoles()
         setDeleteRole(null)
@@ -512,7 +512,7 @@ function RoleForm({
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const _data = await response.json()
 
         onSuccess()
       } else {

@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const startTime = Date.now()
@@ -64,7 +64,7 @@ export async function GET(
       return acc
     }, {})
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Existing product selection tables loaded', {
       productId,
       tablesCount: Object.keys(tables).length,
@@ -77,7 +77,7 @@ export async function GET(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading existing product selection tables', error as any, 'API')
 
     return NextResponse.json({
@@ -175,7 +175,7 @@ export async function PUT(
 
         await executeQuery('COMMIT')
 
-        const duration = Date.now() - startTime
+        const _duration = Date.now() - startTime
         logger.info('Existing product selection tables updated', {
           productId,
           tablesAdded,
@@ -200,7 +200,7 @@ export async function PUT(
     }
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Existing product selection tables PUT error', error as any, 'API')
 
     return NextResponse.json({

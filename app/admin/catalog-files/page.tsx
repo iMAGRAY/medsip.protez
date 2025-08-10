@@ -151,7 +151,7 @@ export default function CatalogFilesPage() {
         ? `/api/catalog-files/${editingCatalog.id}`
         : '/api/catalog-files'
 
-      const method = editingCatalog ? 'PUT' : 'POST'
+      const _method = editingCatalog ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,

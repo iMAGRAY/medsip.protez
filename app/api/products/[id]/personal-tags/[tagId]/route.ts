@@ -4,7 +4,7 @@ import { pool } from '@/lib/db'
 
 // DELETE - удаление личного тега товара
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string, tagId: string } }
 ) {
   try {

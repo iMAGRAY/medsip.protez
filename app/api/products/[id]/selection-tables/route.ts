@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const startTime = Date.now()
@@ -56,7 +56,7 @@ export async function GET(
       }
     })
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Selection tables loaded', { productId, count: result.rows.length, duration })
 
     return NextResponse.json({
@@ -66,7 +66,7 @@ export async function GET(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading selection tables', error, 'API')
 
     return NextResponse.json({
@@ -205,7 +205,7 @@ export async function PUT(
 
         await executeQuery('COMMIT')
 
-        const duration = Date.now() - startTime
+        const _duration = Date.now() - startTime
         logger.info('Selection tables updated', { productId, tablesCount, duration })
 
         return NextResponse.json({
@@ -226,7 +226,7 @@ export async function PUT(
     }
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Selection tables PUT error', error, 'API')
 
     return NextResponse.json({

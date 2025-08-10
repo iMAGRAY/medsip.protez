@@ -96,7 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('cart', JSON.stringify(items))
   }, [items, isClient])
 
-  const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
+  const _addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems(current => {
       // Ищем существующий товар с такой же конфигурацией
       const existingItem = current.find(item => 
@@ -123,7 +123,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(current => current.filter(item => item.id !== id))
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const _updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(id)
       return
@@ -135,7 +135,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
-  const updateCustomPrice = (id: string, customPrice: number) => {
+  const _updateCustomPrice = (id: string, customPrice: number) => {
     setItems(current =>
       current.map(item =>
         item.id === id ? { ...item, custom_price: customPrice } : item
@@ -143,12 +143,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
-  const clearCart = () => {
+  const _clearCart = () => {
     setItems([])
   }
 
-  const totalItems = items.reduce((total, item) => total + item.quantity, 0)
-  const totalPrice = items.reduce((total, item) => {
+  const _totalItems = items.reduce((total, item) => total + item.quantity, 0)
+  const _totalPrice = items.reduce((total, item) => {
     // Товары "По запросу" не учитываются в итоговой сумме, цену устанавливает менеджер
     const itemPrice = item.is_on_request ? 0 : item.price
     return total + (itemPrice * item.quantity)

@@ -70,7 +70,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   const dataReadyState: DataReadyState = useMemo(() => {
     const specGroupsLoaded = specGroups.length > 0
     const characteristicsLoaded = !productId || productCharacteristics.length >= 0 // Allow 0 for products without characteristics
-    const canOperate = !isLoading && !isInitializing && specGroupsLoaded && characteristicsLoaded
+    const _canOperate = !isLoading && !isInitializing && specGroupsLoaded && characteristicsLoaded
 
     return {
       isLoading,
@@ -175,7 +175,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   }, [productId])
 
   // Save characteristics to API
-  const saveCharacteristicsToAPI = useCallback(async (characteristics: ProductCharacteristic[]) => {
+  const _saveCharacteristicsToAPI = useCallback(async (characteristics: ProductCharacteristic[]) => {
     if (!productId) {
       throw new Error('No product ID provided for saving characteristics')
     }

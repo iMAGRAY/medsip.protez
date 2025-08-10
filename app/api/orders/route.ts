@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       )
 
       const orderId = orderResult.rows[0].id
-      const createdAt = orderResult.rows[0].created_at
+      const _createdAt = orderResult.rows[0].created_at
 
       // Добавляем товары в заказ (статус не устанавливается по умолчанию)
       for (const item of items) {
@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
 
 // GET - получение списка заказов (для админ панели)
 export async function GET(request: NextRequest) {
-  const logger = getLogger()
-  const cacheManager = getCacheManager()
+  const _logger = getLogger()
+  const _cacheManager = getCacheManager()
 
   try {
     const { searchParams } = new URL(request.url)

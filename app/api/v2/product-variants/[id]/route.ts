@@ -23,7 +23,7 @@ function cleanObjectForJson(obj: any, fieldName: string): any {
           try {
             JSON.stringify(item)
             return cleanObjectForJson(item, fieldName)
-          } catch (e) {
+          } catch (_e) {
             return null
           }
         }
@@ -45,7 +45,7 @@ function cleanObjectForJson(obj: any, fieldName: string): any {
         return Array.from(obj).filter(item => 
           typeof item === 'string' && item.trim() !== ''
         )
-      } catch (e) {
+      } catch (_e) {
         return []
       }
     }
@@ -72,7 +72,7 @@ function cleanObjectForJson(obj: any, fieldName: string): any {
         try {
           JSON.stringify(value)
           cleaned[key] = cleanObjectForJson(value, fieldName)
-        } catch (e) {
+        } catch (_e) {
           // Пропускаем объекты с циклическими ссылками
           continue
         }
@@ -135,7 +135,7 @@ export async function GET(
     return NextResponse.json(data)
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading product variant', error, 'API')
     
     return NextResponse.json(
@@ -293,7 +293,7 @@ export async function PUT(
       )
     }
     
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info(`Product variant ${variantId} updated successfully`, { duration }, 'API')
     
     return NextResponse.json({
@@ -303,7 +303,7 @@ export async function PUT(
     })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error(`Error updating product variant ${variantId}`, error, 'API')
     
     return NextResponse.json(
@@ -320,7 +320,7 @@ export async function PUT(
 
 // DELETE /api/v2/product-variants/[id] - удалить вариант
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const startTime = Date.now()
@@ -340,11 +340,11 @@ export async function DELETE(
     await pool.query('DELETE FROM variant_price_tiers WHERE variant_id = $1', [variantId])
 
     // Удаляем сам вариант
-    const result = await pool.query('DELETE FROM product_variants WHERE id = $1 RETURNING id', [variantId])
+    const _result = await pool.query('DELETE FROM product_variants WHERE id = $1 RETURNING id', [variantId])
 
     await pool.query('COMMIT')
     
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variant deleted', { variantId, duration })
     
     return NextResponse.json({
@@ -354,7 +354,7 @@ export async function DELETE(
     })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error deleting product variant', error, 'API')
     
     return NextResponse.json(

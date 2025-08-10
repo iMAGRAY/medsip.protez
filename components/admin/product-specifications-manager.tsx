@@ -360,7 +360,7 @@ export function ProductSpecificationsManager({
     }
 
     try {
-      const id = typeof groupId === 'string' && groupId.startsWith('spec_')
+      const _id = typeof groupId === 'string' && groupId.startsWith('spec_')
         ? parseInt(groupId.replace('spec_', ''))
         : groupId
 

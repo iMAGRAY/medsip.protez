@@ -199,7 +199,7 @@ container.register('cacheManager', () => {
       return null;
     }
 
-    set(key: string, data: any, ttl: number = 300000): void {
+    set(key: string, _data: any, ttl: number = 300000): void {
       this.cache.set(key, {
         data,
         expires: Date.now() + ttl

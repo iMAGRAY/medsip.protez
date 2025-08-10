@@ -106,7 +106,7 @@ export default function CategoriesAdmin() {
 
   const handleCategorySave = async () => {
     try {
-      const method = editingCategory ? 'PUT' : 'POST'
+      const _method = editingCategory ? 'PUT' : 'POST'
       const body = editingCategory
         ? { ...categoryFormData, id: editingCategory.id }
         : categoryFormData

@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Группируем права по категориям
-    const permissionsByCategory = AVAILABLE_PERMISSIONS.reduce((acc, permission) => {
+    const _permissionsByCategory = AVAILABLE_PERMISSIONS.reduce((acc, permission) => {
       const category = permission.category
       if (!acc[category]) {
         acc[category] = []

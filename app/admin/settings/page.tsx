@@ -151,7 +151,7 @@ export default function SettingsAdmin() {
       } else {
         toast.error('Ошибка загрузки каталогов')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Ошибка загрузки каталогов')
     } finally {
       setLoadingCatalogs(false)
@@ -209,7 +209,7 @@ export default function SettingsAdmin() {
       } else {
         toast.error(data.error || 'Ошибка загрузки файла')
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Ошибка загрузки файла')
     } finally {
       setUploadingFile(false)
@@ -242,7 +242,7 @@ export default function SettingsAdmin() {
       } else {
         toast.error(data.error || 'Ошибка сохранения')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Ошибка сохранения каталога')
     }
   }
@@ -261,7 +261,7 @@ export default function SettingsAdmin() {
       } else {
         toast.error(data.error || 'Ошибка удаления')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Ошибка удаления каталога')
     }
   }

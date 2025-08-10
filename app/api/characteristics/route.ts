@@ -16,7 +16,7 @@ function isDbConfigured() {
  * что и в API редактирования товара
  */
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     if (!isDbConfigured()) {
       return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
@@ -479,7 +479,7 @@ if (!force) {
       const allGroupIds = [parseInt(id), ...childGroupIds]
 
 // Удаляем все характеристики товаров, связанные с значениями всех групп
-      const deletedCharacteristics = await pool.query(`
+      const _deletedCharacteristics = await pool.query(`
         DELETE FROM product_characteristics_simple
         WHERE value_id IN (
           SELECT id FROM characteristics_values_simple WHERE group_id = ANY($1)
@@ -488,14 +488,14 @@ if (!force) {
       `, [allGroupIds])
 
       // Удаляем все значения характеристик для всех групп
-      const deletedValues = await pool.query(
+      const _deletedValues = await pool.query(
         'DELETE FROM characteristics_values_simple WHERE group_id = ANY($1) RETURNING id',
         [allGroupIds]
       )
 
       // Помечаем все дочерние группы как неактивные
       if (childGroupIds.length > 0) {
-        const deletedChildren = await pool.query(`
+        const _deletedChildren = await pool.query(`
           UPDATE characteristics_groups_simple
           SET is_active = false, updated_at = CURRENT_TIMESTAMP
           WHERE id = ANY($1)
@@ -507,7 +507,7 @@ if (!force) {
 
     // Удаляем значения характеристик только если не было принудительного удаления
     if (!force) {
-      const valuesResult = await pool.query(
+      const _valuesResult = await pool.query(
         'DELETE FROM characteristics_values_simple WHERE group_id = $1 RETURNING id',
         [parseInt(id)]
       )

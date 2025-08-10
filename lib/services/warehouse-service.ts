@@ -268,9 +268,9 @@ export class WarehouseService {
 
   // Выполнение массовых операций
   async executeBulkOperation(
-    operation: string,
-    itemIds: string[],
-    params?: any
+    _operation: string,
+    _itemIds: string[],
+    _params?: any
   ): Promise<{ success: boolean; message: string; details?: any }> {
     try {
       const response = await fetch('/api/warehouse/bulk-operations', {

@@ -8,7 +8,7 @@ const pool = new Pool({
 
 // DELETE /api/form-templates/[id] - Delete form template
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -35,7 +35,7 @@ export async function DELETE(
 }
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

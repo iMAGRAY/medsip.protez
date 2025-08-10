@@ -275,7 +275,7 @@ allGroups.push({
   const buildHierarchy = (flatGroups: SpecGroup[]): SpecGroup[] => {
 
     // Логируем все группы для отладки
-    flatGroups.forEach(group => {
+    flatGroups.forEach(_group => {
 })
 
     // Создаем карту групп по ID для быстрого поиска
@@ -431,7 +431,7 @@ if (group.children && group.children.length > 0) {
     }
 
     try {
-      const method = editingGroup ? "PUT" : "POST"
+      const _method = editingGroup ? "PUT" : "POST"
 
       // Определяем правильный ID и URL для запроса
       let editingId = null
@@ -470,7 +470,7 @@ if (group.children && group.children.length > 0) {
       })
 
       if (res.ok) {
-        const responseData = await res.json()
+        const _responseData = await res.json()
 
         const isSubgroup = groupFormData.parent_id !== undefined
         const isSection = groupFormData.is_section
@@ -577,7 +577,7 @@ if (group.children && group.children.length > 0) {
       setDeletingGroupId(actualId)
       setIsDeleteDialogOpen(true)
 
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка получения информации об удалении",
@@ -611,7 +611,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления группы",
@@ -668,7 +668,7 @@ if (group.children && group.children.length > 0) {
         ? `/api/characteristics/values?id=${editingEnum.id}`
         : "/api/characteristics/values"
 
-      const method = editingEnum ? "PUT" : "POST"
+      const _method = editingEnum ? "PUT" : "POST"
 
       const res = await fetch(url, {
         method,
@@ -699,7 +699,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка сохранения характеристики",
@@ -736,7 +736,7 @@ if (group.children && group.children.length > 0) {
           })
         }
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления характеристики",
@@ -768,7 +768,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления характеристики",
@@ -778,7 +778,7 @@ if (group.children && group.children.length > 0) {
   }
 
   // Функция для переключения сворачивания разделов
-  const toggleSectionCollapse = (sectionId: string) => {
+  const _toggleSectionCollapse = (sectionId: string) => {
     const newCollapsed = new Set(collapsedSections)
     if (newCollapsed.has(sectionId)) {
       newCollapsed.delete(sectionId)
@@ -1032,7 +1032,7 @@ if (group.children && group.children.length > 0) {
                   }
 
                   // Устанавливаем группу для создания характеристики
-                  const groupId = typeof group.id === 'string' && group.id.startsWith('spec_')
+                  const _groupId = typeof group.id === 'string' && group.id.startsWith('spec_')
                     ? parseInt(group.id.replace('spec_', ''))
                     : typeof group.id === 'number' ? group.id : 0;
                   setEnumFormData(prev => ({ ...prev, groupId }));
@@ -1345,7 +1345,7 @@ if (group.children && group.children.length > 0) {
                               <SelectItem value="root">Корневая группа</SelectItem>
                               {(() => {
                                 // Функция для получения всех доступных групп (исключая текущую и её дочерние)
-                                const getAllAvailableGroups = (groups: SpecGroup[], currentGroupId?: string | number): SpecGroup[] => {
+                                const getAllAvailableGroups = (groups: SpecGroup[], _currentGroupId?: string | number): SpecGroup[] => {
                                   const result: SpecGroup[] = [];
 
                                   const addGroup = (group: SpecGroup, level = 0) => {

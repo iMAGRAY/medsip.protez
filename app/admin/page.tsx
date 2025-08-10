@@ -107,7 +107,7 @@ const saved = localStorage.getItem('warehouse-settings')
 // Применяем сохраненные настройки к зонам
       const updatedZones = baseStats.warehouse.zones.map(zone => {
         const savedZone = savedZones.find(s => s.name === zone.name)
-        const newCapacity = savedZone ? savedZone.capacity : zone.capacity
+        const _newCapacity = savedZone ? savedZone.capacity : zone.capacity
 
         return savedZone ? { ...zone, capacity: savedZone.capacity } : zone
       })

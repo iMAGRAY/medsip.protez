@@ -317,11 +317,11 @@ export default function OrdersPage() {
     loadOrders()
   }, [page, activeTab])
 
-  const formatDate = (dateString: string) => {
+  const _formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU')
   }
 
-  const getStatusBadge = (status: string) => {
+  const _getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
     const Icon = config.icon
     return (
@@ -650,7 +650,7 @@ ${order.items?.map(item => {
     toast.success('Переход в WhatsApp...')
   }
 
-  const shareViaEmail = () => {
+  const _shareViaEmail = () => {
     if (!order) {
       toast.error('Заказ не найден')
       return
@@ -1610,7 +1610,7 @@ function DeletedOrdersTable({
     return new Date(dateString).toLocaleString('ru-RU')
   }
 
-  const getStatusBadge = (status: string) => {
+  const _getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
     const Icon = config.icon
   return (

@@ -126,7 +126,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // Проверка прав доступа
-  const hasPermission = (permission: string): boolean => {
+  const _hasPermission = (permission: string): boolean => {
     if (!authStatus.authenticated || !authStatus.user) return false
 
     const permissions = authStatus.user.permissions || []
@@ -195,7 +195,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
   }
 
-  const handleLogout = async () => {
+  const _handleLogout = async () => {
     try {
       const response = await fetch('/api/admin/auth/logout', {
         method: 'POST',

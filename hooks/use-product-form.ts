@@ -38,7 +38,7 @@ const initialFormData: ProductFormData = {
 const initialValidationErrors: ProductValidationErrors = {}
 
 export function useProductForm(product?: any): ProductFormHookReturn {
-  const router = useRouter()
+  const _router = useRouter()
   const productService = ProductService.getInstance()
 
   // Загрузка справочных данных
@@ -228,7 +228,7 @@ export function useProductForm(product?: any): ProductFormHookReturn {
   }, [formData, productImages, productCharacteristics, newProductSelectionTables, existingProductSelectionTables, validateForm, productService])
 
   // Обработчик отправки формы
-  const handleSubmit = useCallback(async (e?: React.FormEvent): Promise<void> => {
+  const _handleSubmit = useCallback(async (e?: React.FormEvent): Promise<void> => {
     e?.preventDefault()
 
     const savedProductId = await saveProduct()
@@ -255,12 +255,12 @@ export function useProductForm(product?: any): ProductFormHookReturn {
     setValidationErrorsState(prev => ({ ...prev, ...errors }))
   }, [])
 
-  const handleImagesChange = useCallback((images: string[]) => {
+  const _handleImagesChange = useCallback((images: string[]) => {
     setProductImages(images)
     setIsDirty(true)
   }, [])
 
-  const handleCharacteristicsChange = useCallback((characteristics: any[]) => {
+  const _handleCharacteristicsChange = useCallback((characteristics: any[]) => {
     // Используем функциональное обновление для предотвращения лишних перерендеров
     setProductCharacteristics(prev => {
       // Проверяем, действительно ли изменились характеристики
@@ -272,7 +272,7 @@ export function useProductForm(product?: any): ProductFormHookReturn {
     setIsDirty(true)
   }, [])
 
-  const handleConfigurableCharacteristicsChange = useCallback((characteristics: any[]) => {
+  const _handleConfigurableCharacteristicsChange = useCallback((characteristics: any[]) => {
     console.log('🔍 handleConfigurableCharacteristicsChange called with:', characteristics)
     setFormDataState(prev => {
       const updated = {
@@ -288,12 +288,12 @@ export function useProductForm(product?: any): ProductFormHookReturn {
     setIsDirty(true)
   }, [])
 
-  const handleNewProductSelectionTablesChange = useCallback((tables: any) => {
+  const _handleNewProductSelectionTablesChange = useCallback((tables: any) => {
     setNewProductSelectionTables(tables)
     setIsDirty(true)
   }, [])
 
-  const handleExistingProductSelectionTablesChange = useCallback((tables: any) => {
+  const _handleExistingProductSelectionTablesChange = useCallback((tables: any) => {
     setExistingProductSelectionTables(tables)
     setIsDirty(true)
   }, [])
@@ -316,7 +316,7 @@ export function useProductForm(product?: any): ProductFormHookReturn {
   }, [product?.id, loadProduct])
 
   // Состояние и действия
-  const state: ProductFormState = useMemo(() => ({
+  const _state: ProductFormState = useMemo(() => ({
     formData,
     validationErrors,
     isLoading,
@@ -328,7 +328,7 @@ export function useProductForm(product?: any): ProductFormHookReturn {
     existingProductSelectionTables
   }), [formData, validationErrors, isLoading, isSaving, isDirty, productImages, productCharacteristics, newProductSelectionTables, existingProductSelectionTables])
 
-  const actions: ProductFormActions = useMemo(() => ({
+  const _actions: ProductFormActions = useMemo(() => ({
     setFormData,
     setValidationErrors,
     setLoading: setIsLoading,

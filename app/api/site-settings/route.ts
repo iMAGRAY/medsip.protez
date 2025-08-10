@@ -56,7 +56,7 @@ export async function GET(_request: NextRequest) {
     }
 
     return NextResponse.json(mappedSettings, { headers: corsHeaders() })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(getFallbackSettings(), { status: 503, headers: corsHeaders() })
   }
 }
@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest) {
   let body
   try {
     body = await request.json()
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400, headers: corsHeaders() })
   }
 
@@ -165,7 +165,7 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(mappedSettings, { headers: corsHeaders() })
-  } catch (error) {
+  } catch (_error) {
     const fallbackSettings = { id: 1, ...body, updated_at: new Date().toISOString(), error: "Database error, changes not saved" }
     return NextResponse.json(fallbackSettings, { status: 503, headers: corsHeaders() })
   }

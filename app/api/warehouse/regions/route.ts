@@ -5,7 +5,7 @@ import { executeQuery } from '@/lib/db-connection';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const includeStats = searchParams.get('include_stats') === 'true';
+    const _includeStats = searchParams.get('include_stats') === 'true';
 
     const query = `
       SELECT

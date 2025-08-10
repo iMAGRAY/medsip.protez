@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 // GET /api/products/[id]/sizes - получить все размеры для конкретного продукта
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

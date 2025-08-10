@@ -131,7 +131,7 @@ export async function cacheMiddleware(
     try {
       // Клонируем ответ для чтения
       const responseClone = response.clone()
-      const data = await responseClone.json()
+      const _data = await responseClone.json()
       
       // Сохраняем важные заголовки
       const headers: Record<string, string> = {}

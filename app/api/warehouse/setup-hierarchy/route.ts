@@ -12,7 +12,7 @@ const pool = new Pool({
   } : false
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
 
     // Создаем таблицы для полной иерархии

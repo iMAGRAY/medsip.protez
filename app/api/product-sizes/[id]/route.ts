@@ -3,7 +3,7 @@ import { getPool } from '@/lib/db-connection'
 
 // GET /api/product-sizes/[id] - получить размер по ID
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -232,7 +232,7 @@ export async function PUT(
 
 // DELETE /api/product-sizes/[id] - удалить размер
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

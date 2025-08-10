@@ -4,7 +4,7 @@ import { executeQuery } from '@/lib/db-connection';
 export const dynamic = 'force-dynamic'
 
 // GET - получить настройки складской системы
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Проверяем существование таблицы настроек
     const tableCheckQuery = `

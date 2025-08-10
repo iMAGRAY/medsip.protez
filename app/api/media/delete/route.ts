@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest) {
         const body = await request.json()
         url = body.url
         key = body.key
-      } catch (e) {
+      } catch (_e) {
         // Игнорируем ошибки парсинга JSON
       }
     }
@@ -190,7 +190,7 @@ export async function DELETE(request: NextRequest) {
         Key: s3Key,
       })
 
-      const s3Result = await s3Client.send(deleteCommand)
+      const _s3Result = await s3Client.send(deleteCommand)
 
       // Коммитим транзакцию
       await pool.query('COMMIT')

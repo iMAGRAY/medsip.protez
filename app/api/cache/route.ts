@@ -17,7 +17,7 @@ const cacheUtils = {
     return null
   },
 
-  set: (key: string, data: any, ttl: number = 300) => { // TTL в секундах
+  set: (key: string, _data: any, ttl: number = 300) => { // TTL в секундах
     serverCache.set(key, {
       data,
       expires: Date.now() + (ttl * 1000)
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       exists: data !== null
     })
 
-  } catch (error) {
+  } catch (_error) {
     logger.error('Cache GET API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'stats') {
-      const stats = cacheUtils.getStats()
+      const _stats = cacheUtils.getStats()
       return NextResponse.json({
         success: true,
         stats
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     )
 
-  } catch (error) {
+  } catch (_error) {
     logger.error('Cache POST API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -162,7 +162,7 @@ export async function DELETE(request: NextRequest) {
       message: success ? 'Cache deleted successfully' : 'Key not found'
     })
 
-  } catch (error) {
+  } catch (_error) {
     logger.error('Cache DELETE API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },

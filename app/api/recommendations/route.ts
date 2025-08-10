@@ -37,14 +37,14 @@ export async function POST(request: NextRequest) {
         }))
         break
       case 'manufacturer':
-        recommendations = engine.getSameManufacturerProducts(currentProduct, limit).map(product => ({
+        recommendations = engine.getSameManufacturerProducts(currentProduct, limit).map(_product => ({
           product,
           score: 0,
           reasons: ['Тот же производитель']
         }))
         break
       case 'price':
-        recommendations = engine.getSimilarPriceProducts(currentProduct, limit).map(product => ({
+        recommendations = engine.getSimilarPriceProducts(currentProduct, limit).map(_product => ({
           product,
           score: 0,
           reasons: ['Похожая цена']
@@ -80,8 +80,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const productId = searchParams.get('productId')
-    const limit = Number(searchParams.get('limit') || '4')
-    const type = searchParams.get('type') || 'mixed'
+    const _limit = Number(searchParams.get('limit') || '4')
+    const _type = searchParams.get('type') || 'mixed'
 
     if (!productId) {
       return NextResponse.json(

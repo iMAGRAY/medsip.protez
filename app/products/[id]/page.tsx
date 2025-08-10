@@ -683,7 +683,7 @@ export default function ProductPage() {
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             className="object-contain transition-transform duration-300 group-hover:scale-105"
                             priority={currentImageIndex === 0}
-                            onError={(e) => {
+                            onError={(_e) => {
                               console.error('Image failed to load:', images[currentImageIndex])
                             }}
                           />

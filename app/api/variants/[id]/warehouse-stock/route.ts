@@ -3,7 +3,7 @@ import { pool } from '@/lib/db'
 
 // GET - получить остатки варианта по складам
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

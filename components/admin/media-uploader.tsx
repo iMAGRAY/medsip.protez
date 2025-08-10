@@ -85,7 +85,7 @@ export function MediaUploader({
   }
 
   const removeSelectedImage = (url: string) => {
-    const newImages = existingImages.filter((img) => img !== url)
+    const _newImages = existingImages.filter((img) => img !== url)
     setFiles([])
     setUploadResults([])
   }

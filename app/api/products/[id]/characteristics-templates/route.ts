@@ -3,7 +3,7 @@ import { getPool } from '@/lib/db-connection';
 
 // GET /api/products/[id]/characteristics-templates - получить характеристики товара на основе шаблонов (simple)
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const productId = parseInt(params.id);

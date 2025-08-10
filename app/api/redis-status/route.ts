@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { redisClient, apiCache, pageCache, mediaCache, productCache, categoryCache } from '@/lib/redis-client'
 
 // GET /api/redis-status - Получить статус Redis и информацию о кешах
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const startTime = Date.now()
 

@@ -120,7 +120,7 @@ export function CatalogDownloadButtons() {
         try {
           await navigator.clipboard.writeText(shareText)
           toast.success('Ссылка скопирована в буфер обмена')
-        } catch (clipboardError) {
+        } catch (_clipboardError) {
           toast.error('Ошибка при поделиться каталогом')
         }
       }

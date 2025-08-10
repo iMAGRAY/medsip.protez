@@ -4,7 +4,7 @@ import { executeQuery } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const startTime = Date.now()
@@ -43,7 +43,7 @@ export async function POST(
     if (existingVariantCheck.rows.length > 0) {
       const variant = existingVariantCheck.rows[0]
 
-      const duration = Date.now() - startTime
+      const _duration = Date.now() - startTime
       logger.info('Existing product variant returned', { productId, variantId: variant.id, duration })
 
       return NextResponse.json({
@@ -87,7 +87,7 @@ export async function POST(
 
     const newVariant = variantResult.rows[0]
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('New product variant created', {
       productId,
       variantId: newVariant.id,
@@ -110,7 +110,7 @@ export async function POST(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Product variant POST error', error, 'API')
 
     let statusCode = 500
@@ -133,7 +133,7 @@ export async function POST(
 }
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const startTime = Date.now()
@@ -163,7 +163,7 @@ export async function GET(
 
     const result = await executeQuery(query, [productId])
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variants loaded', {
       productId,
       variantsCount: result.rows.length,
@@ -177,7 +177,7 @@ export async function GET(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Product variant GET error', error, 'API')
 
     return NextResponse.json({

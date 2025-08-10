@@ -18,7 +18,7 @@ export async function GET(_request: NextRequest) {
     }
 
     const result = await executeQuery('SELECT COUNT(*) as total FROM orders')
-    const total = parseInt(result.rows[0].total)
+    const _total = parseInt(result.rows[0].total)
 
     const responseData = {
       success: true,

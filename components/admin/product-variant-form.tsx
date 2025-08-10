@@ -345,11 +345,11 @@ export function ProductVariantForm({
     })
   }
 
-  const handleCharacteristicsChange = (characteristics: any[]) => {
+  const handleCharacteristicsChange = (_characteristics: any[]) => {
     setFormData(prev => ({ ...prev, characteristics }))
   }
   
-  const handleConfigurableCharacteristicsChange = (configurableCharacteristics: any[]) => {
+  const handleConfigurableCharacteristicsChange = (_configurableCharacteristics: any[]) => {
     setFormData(prev => ({ ...prev, configurableCharacteristics }))
   }
 

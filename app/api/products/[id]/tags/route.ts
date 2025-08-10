@@ -4,7 +4,7 @@ import { pool } from '@/lib/db'
 
 // GET - получение тегов товара
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -200,7 +200,7 @@ export async function PUT(
       
       // Добавляем новые связи
       if (tag_ids.length > 0) {
-        const values = tag_ids.map((tagId, index) => `($1, $${index + 2})`).join(', ')
+        const values = tag_ids.map((_tagId, index) => `($1, $${index + 2})`).join(', ')
         const params = [productId, ...tag_ids]
         await client.query(
           `INSERT INTO product_tag_relations (product_id, tag_id) VALUES ${values}`,

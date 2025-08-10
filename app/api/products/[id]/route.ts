@@ -11,7 +11,7 @@ function isDbConfigured() {
 }
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -84,7 +84,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: product })
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -94,7 +94,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const productId = parseInt(params.id)
-  const cacheManager = getCacheManager()
+  const _cacheManager = getCacheManager()
 
   try {
     if (!isDbConfigured()) {

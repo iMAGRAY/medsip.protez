@@ -1,3 +1,4 @@
+import { SafeImage } from "@/components/safe-image"
 "use client"
 
 import { useState, useEffect } from "react"
@@ -365,11 +366,7 @@ export default function ProductsAdmin() {
                   {paginatedProducts.map((product) => (
                     <Card key={product.id} className="p-4">
                       <div className="flex items-start gap-3">
-                        <img
-                          src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE}
-                          alt={product.name}
-                          className="w-16 h-16 object-cover rounded-md border border-slate-200 flex-shrink-0"
-                        />
+                        <SafeImage src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE} alt={product.name} width={64} height={64} className="w-16 h-16 object-cover rounded-md border border-slate-200 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <h3 className="font-medium text-sm leading-tight">{product.name}</h3>
@@ -488,11 +485,7 @@ export default function ProductsAdmin() {
                       {paginatedProducts.map((product) => (
                         <TableRow key={product.id}>
                           <TableCell className="w-16">
-                            <img
-                              src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE}
-                              alt={product.name}
-                              className="w-14 h-14 object-cover rounded-md border border-slate-200"
-                            />
+                            <SafeImage src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE} alt={product.name} width={56} height={56} className="w-14 h-14 object-cover rounded-md border border-slate-200" />
                           </TableCell>
                           <TableCell className="font-medium max-w-[220px] truncate">{product.name}</TableCell>
                           <TableCell>

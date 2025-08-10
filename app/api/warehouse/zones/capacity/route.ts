@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest) {
 }
 
 // GET - получить текущую вместимость зон склада
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const zonesResult = await executeQuery(`
       SELECT id, name, capacity, updated_at

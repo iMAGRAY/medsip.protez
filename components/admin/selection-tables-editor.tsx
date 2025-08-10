@@ -126,7 +126,7 @@ export function SelectionTablesEditor({
       } else {
         console.error('Failed to fetch selection tables')
       }
-    } catch (error) {
+    } catch (_error) {
     } finally {
       setIsLoading(false)
     }
@@ -147,7 +147,7 @@ export function SelectionTablesEditor({
       }
     }, UI_CONFIG.TIMEOUTS.STATE_UPDATE_DELAY)
   }, [isNewProduct, onNewProductChange, onExistingProductChange])
-  const saveSelectionTables = async () => {
+  const _saveSelectionTables = async () => {
     if (!productId) {
       toast({
         title: "Ошибка",
@@ -291,7 +291,7 @@ export function SelectionTablesEditor({
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableTitle = (type: string, title: string) => {
+  const updateTableTitle = (type: string, _title: string) => {
     setSelectionTables(prev => ({
       ...prev,
       [type]: prev[type] ? { ...prev[type], title } : createEmptyTable(type)
@@ -300,7 +300,7 @@ export function SelectionTablesEditor({
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableHeaders = (type: string, headers: string[]) => {
+  const _updateTableHeaders = (type: string, _headers: string[]) => {
     setSelectionTables(prev => ({
       ...prev,
       [type]: prev[type] ? { ...prev[type], headers } : createEmptyTable(type)
@@ -309,7 +309,7 @@ export function SelectionTablesEditor({
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableRows = (type: string, rows: string[][]) => {
+  const _updateTableRows = (type: string, _rows: string[][]) => {
     setSelectionTables(prev => ({
       ...prev,
       [type]: prev[type] ? { ...prev[type], rows } : createEmptyTable(type)

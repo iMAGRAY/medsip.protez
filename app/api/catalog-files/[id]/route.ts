@@ -6,7 +6,7 @@ import { guardDbOr503Fast } from '@/lib/api-guards'
 
 // GET - получить информацию о каталоге
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

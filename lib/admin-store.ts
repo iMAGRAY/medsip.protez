@@ -148,8 +148,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   },
 
   // Basic actions
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
+  setLoading: (_loading) => set({ loading }),
+  setError: (_error) => set({ error }),
 
   // Принудительное обновление данных
   forceRefresh: async () => {
@@ -259,13 +259,13 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         result: PromiseRejectedResult
       }[]
 
-      const succeeded = results.filter((r) => r.result.status === 'fulfilled') as {
+      const _succeeded = results.filter((r) => r.result.status === 'fulfilled') as {
         name: string
         result: PromiseFulfilledResult<void>
       }[]
 
       const endTime = performance.now()
-      const loadTime = Math.round(endTime - startTime)
+      const _loadTime = Math.round(endTime - startTime)
 
       if (failed.length > 0) {
         console.warn(`Failed to load ${failed.length} data sources:`, failed.map(f => f.name))
@@ -278,7 +278,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         throw new Error("All data loading failed")
       }
 
-    } catch (error) {
+    } catch (_error) {
 
       store.setError("Failed to load data from database. Check console for details.")
     } finally {
@@ -291,7 +291,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     try {
       const settings = await apiClient.getSiteSettings()
       set({ siteSettings: settings })
-    } catch (error) {
+    } catch (_error) {
 
       set({ siteSettings: null })
     }
@@ -338,7 +338,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const mapped = mapTree(apiTree)
       set({ categories: mapped })
-    } catch (error) {
+    } catch (_error) {
 
       set({ categories: [] })
     }
@@ -440,9 +440,9 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       if (!response.ok) throw new Error('Failed to fetch model lines')
       const result = await response.json()
       const apiModelLines = result.success ? result.data : (Array.isArray(result) ? result : [])
-      const modelLines = apiModelLines.map(transformApiModelLine)
+      const _modelLines = apiModelLines.map(transformApiModelLine)
       set({ modelLines })
-    } catch (error) {
+    } catch (_error) {
 
       set({ modelLines: [] })
     }
@@ -528,7 +528,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   loadProducts: async (forceRefresh = false) => {
     try {
       console.log('🔄 Загружаем товары...', forceRefresh ? '(принудительное обновление)' : '')
-      const startTime = performance.now()
+      const _startTime = performance.now()
 
       // Принудительно очищаем кэш если требуется
       if (forceRefresh) {
@@ -574,9 +574,9 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         return
       }
 
-      const products = apiProducts.map(transformApiProduct)
+      const _products = apiProducts.map(transformApiProduct)
 
-      const endTime = performance.now()
+      const _endTime = performance.now()
 
       set({ products })
     } catch (error) {

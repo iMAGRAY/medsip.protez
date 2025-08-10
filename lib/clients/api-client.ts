@@ -16,7 +16,7 @@ const cacheUtils = {
     return null
   },
 
-  set: (key: string, data: any, ttl: number = 300000) => { // 5 минут по умолчанию
+  set: (key: string, _data: any, ttl: number = 300000) => { // 5 минут по умолчанию
     clientApiCache.set(key, {
       data,
       expires: Date.now() + ttl
@@ -98,9 +98,9 @@ export class ApiClient {
     if (options.method === 'PUT' && endpoint.includes('selection-tables')) {
 
       try {
-        const body = JSON.parse(options.body as string)
+        const _body = JSON.parse(options.body as string)
 
-      } catch (e) {
+      } catch (_e) {
         console.log('🌐 PUT request body (not JSON):', options.body)
       }
     }
@@ -290,7 +290,7 @@ export class ApiClient {
       if (error.message.includes('Failed to fetch') && typeof window !== 'undefined') {
 
         try {
-          const simpleFetch = await fetch(fullUrl)
+          const _simpleFetch = await fetch(fullUrl)
 
         } catch (fallbackError: any) {
           console.error('❌ Fallback fetch also failed:', {
@@ -328,7 +328,7 @@ export class ApiClient {
       cacheUtils.delete('site-settings')
 
       return result
-    } catch (error) {
+    } catch (_error) {
 
       // If PUT fails, try POST as fallback
       const result = await this.request("/site-settings", {

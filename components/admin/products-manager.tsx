@@ -389,7 +389,7 @@ export function ProductsManager({
     return modelLine?.name || 'Неизвестная линейка';
   };
 
-  const getCategoryName = (categoryId?: number) => {
+  const _getCategoryName = (categoryId?: number) => {
     if (!categoryId) return null;
     const category = categories.find(c => c.id === categoryId);
     return category?.name || 'Неизвестная категория';

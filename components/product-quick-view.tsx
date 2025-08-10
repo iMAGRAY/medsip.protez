@@ -86,7 +86,7 @@ export function ProductQuickView({ product, isOpen, onClose, onProductChange }: 
   }, [selectedVariant, product])
 
   // Проверяем доступность с учетом выбранного варианта
-  const isAvailable = useMemo(() => {
+  const _isAvailable = useMemo(() => {
     if (!product) return false
     
     if (selectedVariant) {

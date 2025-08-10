@@ -107,8 +107,8 @@ export function ProductImageUploader({
     }
   }
 
-  const handleDuplicateChoice = (file: File, existingFile: DuplicateFileInfo): Promise<'use-existing' | 'upload-new' | 'cancel'> => {
-    return new Promise((resolve) => {
+  const handleDuplicateChoice = (_file: File, _existingFile: DuplicateFileInfo): Promise<'use-existing' | 'upload-new' | 'cancel'> => {
+    return new Promise((_resolve) => {
       setCurrentDuplicate({ file, existingFile, resolve })
       setDuplicateDialogOpen(true)
     })
@@ -134,7 +134,7 @@ export function ProductImageUploader({
   }
 
   // Синхронизация изображений с базой данных
-  const syncImagesToDatabase = async (images: string[]) => {
+  const _syncImagesToDatabase = async (images: string[]) => {
     // Используем переданный productId или пытаемся получить из URL
     let resolvedProductId: string | null = null
     let useVariantApi = isVariant // Используем переданный prop
@@ -533,7 +533,7 @@ export function ProductImageUploader({
     setFullscreenImageIndex(newIndex)
   }, [fullscreenImageIndex, safeProductImages.length])
 
-  const navigateImage = (direction: 'prev' | 'next') => {
+  const _navigateImage = (direction: 'prev' | 'next') => {
     if (safeProductImages.length === 0) return
 
     let newIndex = selectedImageIndex
@@ -610,7 +610,7 @@ export function ProductImageUploader({
     }
   }, [fullscreenOpen, navigateFullscreen, closeFullscreen])
 
-  const totalImages = safeProductImages.length + files.length
+  const _totalImages = safeProductImages.length + files.length
 
   return (
     <>

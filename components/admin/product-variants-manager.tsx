@@ -1,3 +1,4 @@
+import { SafeImage } from "@/components/safe-image"
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -189,7 +190,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
         ? `/api/v2/product-variants/${variant.id}`
         : '/api/v2/product-variants'
       
-      const method = variant.id ? 'PUT' : 'POST'
+      const _method = variant.id ? 'PUT' : 'POST'
       
       // Преобразуем данные в формат для новой таблицы
       const variantData: any = {
@@ -295,7 +296,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
       } else {
         throw new Error('Failed to delete variant')
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось удалить вариант",
@@ -410,12 +411,7 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
                     {variant.images && variant.images.length > 0 && (
                       <div className="flex gap-2 mt-2">
                         {variant.images.slice(0, 4).map((image, index) => (
-                          <img
-                            key={index}
-                            src={image}
-                            alt={`${variant.sizeName} ${index + 1}`}
-                            className="w-12 h-12 object-cover rounded border"
-                          />
+                          <SafeImage src={{image}} alt="{`${variant.sizeName} ${index + 1}`}" width={48} height={48} className="w-12 h-12 object-cover rounded border" />
                         ))}
                         {variant.images.length > 4 && (
                           <div className="w-12 h-12 bg-slate-100 rounded border flex items-center justify-center text-xs text-slate-600">

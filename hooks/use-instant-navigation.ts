@@ -90,7 +90,7 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
   }, [cacheTimeout])
 
   // Мгновенная навигация
-  const navigateInstantly = useCallback((path: string, options?: { replace?: boolean }) => {
+  const _navigateInstantly = useCallback((path: string, options?: { replace?: boolean }) => {
     clearTimeouts()
     setNavigationState(prev => ({
       ...prev,
@@ -118,7 +118,7 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
   }, [router, clearTimeouts])
 
   // Prefetch при hover
-  const handlePrefetch = useCallback((path: string) => {
+  const _handlePrefetch = useCallback((path: string) => {
     if (path === pathname) return // Не prefetch текущий путь
 
     clearTimeouts()
@@ -129,17 +129,17 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
   }, [pathname, prefetchRoute, prefetchDelay, clearTimeouts])
 
   // Отмена prefetch
-  const cancelPrefetch = useCallback(() => {
+  const _cancelPrefetch = useCallback(() => {
     clearTimeouts()
   }, [clearTimeouts])
 
   // Проверка загружается ли путь
-  const isLoading = useCallback((path: string) => {
+  const _isLoading = useCallback((path: string) => {
     return navigationState.loadingStates.has(path)
   }, [navigationState.loadingStates])
 
   // Регистрация skeleton компонента для пути
-  const registerSkeleton = useCallback((path: string, component: React.ComponentType) => {
+  const _registerSkeleton = useCallback((path: string, component: React.ComponentType) => {
     setNavigationState(prev => ({
       ...prev,
       skeletonComponents: new Map(prev.skeletonComponents).set(path, component)
@@ -147,12 +147,12 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
   }, [])
 
   // Получение skeleton компонента для пути
-  const getSkeleton = useCallback((path: string) => {
+  const _getSkeleton = useCallback((path: string) => {
     return navigationState.skeletonComponents.get(path)
   }, [navigationState.skeletonComponents])
 
   // Добавление состояния загрузки
-  const addLoadingState = useCallback((key: string) => {
+  const _addLoadingState = useCallback((key: string) => {
     setNavigationState(prev => ({
       ...prev,
       loadingStates: new Set([...prev.loadingStates, key])
@@ -160,7 +160,7 @@ export function useInstantNavigation(options: InstantNavigationOptions = {}) {
   }, [])
 
   // Удаление состояния загрузки
-  const removeLoadingState = useCallback((key: string) => {
+  const _removeLoadingState = useCallback((key: string) => {
     setNavigationState(prev => {
       const newLoadingStates = new Set(prev.loadingStates)
       newLoadingStates.delete(key)

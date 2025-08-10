@@ -22,7 +22,7 @@ export function InstantNavigationProvider({ children }: InstantNavigationProvide
   const [targetPath, setTargetPath] = useState<string | null>(null)
 
   // Мгновенная навигация без моргания
-  const navigate = useCallback((path: string, options?: { replace?: boolean }) => {
+  const _navigate = useCallback((path: string, options?: { replace?: boolean }) => {
     if (path === pathname) return
 
     setIsNavigating(true)

@@ -21,7 +21,7 @@ export class Validator<T = any> {
     return this
   }
 
-  required(message: string = 'This field is required'): this {
+  required(_message: string = 'This field is required'): this {
     return this.addRule({
       name: 'required',
       message,
@@ -29,7 +29,7 @@ export class Validator<T = any> {
     })
   }
 
-  string(message: string = 'Must be a string'): this {
+  string(_message: string = 'Must be a string'): this {
     return this.addRule({
       name: 'string',
       message,
@@ -37,7 +37,7 @@ export class Validator<T = any> {
     })
   }
 
-  number(message: string = 'Must be a number'): this {
+  number(_message: string = 'Must be a number'): this {
     return this.addRule({
       name: 'number',
       message,
@@ -45,7 +45,7 @@ export class Validator<T = any> {
     })
   }
 
-  email(message: string = 'Must be a valid email'): this {
+  email(_message: string = 'Must be a valid email'): this {
     return this.addRule({
       name: 'email',
       message,
@@ -56,7 +56,7 @@ export class Validator<T = any> {
     })
   }
 
-  url(message: string = 'Must be a valid URL'): this {
+  url(_message: string = 'Must be a valid URL'): this {
     return this.addRule({
       name: 'url',
       message,
@@ -104,7 +104,7 @@ export class Validator<T = any> {
     })
   }
 
-  pattern(regex: RegExp, message: string): this {
+  pattern(regex: RegExp, _message: string): this {
     return this.addRule({
       name: 'pattern',
       message,
@@ -112,7 +112,7 @@ export class Validator<T = any> {
     })
   }
 
-  custom(name: string, validate: (value: T) => boolean, message: string, severity: 'error' | 'warning' = 'error'): this {
+  custom(_name: string, _validate: (value: T) => boolean, _message: string, _severity: 'error' | 'warning' = 'error'): this {
     return this.addRule({
       name,
       message,
@@ -242,7 +242,7 @@ export function validateArray<T>(items: T[], validator: Validator<T>): {
 } {
   const results = items.map(item => validator.validate(item))
   const errors = results
-    .map((result, index) => ({ index, errors: result.errors }))
+    .map((result, _index) => ({ index, errors: result.errors }))
     .filter(item => item.errors.length > 0)
 
   return {

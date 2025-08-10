@@ -4,7 +4,7 @@ import { getLogger } from '@/lib/dependency-injection'
 
 // GET - получение деталей заказа
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const logger = getLogger()
@@ -147,7 +147,7 @@ export async function PUT(
 
 // DELETE - удаление заказа
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -188,7 +188,7 @@ export async function DELETE(
       )
 
       // Удаляем сам заказ
-      const deleteResult = await client.query(
+      const _deleteResult = await client.query(
         'DELETE FROM orders WHERE id = $1 RETURNING id',
         [orderId]
       )

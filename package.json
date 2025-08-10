@@ -38,6 +38,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "lint:auto-fix": "node scripts/tools/auto-fix-lint.js",
     "type-check": "tsc --noEmit",
     "test": "node tests/run-all-tests.js",
     "test:watch": "node tests/run-all-tests.js",
@@ -62,7 +63,9 @@
     "security:check": "node scripts/analysis/security-audit.js",
     "db:apply-indexes": "node scripts/analysis/apply-indexes.js",
     "db:migrate:ensure": "node scripts/migration/ensure-missing-tables.js",
-    "db:optimize": "npm run db:audit:out && npm run db:apply-indexes && npm run test:perf:db"
+    "db:optimize": "npm run db:audit:out && npm run db:apply-indexes && npm run test:perf:db",
+    "analyze:deps": "npx depcheck",
+    "analyze:types": "npx ts-prune"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",

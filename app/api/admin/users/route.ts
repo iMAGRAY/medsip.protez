@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     const result = await client.query(query);
 
-    const users = result.rows.map(row => ({
+    const _users = result.rows.map(row => ({
       id: row.id,
       username: row.username,
       email: row.email,

@@ -38,10 +38,10 @@ export async function GET(request: Request) {
     }
 
     // Default: return metrics
-    const metrics = getDatabaseMetrics()
-    const recentQueries = performanceMonitor.getRecentQueries(10)
-    const slowQueries = performanceMonitor.getSlowQueries(5)
-    const failedQueries = performanceMonitor.getFailedQueries(5)
+    const _metrics = getDatabaseMetrics()
+    const _recentQueries = performanceMonitor.getRecentQueries(10)
+    const _slowQueries = performanceMonitor.getSlowQueries(5)
+    const _failedQueries = performanceMonitor.getFailedQueries(5)
 
     return NextResponse.json({
       success: true,

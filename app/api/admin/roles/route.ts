@@ -58,7 +58,7 @@ const client = getDbConnection()
           END
       `)
 
-      const roles = result.rows.map(row => ({
+      const _roles = result.rows.map(row => ({
         id: row.id,
         name: row.name,
         displayName: row.display_name,

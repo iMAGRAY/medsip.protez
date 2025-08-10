@@ -4,7 +4,7 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 
 // GET /api/products/[id]/characteristics - получить характеристики товара из EAV системы
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const productId = parseInt(params.id);
@@ -68,7 +68,7 @@ export async function GET(
 }
 
 // Функция для форматирования характеристик из новой EAV системы
-function formatEAVCharacteristics(rows: any[], productId: number) {
+function formatEAVCharacteristics(rows: any[], _productId: number) {
   const groupedCharacteristics: any = {};
 
   rows.forEach((row: any) => {
@@ -170,7 +170,7 @@ function formatEAVCharacteristics(rows: any[], productId: number) {
 }
 
 // Функция для форматирования характеристик из старой системы (fallback)
-function formatOldCharacteristics(rows: any[], productId: number) {
+function formatOldCharacteristics(rows: any[], _productId: number) {
   const groupedCharacteristics: any = {};
 
   rows.forEach((row: any) => {
@@ -357,7 +357,7 @@ export async function POST(
             }
 
             try {
-              const deleteResult = await pool.query(deleteQuery, deleteParams);
+              const _deleteResult = await pool.query(deleteQuery, deleteParams);
 
             } catch (deleteError) {
               console.error(`❌ Ошибка удаления характеристики:`, deleteError);

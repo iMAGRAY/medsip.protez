@@ -81,9 +81,9 @@ function recordFailedAttempt(ipAddress: string): void {
 
 // Создание сессии
 export function createSession(
-  username: string,
+  _username: string,
   ipAddress: string,
-  userAgent: string,
+  _userAgent: string,
   rememberMe: boolean = false
 ): string {
   const sessionId = generateSecureToken(64)
@@ -174,7 +174,7 @@ export async function authenticateAdmin(
   }
 
   // Создание сессии с учетом "запомнить меня"
-  const sessionId = createSession(username, ipAddress, userAgent, rememberMe)
+  const _sessionId = createSession(username, ipAddress, userAgent, rememberMe)
 
   return { success: true, sessionId, rememberMe }
 }

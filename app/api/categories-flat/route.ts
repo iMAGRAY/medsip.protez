@@ -12,7 +12,7 @@ function isDbConfigured() {
 }
 
 // GET /api/categories-flat - Получить плоский список всех активных категорий для форм товаров
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
 
     const guard = guardDbOr503Fast()

@@ -151,7 +151,7 @@ export function ProductVariantSelectorV2({
   }
 
   // Группировка вариантов по атрибутам
-  const groupedVariants = useMemo(() => {
+  const _groupedVariants = useMemo(() => {
     const groups: Record<string, ProductVariantV2[]> = {}
     
     variants.forEach(variant => {

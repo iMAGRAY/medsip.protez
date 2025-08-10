@@ -3,7 +3,7 @@ import { pool } from '@/lib/db';
 
 // GET /api/product-variants/[id] - получить конкретный вариант товара
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -92,7 +92,7 @@ export async function PUT(
 
 // DELETE /api/product-variants/[id] - удалить вариант товара (soft delete)
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

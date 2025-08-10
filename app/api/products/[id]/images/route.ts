@@ -3,7 +3,7 @@ import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -35,7 +35,7 @@ export async function GET(
     // Process images from JSON field or fallback to image_url
     try {
       if (product.images && Array.isArray(product.images)) {
-        imageUrls = product.images.map((img, index) =>
+        imageUrls = product.images.map((img, _index) =>
           typeof img === 'string' ? img : img.url || img.image_url
         ).filter(Boolean);
       } else if (product.image_url) {

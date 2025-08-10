@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
 
@@ -229,7 +229,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
 
@@ -302,7 +302,7 @@ export async function DELETE(
 
     // Удаляем модельную линию
     const deleteQuery = 'DELETE FROM model_series WHERE id = $1 RETURNING id';
-    const result = await executeQuery(deleteQuery, [modelLineId]);
+    const _result = await executeQuery(deleteQuery, [modelLineId]);
 
     return NextResponse.json({
       message: 'Model line deleted successfully',

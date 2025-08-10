@@ -158,7 +158,7 @@ export class ApiCacheHeaders {
       }
     }
 
-    const headers = this.conditionalCache(etag, lastModified)
+    const _headers = this.conditionalCache(etag, lastModified)
 
     return { notModified, headers }
   }

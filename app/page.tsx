@@ -110,7 +110,7 @@ export default function HomePage() {
   }, [allProducts, adminCategories])
 
   // Функция для принудительного обновления данных
-  const handleForceRefresh = async () => {
+  const _handleForceRefresh = async () => {
     setRefreshing(true)
     try {
       await forceRefresh()
@@ -722,7 +722,7 @@ export default function HomePage() {
     }
   }, [loadMoreProducts, hasMore, isLoadingMore])
 
-  const handleFilterChange = useCallback((filters: any) => {
+  const _handleFilterChange = useCallback((filters: any) => {
     setAppliedFilters(filters)
     if (isFilterDrawerOpen) setIsFilterDrawerOpen(false)
   }, [isFilterDrawerOpen])

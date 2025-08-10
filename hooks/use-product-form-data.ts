@@ -147,22 +147,22 @@ export function useProductFormData() {
   }, [])
 
   // Получение модельных рядов по производителю
-  const getModelLinesByManufacturer = (manufacturerId: number) => {
+  const _getModelLinesByManufacturer = (manufacturerId: number) => {
     return modelLines.filter(ml => ml.manufacturer_id === manufacturerId)
   }
 
   // Получение категории по ID
-  const getCategoryById = (categoryId: number) => {
+  const _getCategoryById = (categoryId: number) => {
     return categories.find(cat => cat.id === categoryId)
   }
 
   // Получение производителя по ID
-  const getManufacturerById = (manufacturerId: number) => {
+  const _getManufacturerById = (manufacturerId: number) => {
     return manufacturers.find(man => man.id === manufacturerId)
   }
 
   // Получение модельного ряда по ID
-  const getModelLineById = (modelLineId: number) => {
+  const _getModelLineById = (modelLineId: number) => {
     return modelLines.find(ml => ml.id === modelLineId)
   }
 

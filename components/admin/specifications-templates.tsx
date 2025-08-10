@@ -166,7 +166,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
   }
 
   // Функция для массового добавления характеристик
-  const addGroupSpecs = async (productId: number, specs: any[]) => {
+  const _addGroupSpecs = async (productId: number, specs: any[]) => {
     const response = await fetch(`/api/products/${productId}/characteristics-simple`, {
       method: 'POST',
       headers: {
@@ -218,7 +218,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
               } else {
                 errorCount++
               }
-            } catch (error) {
+            } catch (_error) {
               errorCount++
             }
           }
@@ -243,7 +243,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
             } else {
               errorCount++
             }
-          } catch (error) {
+          } catch (_error) {
             errorCount++
           }
         }

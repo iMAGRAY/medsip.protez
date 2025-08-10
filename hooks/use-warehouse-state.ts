@@ -199,7 +199,7 @@ export function useWarehouseState() {
       dispatch({ type: 'SET_ANALYTICS_DATA', payload: data })
   }, [])
 
-  const setDialog = useCallback((type: keyof WarehouseState['dialogs'], open: boolean) => {
+  const setDialog = useCallback((_type: keyof WarehouseState['dialogs'], _open: boolean) => {
       dispatch({ type: 'SET_DIALOG', payload: { type, open } })
   }, [])
 
@@ -207,7 +207,7 @@ export function useWarehouseState() {
       dispatch({ type: 'SET_EDITING_ITEM', payload: item })
   }, [])
 
-  const setSelectedId = useCallback((type: keyof WarehouseState['selectedIds'], id: number) => {
+  const setSelectedId = useCallback((_type: keyof WarehouseState['selectedIds'], _id: number) => {
       dispatch({ type: 'SET_SELECTED_ID', payload: { type, id } })
   }, [])
 
@@ -228,7 +228,7 @@ export function useWarehouseState() {
     }, [])
 
   // Стабильный объект actions через useMemo
-  const actions = useMemo(() => ({
+  const _actions = useMemo(() => ({
     setLoading,
     setError,
     setActiveTab,

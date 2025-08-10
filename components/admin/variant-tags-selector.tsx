@@ -234,7 +234,7 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     setIsCreating(true)
     try {
       // Генерируем slug из названия, если не указан
-      const slug = newTagData.slug || newTagData.name
+      const _slug = newTagData.slug || newTagData.name
         .toLowerCase()
         .replace(/[а-яё]/g, (match) => {
           const ru = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'

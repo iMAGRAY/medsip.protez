@@ -133,7 +133,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось очистить кеш",
@@ -185,7 +185,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Неверный JSON или ошибка сохранения",
@@ -235,7 +235,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось получить данные",
@@ -271,7 +271,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось выполнить ping",

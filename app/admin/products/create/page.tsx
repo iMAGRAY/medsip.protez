@@ -33,7 +33,7 @@ export default function CreateProductPage() {
     )
   }
 
-  const handleSave = async (savedProduct: any) => {
+  const handleSave = async (_savedProduct: any) => {
 
     // Принудительно обновляем список товаров в admin store
     try {

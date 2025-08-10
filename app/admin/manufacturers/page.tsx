@@ -81,7 +81,7 @@ export default function ManufacturersAdminPage() {
       } else {
         setMessage({ type: 'error', text: 'Ошибка загрузки производителей' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     } finally {
       setIsLoading(false)
@@ -134,7 +134,7 @@ export default function ManufacturersAdminPage() {
         ? `/api/manufacturers/${editingManufacturer.id}`
         : '/api/manufacturers'
 
-      const method = editingManufacturer ? 'PUT' : 'POST'
+      const _method = editingManufacturer ? 'PUT' : 'POST'
 
       const payload = {
         ...formData,
@@ -162,7 +162,7 @@ export default function ManufacturersAdminPage() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Ошибка сохранения' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     } finally {
       setIsSubmitting(false)

@@ -26,7 +26,7 @@ export default function SetupTemplatesPage() {
         setStatus('missing')
         setMessage(data.message)
       }
-    } catch (error) {
+    } catch (_error) {
       setStatus('missing')
       setMessage('Ошибка при проверке таблицы')
     } finally {
@@ -49,7 +49,7 @@ export default function SetupTemplatesPage() {
       } else {
         setMessage(`Ошибка: ${data.error}`)
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage('Ошибка при создании таблицы')
     } finally {
       setIsLoading(false)

@@ -18,7 +18,7 @@ export async function GET(_request: NextRequest) {
     }
 
     // Получаем статистику кеша
-    const cacheStats = await getCacheStats()
+    const _cacheStats = await getCacheStats()
     
     // Получаем дополнительную информацию о Redis
     const info = {

@@ -130,7 +130,7 @@ export async function PUT(
 
       logger.info('Order item updated successfully', logData)
 
-      const message = custom_price !== undefined
+      const _message = custom_price !== undefined
         ? 'Цена товара обновлена'
         : status !== undefined
           ? 'Статус товара обновлен'

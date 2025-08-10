@@ -116,7 +116,7 @@ export async function GET(
     }, {});
 
     // Преобразуем в массив и сортируем группы
-    const characteristics = Object.values(groupedCharacteristics)
+    const _characteristics = Object.values(groupedCharacteristics)
       .sort((a: any, b: any) => a.group_sort_order - b.group_sort_order);
 
     return NextResponse.json({

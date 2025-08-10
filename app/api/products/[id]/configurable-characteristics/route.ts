@@ -5,7 +5,7 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 
 // GET - получить конфигурируемые характеристики
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

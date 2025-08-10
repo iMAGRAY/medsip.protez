@@ -90,7 +90,7 @@ export default function ProductCharacteristics({
     return value.trim() || 'Не указано';
   };
 
-  const getValueDisplayIcon = (ch: Characteristic, value: string) => {
+  const getValueDisplayIcon = (ch: Characteristic, _value: string) => {
     // Цветовой индикатор для характеристик с цветом
     if (ch.color_hex && ch.color_hex.trim()) {
       return (

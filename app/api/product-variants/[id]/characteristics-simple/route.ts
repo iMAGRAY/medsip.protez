@@ -3,7 +3,7 @@ import { pool } from '@/lib/db';
 
 // GET /api/product-variants/[id]/characteristics-simple - получить характеристики варианта
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -195,7 +195,7 @@ export async function POST(
 
 // DELETE /api/product-variants/[id]/characteristics-simple - удалить характеристики варианта
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

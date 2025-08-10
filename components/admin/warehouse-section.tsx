@@ -151,7 +151,7 @@ export function WarehouseSection() {
     })
   }
 
-  const formatPrice = (price: string) => {
+  const _formatPrice = (price: string) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB',

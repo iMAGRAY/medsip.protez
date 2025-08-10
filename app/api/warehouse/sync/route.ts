@@ -4,7 +4,7 @@ import { getCacheManager } from '@/lib/dependency-injection';
 import { invalidateRelated } from '@/lib/cache-manager';
 
 // POST - синхронизировать данные о товарах между складом и каталогом
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
     const cacheManager = getCacheManager();
 
     try {

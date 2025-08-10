@@ -98,7 +98,7 @@ export default function ProductTagsPage() {
     e.preventDefault()
     
     try {
-      const method = editingTag ? 'PUT' : 'POST'
+      const _method = editingTag ? 'PUT' : 'POST'
       const body = editingTag 
         ? { id: editingTag.id, ...formData }
         : formData

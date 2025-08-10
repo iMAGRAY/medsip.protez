@@ -180,7 +180,7 @@ export default function ModelLineProductsPage() {
         loadData();
         setMessage({ type: 'error', text: data.error || 'Ошибка удаления' })
       }
-    } catch (error) {
+    } catch (_error) {
       // Возвращаем товар в список при ошибке
       loadData();
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })

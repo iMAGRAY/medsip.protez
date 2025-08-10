@@ -129,7 +129,7 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
   }
 
   // Переключение выбора характеристики
-  const toggleCharacteristic = (value: CharacteristicValue, groupName: string) => {
+  const toggleCharacteristic = (value: CharacteristicValue, _groupName: string) => {
     const isCurrentlySelected = selectedCharacteristics.some(c => c.value_id === value.id)
 
     if (isCurrentlySelected) {

@@ -75,7 +75,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   // Создаем безопасные CSS стили без использования dangerouslySetInnerHTML
   const styles = Object.entries(THEMES)
     .map(([theme, prefix]) => {
-      const cssRules = colorConfig
+      const _cssRules = colorConfig
         .map(([key, itemConfig]) => {
           const color =
             itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||

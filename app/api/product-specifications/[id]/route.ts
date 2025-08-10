@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 
 // GET /api/product-specifications/[id] - Get specifications for a specific product
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -156,7 +156,7 @@ export async function PUT(
 
 // DELETE - Удалить характеристику
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const pool = getPool()

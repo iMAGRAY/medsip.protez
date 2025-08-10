@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       }))
     }
     
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     
     logger.info('Characteristics loaded by category', { 
       categoryId, 
@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading characteristics by category', error)
     
     return NextResponse.json(

@@ -178,7 +178,7 @@ export default function CharacteristicTemplatesAdmin() {
         ? `/api/admin/characteristic-templates/${editingTemplate.id}`
         : '/api/admin/characteristic-templates'
 
-      const method = editingTemplate ? 'PUT' : 'POST'
+      const _method = editingTemplate ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,
