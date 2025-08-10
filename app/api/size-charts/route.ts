@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
         sc.name,
         sc.category_id,
         sc.description,
-        sc.chart_type,
         sc.created_at,
         sc.updated_at
       FROM size_charts sc

@@ -60,7 +60,8 @@ export async function GET(
         SELECT *
         FROM characteristic_preset_values
         WHERE template_id = $1
-        ORDER BY sort_order, value;
+        ORDER BY sort_order, value
+        LIMIT 500;
       `, [templateId]);
       template.preset_values = presetValuesResult.rows;
     } else {
