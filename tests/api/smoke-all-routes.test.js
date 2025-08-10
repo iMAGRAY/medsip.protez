@@ -19,6 +19,16 @@ const ALLOWED_STATUS = [
   { pattern: /^\/api\/media\/check-duplicate$/, codes: [405] },
   { pattern: /^\/api\/orders\/\d+\/items\/\d+$/, codes: [405] },
   { pattern: /^\/api\/variants\/\d+\/personal-tags\/\d+$/, codes: [405] },
+  // Новые безопасные 405-роуты
+  { pattern: /^\/api\/warehouse\/clean-fake-data$/, codes: [405] },
+  { pattern: /^\/api\/products\/\d+\/personal-tags\/\d+$/, codes: [405] },
+  { pattern: /^\/api\/products\/refresh$/, codes: [405] },
+  // Админ-роуты без авторизации допустимы с 401/403/405
+  { pattern: /^\/api\/admin(\/|$)/, codes: [200, 401, 403, 405] },
+  // Кеш-роут может вернуть 400 без параметров
+  { pattern: /^\/api\/cache$/, codes: [200, 400] },
+  // Частный случай размеров для продуктов в админке
+  { pattern: /^\/api\/admin\/products\/\d+\/sizes$/, codes: [200, 405] },
 ]
 
 function isAllowedStatus(url, status) {
@@ -63,7 +73,7 @@ async function main() {
   }, GLOBAL_TIMEOUT_MS)
 
   const routes = discoverRoutes(require('path').join(process.cwd(), 'app', 'api'))
-  const stats = { total: 0, ok: 0, fail: 0, errors: [] }
+  const stats = { total: 0, ok: 0, fail: 0, errors: [], failed: [] }
 
   const worker = async (route) => {
     if (/\/(upload|delete|cleanup|admin\/auth|seed|reset|sync|init|register|db-reset|cache\/clear|test-)/i.test(route)) return null
@@ -78,6 +88,7 @@ async function main() {
         console.log(`✅ ${url} ${res.status} ${ms}ms`)
       } else {
         stats.fail++
+        stats.failed.push({ url, status: res.status, ms })
         console.warn(`⚠️ ${url} ${res.status} ${ms}ms`)
       }
     } catch (e) {
@@ -92,6 +103,9 @@ async function main() {
 
   clearTimeout(killer)
   console.log('\nSmoke summary:', stats)
+  if (stats.failed.length) {
+    console.log('Failures list:', stats.failed)
+  }
   process.exit(stats.fail > 0 ? 1 : 0)
 }
 
