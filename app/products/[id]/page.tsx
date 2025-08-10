@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { SafeImage } from "@/components/safe-image"
 import Link from "next/link"
@@ -520,39 +520,39 @@ export default function ProductPage() {
   }, [isFullscreenOpen])
 
   // Загружаем конфигурируемые характеристики при изменении товара или варианта
+    const loadConfigurableCharacteristics = useCallback(async () => {
+              try {
+                // Определяем ID для загрузки характеристик
+                const idToLoad = selectedVariant ? selectedVariant.id : product?.id
+                if (!idToLoad) {
+                  setConfigurableCharacteristics([])
+                  return
+                }
+
+                console.log('🔍 Загрузка конфигурируемых характеристик для:', selectedVariant ? 'варианта' : 'товара', idToLoad)
+                
+                const response = await fetch(`/api/products/${idToLoad}/configurable-characteristics`)
+                const data = await response.json()
+                
+                if (data.success && data.data.configurable_characteristics) {
+                  setConfigurableCharacteristics(data.data.configurable_characteristics)
+                  console.log('✅ Загружено конфигурируемых характеристик:', {
+                    count: data.data.configurable_characteristics.length,
+                    characteristics: data.data.configurable_characteristics
+                  })
+                } else {
+                  console.log('⚠️ Нет конфигурируемых характеристик')
+                  setConfigurableCharacteristics([])
+                }
+              } catch (error) {
+                console.error('❌ Ошибка загрузки конфигурируемых характеристик:', error)
+                setConfigurableCharacteristics([])
+              }
+            }, [product?.id, selectedVariant?.id])
+
   useEffect(() => {
-    const loadConfigurableCharacteristics = async () => {
-      try {
-        // Определяем ID для загрузки характеристик
-        const idToLoad = selectedVariant ? selectedVariant.id : product?.id
-        if (!idToLoad) {
-          setConfigurableCharacteristics([])
-          return
-        }
-
-        console.log('🔍 Загрузка конфигурируемых характеристик для:', selectedVariant ? 'варианта' : 'товара', idToLoad)
-        
-        const response = await fetch(`/api/products/${idToLoad}/configurable-characteristics`)
-        const data = await response.json()
-        
-        if (data.success && data.data.configurable_characteristics) {
-          setConfigurableCharacteristics(data.data.configurable_characteristics)
-          console.log('✅ Загружено конфигурируемых характеристик:', {
-            count: data.data.configurable_characteristics.length,
-            characteristics: data.data.configurable_characteristics
-          })
-        } else {
-          console.log('⚠️ Нет конфигурируемых характеристик')
-          setConfigurableCharacteristics([])
-        }
-      } catch (error) {
-        console.error('❌ Ошибка загрузки конфигурируемых характеристик:', error)
-        setConfigurableCharacteristics([])
-      }
-    }
-
     loadConfigurableCharacteristics()
-  }, [product?.id, selectedVariant?.id])
+  }, [loadConfigurableCharacteristics])
 
   if (isLoading) {
     return (

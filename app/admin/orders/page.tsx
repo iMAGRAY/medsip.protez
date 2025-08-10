@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { useOrders } from "@/lib/orders-context"
 import { Button } from "@/components/ui/button"
@@ -99,29 +99,29 @@ export default function OrdersPage() {
   const [showOrderDialog, setShowOrderDialog] = useState(false)
   const { refreshOrdersCount } = useOrders()
 
-  const loadOrders = async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '50'
-      })
+  const loadOrders = useCallback(async () => {
+      try {
+        setLoading(true)
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: '50'
+        })
 
-      const response = await fetch(`/api/orders?${params}`)
-      const data = await response.json()
+        const response = await fetch(`/api/orders?${params}`)
+        const data = await response.json()
 
-      if (data.success) {
-        setOrders(data.data.orders)
-        setTotalPages(data.data.pagination.pages)
-      } else {
-        console.error('Ошибка загрузки заказов:', data.error)
+        if (data.success) {
+          setOrders(data.data.orders)
+          setTotalPages(data.data.pagination.pages)
+        } else {
+          console.error('Ошибка загрузки заказов:', data.error)
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки заказов:', error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Ошибка загрузки заказов:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [page, activeTab])
 
   // Функция для фильтрации заказов по вкладкам
   const getOrdersByTab = (tabName: string) => {
@@ -315,7 +315,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadOrders()
-  }, [page, activeTab])
+  }, [loadOrders])
 
   const _formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU')

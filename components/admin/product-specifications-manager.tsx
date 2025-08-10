@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -120,29 +120,29 @@ export function ProductSpecificationsManager({
   }
 
   // Загрузка данных
-  const loadSpecGroups = async () => {
-    try {
+  const loadSpecGroups = useCallback(async () => {
+      try {
 
-      const res = await fetch("/api/specifications")
+        const res = await fetch("/api/specifications")
 
-      if (res.ok) {
-        const apiResponse = await res.json()
-        const data = apiResponse.data || apiResponse
+        if (res.ok) {
+          const apiResponse = await res.json()
+          const data = apiResponse.data || apiResponse
 
-        const hierarchicalGroups = processHierarchicalGroups(data)
+          const hierarchicalGroups = processHierarchicalGroups(data)
 
-        setSpecGroups(hierarchicalGroups)
-      } else {
-        console.error("❌ Failed to load spec groups:", res.status)
-        toast.error('Не удалось загрузить группы характеристик')
+          setSpecGroups(hierarchicalGroups)
+        } else {
+          console.error("❌ Failed to load spec groups:", res.status)
+          toast.error('Не удалось загрузить группы характеристик')
+        }
+      } catch (error) {
+        console.error("❌ Error loading spec groups:", error)
+        toast.error('Ошибка при загрузке групп характеристик')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("❌ Error loading spec groups:", error)
-      toast.error('Ошибка при загрузке групп характеристик')
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
     const processGroup = (group: any): SpecGroup => {
@@ -167,7 +167,7 @@ export function ProductSpecificationsManager({
 
   useEffect(() => {
     loadSpecGroups()
-  }, [])
+  }, [loadSpecGroups])
 
   // Синхронизация с родительским компонентом
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -75,7 +75,7 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   useEffect(() => {
     if (manufacturerId) {
@@ -83,29 +83,29 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
     }
   }, [manufacturerId]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [modelLinesResponse, manufacturersResponse, categoriesResponse] = await Promise.all([
-        apiClient.getModelLines(),
-        apiClient.getManufacturers(),
-        apiClient.getCategories()
-      ]);
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true);
+        const [modelLinesResponse, manufacturersResponse, categoriesResponse] = await Promise.all([
+          apiClient.getModelLines(),
+          apiClient.getManufacturers(),
+          apiClient.getCategories()
+        ]);
 
-      setModelLines(modelLinesResponse?.data || []);
-      setManufacturers(manufacturersResponse?.data || []);
-      setCategories(categoriesResponse?.data || []);
-    } catch (error) {
-      logger.error('Failed to load data:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+        setModelLines(modelLinesResponse?.data || []);
+        setManufacturers(manufacturersResponse?.data || []);
+        setCategories(categoriesResponse?.data || []);
+      } catch (error) {
+        logger.error('Failed to load data:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить данные",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, []);
 
   const loadModelLinesForManufacturer = async () => {
     if (!manufacturerId) return;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface SelectionTablesProps {
   productSku: string;
@@ -30,44 +30,44 @@ const SelectionTables: React.FC<SelectionTablesProps> = ({ productSku, className
   };
 
   // Load selection tables from database only
+    const loadSelectionTables = useCallback(async () => {
+              setIsLoading(true);
+
+              try {
+                const productId = extractProductId(productSku);
+
+                if (productId) {
+
+                  const response = await fetch(`/api/products/${productId}/selection-tables`);
+
+                  if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && Object.keys(data.data).length > 0) {
+
+                      setTableData(data.data);
+                    } else {
+
+                      setTableData(null);
+                    }
+                  } else {
+
+                    setTableData(null);
+                  }
+                } else {
+
+                  setTableData(null);
+                }
+              } catch (error) {
+                console.error('❌ Error loading selection tables:', error);
+                setTableData(null);
+              } finally {
+                setIsLoading(false);
+              }
+            }, [productSku])
+
   useEffect(() => {
-    const loadSelectionTables = async () => {
-      setIsLoading(true);
-
-      try {
-        const productId = extractProductId(productSku);
-
-        if (productId) {
-
-          const response = await fetch(`/api/products/${productId}/selection-tables`);
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && Object.keys(data.data).length > 0) {
-
-              setTableData(data.data);
-            } else {
-
-              setTableData(null);
-            }
-          } else {
-
-            setTableData(null);
-          }
-        } else {
-
-          setTableData(null);
-        }
-      } catch (error) {
-        console.error('❌ Error loading selection tables:', error);
-        setTableData(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadSelectionTables();
-  }, [productSku]);
+  }, [loadSelectionTables]);
 
   if (isLoading) {
     return (

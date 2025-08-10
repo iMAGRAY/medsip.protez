@@ -238,27 +238,27 @@ export const VirtualizedMediaGrid: React.FC<VirtualizedMediaGridProps> = ({
   })
 
   // Обновляем размеры контейнера при изменении
-  useEffect(() => {
-    const updateSize = () => {
-      // Используем родительский элемент для определения размеров
-      const parentElement = document.querySelector('[data-virtualized-grid-container]')
-      if (parentElement) {
-        setActualContainerSize({
-          width: parentElement.clientWidth || containerWidth,
-          height: parentElement.clientHeight || containerHeight
-        })
-      } else {
-        setActualContainerSize({
-          width: containerWidth,
-          height: containerHeight
-        })
-      }
-    }
+    const updateSize = useCallback(() => {
+              // Используем родительский элемент для определения размеров
+              const parentElement = document.querySelector('[data-virtualized-grid-container]')
+              if (parentElement) {
+                setActualContainerSize({
+                  width: parentElement.clientWidth || containerWidth,
+                  height: parentElement.clientHeight || containerHeight
+                })
+              } else {
+                setActualContainerSize({
+                  width: containerWidth,
+                  height: containerHeight
+                })
+              }
+            }, [containerWidth, containerHeight])
 
+  useEffect(() => {
     updateSize()
     window.addEventListener('resize', updateSize)
     return () => window.removeEventListener('resize', updateSize)
-  }, [containerWidth, containerHeight])
+  }, [updateSize])
 
   // Мемоизированная конфигурация сетки
   const gridConfig = useMemo(() =>

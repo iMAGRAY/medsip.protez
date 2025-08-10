@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 
 export interface FormCategory {
@@ -125,26 +125,26 @@ export function useProductFormData() {
   }
 
   // Загрузка всех данных при монтировании
+    const loadAllData = useCallback(async () => {
+              setLoading(true)
+              setError(null)
+
+              try {
+                await Promise.all([
+                  loadCategories(),
+                  loadManufacturers(),
+                  loadModelLines()
+                ])
+              } catch (err) {
+                console.error('❌ Error loading form data:', err)
+              } finally {
+                setLoading(false)
+              }
+            }, [])
+
   useEffect(() => {
-    const loadAllData = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        await Promise.all([
-          loadCategories(),
-          loadManufacturers(),
-          loadModelLines()
-        ])
-      } catch (err) {
-        console.error('❌ Error loading form data:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadAllData()
-  }, [])
+  }, [loadAllData])
 
   // Получение модельных рядов по производителю
   const _getModelLinesByManufacturer = (manufacturerId: number) => {

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -83,45 +83,45 @@ export function ProductVariantSelectorV2({
 
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
-      )
-      const data = await response.json()
-      
-      if (data.success && data.data) {
-        setVariants(data.data)
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
+        )
+        const data = await response.json()
         
-        // Выбираем начальный вариант
-        let variantToSelect = null
-        
-        if (initialVariantId) {
-          variantToSelect = data.data.find((v: ProductVariantV2) => v.id === initialVariantId)
+        if (data.success && data.data) {
+          setVariants(data.data)
+          
+          // Выбираем начальный вариант
+          let variantToSelect = null
+          
+          if (initialVariantId) {
+            variantToSelect = data.data.find((v: ProductVariantV2) => v.id === initialVariantId)
+          }
+          
+          if (!variantToSelect) {
+            // Приоритеты: рекомендуемый > избранный > в наличии > первый
+            variantToSelect = data.data.find((v: ProductVariantV2) => v.is_recommended) ||
+                             data.data.find((v: ProductVariantV2) => v.is_featured) ||
+                             data.data.find((v: ProductVariantV2) => v.in_stock) ||
+                             data.data[0]
+          }
+          
+          if (variantToSelect) {
+            handleVariantSelect(variantToSelect)
+          }
         }
-        
-        if (!variantToSelect) {
-          // Приоритеты: рекомендуемый > избранный > в наличии > первый
-          variantToSelect = data.data.find((v: ProductVariantV2) => v.is_recommended) ||
-                           data.data.find((v: ProductVariantV2) => v.is_featured) ||
-                           data.data.find((v: ProductVariantV2) => v.in_stock) ||
-                           data.data[0]
-        }
-        
-        if (variantToSelect) {
-          handleVariantSelect(variantToSelect)
-        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты товара')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты товара')
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [productId])
 
   const handleVariantSelect = (variant: ProductVariantV2) => {
     setImageLoading(true)

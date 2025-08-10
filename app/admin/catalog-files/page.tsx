@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -72,28 +72,28 @@ export default function CatalogFilesPage() {
   })
 
   // Загрузка каталогов
-  const loadCatalogs = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/catalog-files?active=false')
-      const data = await response.json()
+  const loadCatalogs = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/catalog-files?active=false')
+        const data = await response.json()
 
-      if (data.success) {
-        setCatalogs(data.data)
-      } else {
-        setError(data.error || 'Ошибка загрузки каталогов')
+        if (data.success) {
+          setCatalogs(data.data)
+        } else {
+          setError(data.error || 'Ошибка загрузки каталогов')
+        }
+      } catch (err) {
+        setError('Ошибка соединения с сервером')
+        console.error('Error loading catalogs:', err)
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      setError('Ошибка соединения с сервером')
-      console.error('Error loading catalogs:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   useEffect(() => {
     loadCatalogs()
-  }, [])
+  }, [loadCatalogs])
 
   // Обработка загрузки файла
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

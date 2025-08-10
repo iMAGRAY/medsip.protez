@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -243,50 +243,50 @@ export default function CatalogMenuPage() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [loadData])
 
-  const loadData = async () => {
-    setLoading(true)
-    try {
+  const loadData = useCallback(async () => {
+      setLoading(true)
+      try {
 
-      // Загружаем текущее меню
-      const menuResponse = await fetch('/api/catalog-menu')
-      const menuData = await menuResponse.json()
+        // Загружаем текущее меню
+        const menuResponse = await fetch('/api/catalog-menu')
+        const menuData = await menuResponse.json()
 
-      if (menuData.success) {
+        if (menuData.success) {
 
-        setMenuSettings(menuData.flat || [])
-      } else {
-        console.error('❌ Ошибка загрузки меню:', menuData.error)
+          setMenuSettings(menuData.flat || [])
+        } else {
+          console.error('❌ Ошибка загрузки меню:', menuData.error)
+          toast({
+            title: "Ошибка",
+            description: "Не удалось загрузить настройки меню",
+            variant: "destructive"
+          })
+        }
+
+        // Загружаем доступные сущности
+        const entitiesResponse = await fetch('/api/catalog-menu/available-entities')
+        const entitiesData = await entitiesResponse.json()
+
+        if (entitiesData.success) {
+
+          setAvailableEntities(entitiesData.data)
+        } else {
+          console.error('❌ Ошибка загрузки сущностей:', entitiesData.error)
+        }
+
+      } catch (error) {
+        console.error('💥 Ошибка при загрузке данных:', error)
         toast({
           title: "Ошибка",
-          description: "Не удалось загрузить настройки меню",
+          description: "Произошла ошибка при загрузке данных",
           variant: "destructive"
         })
+      } finally {
+        setLoading(false)
       }
-
-      // Загружаем доступные сущности
-      const entitiesResponse = await fetch('/api/catalog-menu/available-entities')
-      const entitiesData = await entitiesResponse.json()
-
-      if (entitiesData.success) {
-
-        setAvailableEntities(entitiesData.data)
-      } else {
-        console.error('❌ Ошибка загрузки сущностей:', entitiesData.error)
-      }
-
-    } catch (error) {
-      console.error('💥 Ошибка при загрузке данных:', error)
-      toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при загрузке данных",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   const handleToggleVisibility = async (item: CatalogMenuItem) => {
     if (!item.id) return

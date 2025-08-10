@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -58,24 +58,24 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
 
   useEffect(() => {
     loadManufacturers();
-  }, []);
+  }, [loadManufacturers]);
 
-  const loadManufacturers = async () => {
-    try {
-      setLoading(true);
-      const data = await apiClient.getManufacturers();
-      setManufacturers(data || []);
-    } catch (error) {
-      logger.error('Failed to load manufacturers:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить производителей",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadManufacturers = useCallback(async () => {
+      try {
+        setLoading(true);
+        const data = await apiClient.getManufacturers();
+        setManufacturers(data || []);
+      } catch (error) {
+        logger.error('Failed to load manufacturers:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить производителей",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, []);
 
   const resetManufacturerForm = () => {
     setManufacturerForm({

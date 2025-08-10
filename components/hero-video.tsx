@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 
 const HeroVideo = () => {
   const [videoError, setVideoError] = useState(false)
@@ -10,18 +10,18 @@ const HeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   // Проверка только на очень медленное соединение для fallback
+    const checkSlowConnection = useCallback(() => {
+              // Проверка на медленное соединение
+              const isSlowConn = 'connection' in navigator &&
+                ((navigator as any).connection.effectiveType === '2g' ||
+                (navigator as any).connection.saveData === true)
+
+              setIsSlowConnection(isSlowConn)
+            }, [])
+
   useEffect(() => {
-    const checkSlowConnection = () => {
-      // Проверка на медленное соединение
-      const isSlowConn = 'connection' in navigator &&
-        ((navigator as any).connection.effectiveType === '2g' ||
-        (navigator as any).connection.saveData === true)
-
-      setIsSlowConnection(isSlowConn)
-    }
-
     checkSlowConnection()
-  }, [])
+  }, [checkSlowConnection])
 
   // Отслеживание скролла для эффекта параллакса
   useEffect(() => {

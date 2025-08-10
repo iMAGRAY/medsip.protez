@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -94,39 +94,39 @@ export default function CharacteristicTemplatesAdmin() {
   // Загрузка данных
   useEffect(() => {
     loadData()
-  }, [])
+  }, [loadData])
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true)
 
-      const [groupsRes, templatesRes, unitsRes] = await Promise.all([
-        fetch('/api/admin/characteristic-groups'),
-        fetch('/api/admin/characteristic-templates'),
-        fetch('/api/characteristic-units')
-      ])
+        const [groupsRes, templatesRes, unitsRes] = await Promise.all([
+          fetch('/api/admin/characteristic-groups'),
+          fetch('/api/admin/characteristic-templates'),
+          fetch('/api/characteristic-units')
+        ])
 
-      if (groupsRes.ok) {
-        const groupsData = await groupsRes.json()
-        setGroups(groupsData.data || [])
+        if (groupsRes.ok) {
+          const groupsData = await groupsRes.json()
+          setGroups(groupsData.data || [])
+        }
+
+        if (templatesRes.ok) {
+          const templatesData = await templatesRes.json()
+          setTemplates(templatesData.data || [])
+        }
+
+        if (unitsRes.ok) {
+          const unitsData = await unitsRes.json()
+          setUnits(unitsData.data || [])
+        }
+
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+      } finally {
+        setLoading(false)
       }
-
-      if (templatesRes.ok) {
-        const templatesData = await templatesRes.json()
-        setTemplates(templatesData.data || [])
-      }
-
-      if (unitsRes.ok) {
-        const unitsData = await unitsRes.json()
-        setUnits(unitsData.data || [])
-      }
-
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   // Фильтруем шаблоны по выбранной группе
   const filteredTemplates = selectedGroupId

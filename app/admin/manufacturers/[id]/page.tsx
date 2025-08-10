@@ -1,7 +1,7 @@
 import { SafeImage } from "@/components/safe-image"
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -71,26 +71,26 @@ export default function ManufacturerModelLinesPage() {
 
   useEffect(() => {
     loadData()
-  }, [manufacturerId])
+  }, [loadData])
 
-  const loadData = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch(`/api/manufacturers/${manufacturerId}/model-lines`)
-      const data = await response.json()
+  const loadData = useCallback(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`/api/manufacturers/${manufacturerId}/model-lines`)
+        const data = await response.json()
 
-      if (data.success) {
-        setManufacturer(data.data.manufacturer)
-        setModelLines(data.data.modelLines)
-      } else {
-        setMessage({ type: 'error', text: 'Ошибка загрузки данных' })
+        if (data.success) {
+          setManufacturer(data.data.manufacturer)
+          setModelLines(data.data.modelLines)
+        } else {
+          setMessage({ type: 'error', text: 'Ошибка загрузки данных' })
+        }
+      } catch (_error) {
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (_error) {
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [manufacturerId])
 
   const handleDeleteModelLine = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить модельный ряд "${name}"?`)) {

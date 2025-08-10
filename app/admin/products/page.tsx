@@ -1,7 +1,7 @@
 import { SafeImage } from "@/components/safe-image"
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { ProductFormModern } from "@/components/admin/product-form-modern"
@@ -44,51 +44,51 @@ export default function ProductsAdmin() {
 
 
   // Initialize data when component mounts with force refresh
+    const loadData = useCallback(async () => {
+              try {
+
+                // Сначала очищаем кэш
+                const { apiClient } = await import('@/lib/api-client')
+                apiClient.clearCache()
+
+                // Принудительно очищаем Redis кэш
+                try {
+                  const response = await fetch('/api/cache/clear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      patterns: [
+                        'medsip:products:*',
+                        'products:*',
+                        'product:*',
+                        'products-fast:*',
+                        'products-full:*',
+                        'products-detailed:*',
+                        'products-basic:*'
+                      ]
+                    })
+                  })
+
+                  if (response.ok) {
+
+                  }
+                } catch (cacheError) {
+                  console.warn('⚠️ Failed to clear cache via API:', cacheError)
+                }
+
+                // Принудительно обновляем данные при загрузке страницы
+                await forceRefresh()
+
+              } catch (error) {
+                console.error('❌ Ошибка при загрузке данных:', error)
+                // Fallback к обычной загрузке
+                await initializeData()
+              }
+            }, [forceRefresh, initializeData])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-
-        // Сначала очищаем кэш
-        const { apiClient } = await import('@/lib/api-client')
-        apiClient.clearCache()
-
-        // Принудительно очищаем Redis кэш
-        try {
-          const response = await fetch('/api/cache/clear', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              patterns: [
-                'medsip:products:*',
-                'products:*',
-                'product:*',
-                'products-fast:*',
-                'products-full:*',
-                'products-detailed:*',
-                'products-basic:*'
-              ]
-            })
-          })
-
-          if (response.ok) {
-
-          }
-        } catch (cacheError) {
-          console.warn('⚠️ Failed to clear cache via API:', cacheError)
-        }
-
-        // Принудительно обновляем данные при загрузке страницы
-        await forceRefresh()
-
-      } catch (error) {
-        console.error('❌ Ошибка при загрузке данных:', error)
-        // Fallback к обычной загрузке
-        await initializeData()
-      }
-    }
-
     loadData()
-  }, [forceRefresh, initializeData])
+  }, [loadData])
 
   // Дополнительное обновление при наличии параметра refresh в URL
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -77,24 +77,24 @@ export function WarehouseSettings() {
 
   useEffect(() => {
     loadSettings()
-  }, [])
+  }, [loadSettings])
 
-  const loadSettings = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/warehouse/settings')
-      if (response.ok) {
-        const result = await response.json()
-        if (result.success) {
-          setSettings({ ...settings, ...result.data })
+  const loadSettings = useCallback(async () => {
+      setLoading(true)
+      try {
+        const response = await fetch('/api/warehouse/settings')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success) {
+            setSettings({ ...settings, ...result.data })
+          }
         }
+      } catch (error) {
+        console.error('Ошибка загрузки настроек:', error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Ошибка загрузки настроек:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   const saveSettings = async () => {
     setSaving(true)

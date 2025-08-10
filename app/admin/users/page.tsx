@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -101,11 +101,29 @@ export default function UsersPage() {
   // Проверяем права доступа
   const canManageUsers = hasPermission('users.manage') || hasPermission('*')
 
+  const loadUsers = useCallback(async () => {
+      try {
+        const response = await fetch('/api/admin/users', {
+          credentials: 'include'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setUsers(data.users || [])
+        } else {
+          setError('Ошибка загрузки пользователей')
+        }
+      } catch (_error) {
+        setError('Ошибка соединения с сервером')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
 
   useEffect(() => {
     loadUsers()
     loadRoles()
-  }, [])
+  }, [loadUsers])
 
   // Ранний возврат без прав — после хуков
   if (!canManageUsers) {
@@ -124,25 +142,6 @@ export default function UsersPage() {
         </div>
       </AdminLayout>
     )
-  }
-
-  const loadUsers = async () => {
-    try {
-      const response = await fetch('/api/admin/users', {
-        credentials: 'include'
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users || [])
-      } else {
-        setError('Ошибка загрузки пользователей')
-      }
-    } catch (_error) {
-      setError('Ошибка соединения с сервером')
-    } finally {
-      setLoading(false)
-    }
   }
 
   const loadRoles = async () => {

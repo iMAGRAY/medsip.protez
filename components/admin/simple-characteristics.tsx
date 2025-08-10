@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -63,70 +63,70 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
   // Загрузка характеристик с API
   useEffect(() => {
     loadCharacteristics()
-  }, [productId])
+  }, [loadCharacteristics])
 
-  const loadCharacteristics = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/products/${productId}/characteristics-simple`)
+  const loadCharacteristics = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/products/${productId}/characteristics-simple`)
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
-      }
-
-      const data = await response.json()
-
-      if (data.success) {
-        // Обрабатываем новую структуру с разделами и группами
-        if (data.data.available_characteristics) {
-        setAvailableCharacteristics(data.data.available_characteristics || [])
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`)
         }
 
-        // Преобразуем выбранные характеристики из новой структуры разделы -> группы -> характеристики
-        const sections = data.data.sections || []
-        const flatSelected: SelectedCharacteristic[] = []
+        const data = await response.json()
 
-        // Сохраняем структуру разделов для readonly отображения
-        setCharacteristicSections(sections)
+        if (data.success) {
+          // Обрабатываем новую структуру с разделами и группами
+          if (data.data.available_characteristics) {
+          setAvailableCharacteristics(data.data.available_characteristics || [])
+          }
 
-        sections.forEach((section: any) => {
-          section.groups?.forEach((group: any) => {
-            group.characteristics?.forEach((char: any) => {
-              // Логируем для отладки
-              if (!char.value_name && !char.additional_value) {
-                console.warn('Характеристика без значения:', {
-                  sectionName: section.section_name,
-                  groupName: group.group_name,
-                  char: char
-                });
-              }
-              
-              flatSelected.push({
-                value_id: char.value_id,
-                value_name: char.value_name || '',
-                additional_value: char.additional_value || '',
-                color_hex: char.color_hex
+          // Преобразуем выбранные характеристики из новой структуры разделы -> группы -> характеристики
+          const sections = data.data.sections || []
+          const flatSelected: SelectedCharacteristic[] = []
+
+          // Сохраняем структуру разделов для readonly отображения
+          setCharacteristicSections(sections)
+
+          sections.forEach((section: any) => {
+            section.groups?.forEach((group: any) => {
+              group.characteristics?.forEach((char: any) => {
+                // Логируем для отладки
+                if (!char.value_name && !char.additional_value) {
+                  console.warn('Характеристика без значения:', {
+                    sectionName: section.section_name,
+                    groupName: group.group_name,
+                    char: char
+                  });
+                }
+                
+                flatSelected.push({
+                  value_id: char.value_id,
+                  value_name: char.value_name || '',
+                  additional_value: char.additional_value || '',
+                  color_hex: char.color_hex
+                })
               })
             })
           })
+
+          setSelectedCharacteristics(flatSelected)
+
+        } else {
+          throw new Error(data.error || 'Неизвестная ошибка')
+        }
+      } catch (error) {
+        console.error('❌ Ошибка загрузки характеристик:', error)
+        toast({
+          title: "Ошибка загрузки",
+          description: "Не удалось загрузить характеристики",
+          variant: "destructive"
         })
-
-        setSelectedCharacteristics(flatSelected)
-
-      } else {
-        throw new Error(data.error || 'Неизвестная ошибка')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('❌ Ошибка загрузки характеристик:', error)
-      toast({
-        title: "Ошибка загрузки",
-        description: "Не удалось загрузить характеристики",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [productId])
 
   // Переключение выбора характеристики
   const toggleCharacteristic = (value: CharacteristicValue, _groupName: string) => {

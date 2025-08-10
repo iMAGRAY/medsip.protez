@@ -61,11 +61,29 @@ function convertImgToSafeImage(sf) {
     if (!srcAttr) continue
     const altAttr = attrs.alt
     const classAttr = attrs.className
+    const widthAttr = attrs.width
+    const heightAttr = attrs.height
 
     const alt = altAttr === true ? '' : (altAttr ? altAttr.text : '')
     const className = classAttr === true ? '' : (classAttr ? classAttr.text : '')
 
-    const { w, h } = derivePxFromClassName(className)
+    // Prefer explicit width/height props, else derive from classes
+    let w = null, h = null
+    if (widthAttr && heightAttr) {
+      const parseNum = (t) => {
+        if (!t) return null
+        if (typeof t === 'string' && /^\d+$/.test(t)) return parseInt(t, 10)
+        const m = String(t).match(/\{\s*(\d+)\s*\}/)
+        return m ? parseInt(m[1], 10) : null
+      }
+      w = parseNum(widthAttr.text)
+      h = parseNum(heightAttr.text)
+    }
+    if (!w || !h) {
+      const d = derivePxFromClassName(className)
+      w = w || d.w
+      h = h || d.h
+    }
     if (!w || !h) continue
 
     const srcProp = srcAttr.isString ? `src="${srcAttr.text}"` : `src={${srcAttr.text}}`

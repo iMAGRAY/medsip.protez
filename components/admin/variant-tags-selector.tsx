@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
@@ -88,28 +88,28 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     if (variantId) {
       fetchVariantTags()
     }
-  }, [variantId])
+  }, [fetchAllTags])
 
-  const fetchAllTags = async () => {
-    try {
-      // Получаем общие теги + личные теги этого варианта
-      const url = variantId 
-        ? `/api/product-tags?variant_id=${variantId}`
-        : '/api/product-tags'
+  const fetchAllTags = useCallback(async () => {
+      try {
+        // Получаем общие теги + личные теги этого варианта
+        const url = variantId 
+          ? `/api/product-tags?variant_id=${variantId}`
+          : '/api/product-tags'
+          
+        const response = await fetch(url, {
+          credentials: 'include',
+        })
+        const data = await response.json()
         
-      const response = await fetch(url, {
-        credentials: 'include',
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        setAllTags(data.data)
+        if (data.success) {
+          setAllTags(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        toast.error('Ошибка загрузки тегов')
       }
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      toast.error('Ошибка загрузки тегов')
-    }
-  }
+    }, [variantId])
 
   const fetchVariantTags = async () => {
     try {

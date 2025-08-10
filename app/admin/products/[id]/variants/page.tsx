@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -307,20 +307,20 @@ export default function ProductVariantsPage() {
   useEffect(() => {
     fetchProduct()
     fetchVariants()
-  }, [productId])
+  }, [fetchProduct])
 
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`/api/products/${productId}`)
-      const data = await response.json()
-      if (data.success) {
-        setProduct(data.data)
+  const fetchProduct = useCallback(async () => {
+      try {
+        const response = await fetch(`/api/products/${productId}`)
+        const data = await response.json()
+        if (data.success) {
+          setProduct(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error)
+        toast.error('Не удалось загрузить информацию о товаре')
       }
-    } catch (error) {
-      console.error('Error fetching product:', error)
-      toast.error('Не удалось загрузить информацию о товаре')
-    }
-  }
+    }, [productId])
 
   const fetchVariants = async () => {
     try {

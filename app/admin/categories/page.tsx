@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,47 +47,47 @@ export default function CategoriesAdmin() {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set())
 
   // Загрузка данных
-  const loadCategories = async () => {
-    try {
+  const loadCategories = useCallback(async () => {
+      try {
 
-      const res = await fetch("/api/categories", {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        },
-        cache: 'no-store'
-      })
+        const res = await fetch("/api/categories", {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          cache: 'no-store'
+        })
 
-      if (res.ok) {
-        const apiResponse = await res.json()
-        const data = apiResponse.data || apiResponse
+        if (res.ok) {
+          const apiResponse = await res.json()
+          const data = apiResponse.data || apiResponse
 
-        setCategories(data)
-      } else {
-        const errorText = await res.text()
-        console.error("❌ Failed to load categories:", res.status, errorText)
+          setCategories(data)
+        } else {
+          const errorText = await res.text()
+          console.error("❌ Failed to load categories:", res.status, errorText)
+          toast({
+            title: "Ошибка",
+            description: `Не удалось загрузить категории: ${res.status}`,
+            variant: "destructive"
+          })
+        }
+      } catch (error) {
+        console.error("💥 Ошибка загрузки категорий:", error)
         toast({
           title: "Ошибка",
-          description: `Не удалось загрузить категории: ${res.status}`,
+          description: "Ошибка сетевого соединения при загрузке категорий",
           variant: "destructive"
         })
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("💥 Ошибка загрузки категорий:", error)
-      toast({
-        title: "Ошибка",
-        description: "Ошибка сетевого соединения при загрузке категорий",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   useEffect(() => {
     loadCategories()
-  }, [])
+  }, [loadCategories])
 
   const resetCategoryForm = () => {
     setCategoryFormData({

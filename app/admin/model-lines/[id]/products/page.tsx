@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -93,7 +93,7 @@ export default function ModelLineProductsPage() {
 
   useEffect(() => {
     loadData()
-  }, [modelLineId])
+  }, [loadData])
 
           // Фильтрация товаров по поисковому запросу
   useEffect(() => {
@@ -110,46 +110,46 @@ export default function ModelLineProductsPage() {
   }, [products, searchQuery])
 
   // Загрузка категорий для выпадающего списка
+    const loadCategories = useCallback(async () => {
+              try {
+                const response = await fetch('/api/categories')
+                const data = await response.json()
+                if (data.success) {
+                  setCategories(data.data)
+                }
+              } catch (error) {
+                console.error('Ошибка загрузки категорий:', error)
+              }
+            }, [])
+
   useEffect(() => {
-    const loadCategories = async () => {
+    loadCategories()
+  }, [loadCategories])
+
+  const loadData = useCallback(async () => {
       try {
-        const response = await fetch('/api/categories')
+        setIsLoading(true)
+
+        const response = await fetch(`/api/model-lines/${modelLineId}/products`)
+
         const data = await response.json()
+
         if (data.success) {
-          setCategories(data.data)
+          setModelLine(data.data.modelLine)
+          setProducts(data.data.products || [])
+          setFilteredProducts(data.data.products || [])
+
+        } else {
+          console.error('Ошибка API:', data.error)
+          setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
         }
       } catch (error) {
-        console.error('Ошибка загрузки категорий:', error)
+        console.error('Ошибка загрузки данных:', error)
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
       }
-    }
-
-    loadCategories()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true)
-
-      const response = await fetch(`/api/model-lines/${modelLineId}/products`)
-
-      const data = await response.json()
-
-      if (data.success) {
-        setModelLine(data.data.modelLine)
-        setProducts(data.data.products || [])
-        setFilteredProducts(data.data.products || [])
-
-      } else {
-        console.error('Ошибка API:', data.error)
-        setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [modelLineId])
 
   const handleDeleteProduct = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить товар "${name}"? Это действие нельзя отменить.`)) {

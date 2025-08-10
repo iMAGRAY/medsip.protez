@@ -233,34 +233,34 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   }, [productId])
 
   // Initialize data loading
+    const loadData = useCallback(async () => {
+              try {
+                setIsLoading(true)
+                setIsInitializing(true)
+                setError(null)
+
+                // Reset state for new products
+                if (isNewProduct) {
+                  setProductCharacteristics([])
+                  setSelectedCharacteristicIds(new Set())
+                }
+
+                         await Promise.all([
+                   loadSpecGroups(),
+                   loadProductCharacteristics()
+                 ])
+               } catch (error) {
+                 console.error('Failed to load data:', error)
+                setError('Не удалось загрузить данные')
+              } finally {
+                setIsLoading(false)
+                setIsInitializing(false)
+              }
+            }, [productId, isNewProduct, loadSpecGroups, loadProductCharacteristics])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
-        setIsInitializing(true)
-        setError(null)
-
-        // Reset state for new products
-        if (isNewProduct) {
-          setProductCharacteristics([])
-          setSelectedCharacteristicIds(new Set())
-        }
-
-                 await Promise.all([
-           loadSpecGroups(),
-           loadProductCharacteristics()
-         ])
-       } catch (error) {
-         console.error('Failed to load data:', error)
-        setError('Не удалось загрузить данные')
-      } finally {
-        setIsLoading(false)
-        setIsInitializing(false)
-      }
-    }
-
     loadData()
-  }, [productId, isNewProduct, loadSpecGroups, loadProductCharacteristics])
+  }, [loadData])
 
   // Helper function to process hierarchical groups
   const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {

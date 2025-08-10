@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -139,28 +139,29 @@ export function ProductCharacteristicsManager({
   })
 
   // Загрузка данных
+    const loadData = useCallback(async () => {
+              try {
+                setLoading(true)
+                setIsInitializing(true) // Блокируем синхронизацию во время загрузки
+
+                // Сбрасываем состояние для новых товаров
+                if (isNewProduct) {
+                  setProductCharacteristics([])
+                }
+
+                await Promise.all([
+                  loadSpecGroups(),
+                  loadProductCharacteristics()
+                ])
+              } finally {
+                setLoading(false)
+                setIsInitializing(false) // Разблокируем синхронизацию после загрузки
+              }
+            }, [productId, isNewProduct])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true)
-        setIsInitializing(true) // Блокируем синхронизацию во время загрузки
-
-        // Сбрасываем состояние для новых товаров
-        if (isNewProduct) {
-          setProductCharacteristics([])
-        }
-
-        await Promise.all([
-          loadSpecGroups(),
-          loadProductCharacteristics()
-        ])
-      } finally {
-        setLoading(false)
-        setIsInitializing(false) // Разблокируем синхронизацию после загрузки
-      }
-    }
     loadData()
-  }, [productId, isNewProduct])
+  }, [loadData])
 
   // Синхронизация с родительским компонентом (только при ручных изменениях, не при загрузке)
   const [isInitializing, setIsInitializing] = useState(false)

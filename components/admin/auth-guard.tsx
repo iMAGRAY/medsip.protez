@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import type React, { useCallback } from "react"
 
 import { useState, useEffect, createContext, useContext } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -74,21 +74,21 @@ export function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     loadSavedCredentials()
     checkAuthStatus()
-  }, [])
+  }, [loadSavedCredentials])
 
-  const loadSavedCredentials = () => {
-    try {
-      const savedUsername = localStorage.getItem(STORAGE_KEYS.REMEMBERED_USERNAME)
-      const savedRememberPreference = localStorage.getItem(STORAGE_KEYS.REMEMBER_PREFERENCE)
+  const loadSavedCredentials = useCallback(() => {
+      try {
+        const savedUsername = localStorage.getItem(STORAGE_KEYS.REMEMBERED_USERNAME)
+        const savedRememberPreference = localStorage.getItem(STORAGE_KEYS.REMEMBER_PREFERENCE)
 
-      if (savedUsername && savedRememberPreference === 'true') {
-        setCredentials(prev => ({ ...prev, username: savedUsername }))
-        setRememberMe(true)
+        if (savedUsername && savedRememberPreference === 'true') {
+          setCredentials(prev => ({ ...prev, username: savedUsername }))
+          setRememberMe(true)
+        }
+      } catch (error) {
+        console.warn('Failed to load saved credentials:', error)
       }
-    } catch (error) {
-      console.warn('Failed to load saved credentials:', error)
-    }
-  }
+    }, [])
 
   const saveSavedCredentials = (username: string, remember: boolean) => {
     try {

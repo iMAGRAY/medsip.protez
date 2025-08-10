@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -109,7 +109,7 @@ export function ProductsManager({
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   useEffect(() => {
     if (modelLineId) {
@@ -117,29 +117,29 @@ export function ProductsManager({
     }
   }, [modelLineId]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [productsData, modelLinesData, categoriesData] = await Promise.all([
-        apiClient.getProducts(),
-        apiClient.getModelLines(),
-        apiClient.getCategories()
-      ]);
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true);
+        const [productsData, modelLinesData, categoriesData] = await Promise.all([
+          apiClient.getProducts(),
+          apiClient.getModelLines(),
+          apiClient.getCategories()
+        ]);
 
-      setProducts(productsData || []);
-      setModelLines(modelLinesData || []);
-      setCategories(categoriesData || []);
-    } catch (error) {
-      logger.error('Failed to load data:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+        setProducts(productsData || []);
+        setModelLines(modelLinesData || []);
+        setCategories(categoriesData || []);
+      } catch (error) {
+        logger.error('Failed to load data:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить данные",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, []);
 
   const loadProductsForModelLine = async () => {
     if (!modelLineId) return;

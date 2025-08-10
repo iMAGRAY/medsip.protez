@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -29,19 +29,20 @@ export default function ExportImportAdminPage() {
   const [previewTable, setPreviewTable] = useState<string>('products')
 
   // Fetch preview when table changes
+    const loadPreview = useCallback(async () => {
+              try {
+                const res = await fetch(`/api/sql-table/${previewTable}`)
+                const data = await res.json()
+                setPreviewRows(data.rows || [])
+              } catch (error) {
+                console.error('Preview load error', error)
+                setPreviewRows([])
+              }
+            }, [previewTable])
+
   useEffect(() => {
-    const loadPreview = async () => {
-      try {
-        const res = await fetch(`/api/sql-table/${previewTable}`)
-        const data = await res.json()
-        setPreviewRows(data.rows || [])
-      } catch (error) {
-        console.error('Preview load error', error)
-        setPreviewRows([])
-      }
-    }
     loadPreview()
-  }, [previewTable])
+  }, [loadPreview])
 
   const toggleTable = (key: string) => {
     setSelectedTables((prev) => {

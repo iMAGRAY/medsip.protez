@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -72,27 +72,27 @@ export default function ProductTagsPage() {
 
   useEffect(() => {
     fetchTags()
-  }, [])
+  }, [fetchTags])
 
-  const fetchTags = async () => {
-    try {
-      const response = await fetch('/api/product-tags?include_inactive=true', {
-        credentials: 'include', // Важно для передачи cookies
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        setTags(data.data)
-      } else {
+  const fetchTags = useCallback(async () => {
+      try {
+        const response = await fetch('/api/product-tags?include_inactive=true', {
+          credentials: 'include', // Важно для передачи cookies
+        })
+        const data = await response.json()
+        
+        if (data.success) {
+          setTags(data.data)
+        } else {
+          toast.error('Ошибка загрузки тегов')
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
         toast.error('Ошибка загрузки тегов')
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      toast.error('Ошибка загрузки тегов')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

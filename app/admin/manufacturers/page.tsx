@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -68,25 +68,25 @@ export default function ManufacturersAdminPage() {
 
   useEffect(() => {
     loadManufacturers()
-  }, [])
+  }, [loadManufacturers])
 
-  const loadManufacturers = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/manufacturers')
-      const data = await response.json()
+  const loadManufacturers = useCallback(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/manufacturers')
+        const data = await response.json()
 
-      if (data.success) {
-        setManufacturers(data.data)
-      } else {
-        setMessage({ type: 'error', text: 'Ошибка загрузки производителей' })
+        if (data.success) {
+          setManufacturers(data.data)
+        } else {
+          setMessage({ type: 'error', text: 'Ошибка загрузки производителей' })
+        }
+      } catch (_error) {
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (_error) {
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [])
 
   const resetForm = () => {
     setFormData({

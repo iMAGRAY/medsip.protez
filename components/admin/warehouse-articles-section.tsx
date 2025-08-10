@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -92,32 +92,32 @@ export function WarehouseArticlesSection() {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  const fetchData = useCallback(async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-      // Загружаем складской инвентарь
-      const inventoryResponse = await fetch('/api/warehouse/inventory')
-      if (!inventoryResponse.ok) throw new Error('Ошибка загрузки инвентаря')
-      const inventoryData = await inventoryResponse.json()
-      setInventory(inventoryData.data || [])
+        // Загружаем складской инвентарь
+        const inventoryResponse = await fetch('/api/warehouse/inventory')
+        if (!inventoryResponse.ok) throw new Error('Ошибка загрузки инвентаря')
+        const inventoryData = await inventoryResponse.json()
+        setInventory(inventoryData.data || [])
 
-      // Загружаем секции
-      const sectionsResponse = await fetch('/api/warehouse/sections')
-      if (!sectionsResponse.ok) throw new Error('Ошибка загрузки секций')
-      const sectionsData = await sectionsResponse.json()
-      setSections(sectionsData.data || [])
+        // Загружаем секции
+        const sectionsResponse = await fetch('/api/warehouse/sections')
+        if (!sectionsResponse.ok) throw new Error('Ошибка загрузки секций')
+        const sectionsData = await sectionsResponse.json()
+        setSections(sectionsData.data || [])
 
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-      setError(error instanceof Error ? error.message : 'Ошибка загрузки данных')
-    } finally {
-      setLoading(false)
-    }
-  }
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+        setError(error instanceof Error ? error.message : 'Ошибка загрузки данных')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
 
   const handleCreateArticle = async () => {
     if (!selectedProduct || !form.sku || !form.section_id || form.quantity === undefined) {

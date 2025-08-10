@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -362,19 +362,20 @@ if (group.children && group.children.length > 0) {
               console.error("Ошибка загрузки характеристик товаров:", error)
     }
   }
+    const loadData = useCallback(async () => {
+              setLoading(true)
+              await Promise.all([
+                loadSpecGroups(),
+                loadProductSizes(),
+                loadProductCharacteristics()
+              ])
+              setLoading(false)
+            }, [])
+
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      await Promise.all([
-        loadSpecGroups(),
-        loadProductSizes(),
-        loadProductCharacteristics()
-      ])
-      setLoading(false)
-    }
     loadData()
-  }, [])
+  }, [loadData])
 
   const resetGroupForm = () => {
     setEditingGroup(null)

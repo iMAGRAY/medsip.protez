@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { FileDown, Share2, ChevronDown, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
@@ -29,24 +29,24 @@ export function CatalogDownloadButtons() {
   }, [])
 
   // Загрузка активных каталогов
+    const loadCatalogs = useCallback(async () => {
+              try {
+                const response = await fetch('/api/catalog-files?active=true')
+                const data = await response.json()
+
+                if (data.success) {
+                  setCatalogs(data.data)
+                }
+              } catch (error) {
+                console.error('Error loading catalogs:', error)
+              } finally {
+                setLoading(false)
+              }
+            }, [])
+
   useEffect(() => {
-    const loadCatalogs = async () => {
-      try {
-        const response = await fetch('/api/catalog-files?active=true')
-        const data = await response.json()
-
-        if (data.success) {
-          setCatalogs(data.data)
-        }
-      } catch (error) {
-        console.error('Error loading catalogs:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadCatalogs()
-  }, [])
+  }, [loadCatalogs])
 
   // Скачивание каталога
   const handleDownload = async (catalog: CatalogFile) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { AdminLayout } from '@/components/admin/admin-layout'
@@ -24,43 +24,43 @@ export default function EditProductPage() {
 
   // Проверяем права доступа
   const canUpdateProducts = hasPermission('products.update') || hasPermission('products.*') || hasPermission('*')
+    const loadProduct = useCallback(async () => {
+              if (!productId) {
+                setError('ID товара не указан')
+                setLoading(false)
+                return
+              }
+
+              try {
+
+                const response = await fetch(`/api/products/${productId}`)
+
+                if (!response.ok) {
+                  throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+                }
+
+                const data = await response.json()
+
+                if (!data.success) {
+                  throw new Error(data.error || 'Failed to load product')
+                }
+
+                setProduct(data.data)
+              } catch (err) {
+                console.error('❌ Error loading product:', err)
+                const errorMessage = err instanceof Error ? err.message : 'Failed to load product'
+                setError(errorMessage)
+                toast.error(`Ошибка загрузки товара: ${errorMessage}`)
+              } finally {
+                setLoading(false)
+              }
+            }, [productId])
+
 
 
   useEffect(() => {
-    const loadProduct = async () => {
-      if (!productId) {
-        setError('ID товара не указан')
-        setLoading(false)
-        return
-      }
-
-      try {
-
-        const response = await fetch(`/api/products/${productId}`)
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-
-        const data = await response.json()
-
-        if (!data.success) {
-          throw new Error(data.error || 'Failed to load product')
-        }
-
-        setProduct(data.data)
-      } catch (err) {
-        console.error('❌ Error loading product:', err)
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load product'
-        setError(errorMessage)
-        toast.error(`Ошибка загрузки товара: ${errorMessage}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadProduct()
-  }, [productId])
+  }, [loadProduct])
 
   const handleSave = async (savedProduct: any, isManualSave?: boolean) => {
 

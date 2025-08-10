@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -40,29 +40,29 @@ export function SidebarFilters({
   const [categories, setCategories] = useState<string[]>([])
   const [features, setFeatures] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+    const loadFilterData = useCallback(async () => {
+              try {
+                const [categoriesData, featuresData] = await Promise.all([
+                  apiClient.getCategories(),
+                  apiClient.getFeatures()
+                ])
+
+                setCategories(categoriesData.filter((cat: any) => cat.is_active).map((cat: any) => cat.name))
+                setFeatures(featuresData.filter((feat: any) => feat.is_active).map((feat: any) => feat.name))
+              } catch (error) {
+                console.error("Failed to load filter data:", error)
+                // Fallback data
+                setCategories(["Протезы рук", "Протезы ног", "Специальные протезы", "Детские протезы"])
+                setFeatures(["Миоэлектрическое управление", "Водонепроницаемость", "Регулируемая посадка", "Легкий вес", "Высокая прочность"])
+              } finally {
+                setLoading(false)
+              }
+            }, [])
+
 
   useEffect(() => {
-    const loadFilterData = async () => {
-      try {
-        const [categoriesData, featuresData] = await Promise.all([
-          apiClient.getCategories(),
-          apiClient.getFeatures()
-        ])
-
-        setCategories(categoriesData.filter((cat: any) => cat.is_active).map((cat: any) => cat.name))
-        setFeatures(featuresData.filter((feat: any) => feat.is_active).map((feat: any) => feat.name))
-      } catch (error) {
-        console.error("Failed to load filter data:", error)
-        // Fallback data
-        setCategories(["Протезы рук", "Протезы ног", "Специальные протезы", "Детские протезы"])
-        setFeatures(["Миоэлектрическое управление", "Водонепроницаемость", "Регулируемая посадка", "Легкий вес", "Высокая прочность"])
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadFilterData()
-  }, [])
+  }, [loadFilterData])
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>

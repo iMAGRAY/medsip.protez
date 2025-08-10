@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -154,29 +154,30 @@ export function ProductSpecificationsManagerNew({
   }, [selectedGroups])
 
   // Загрузка данных
+    const loadData = useCallback(async () => {
+              try {
+                setLoading(true)
+
+                // Сбрасываем состояние для новых товаров
+                if (isNewProduct) {
+                  setSelectedGroups(new Set())
+                  setProductCharacteristics([])
+                  setActiveStep('groups')
+                }
+
+                await Promise.all([
+                  loadSpecGroups(),
+                  loadProductCharacteristics(),
+                  loadTemplates()
+                ])
+              } finally {
+                setLoading(false)
+              }
+            }, [productId, isNewProduct])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true)
-
-        // Сбрасываем состояние для новых товаров
-        if (isNewProduct) {
-          setSelectedGroups(new Set())
-          setProductCharacteristics([])
-          setActiveStep('groups')
-        }
-
-        await Promise.all([
-          loadSpecGroups(),
-          loadProductCharacteristics(),
-          loadTemplates()
-        ])
-      } finally {
-        setLoading(false)
-      }
-    }
     loadData()
-  }, [productId, isNewProduct])
+  }, [loadData])
 
   // Синхронизация с родительским компонентом
   useEffect(() => {

@@ -113,43 +113,43 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
   // Загрузка пользовательских настроек
   useEffect(() => {
     loadUserSettings()
-  }, [])
+  }, [loadUserSettings])
 
-  const loadUserSettings = async () => {
-    try {
-      setSettingsLoading(true)
+  const loadUserSettings = useCallback(async () => {
+      try {
+        setSettingsLoading(true)
 
-      // Пытаемся загрузить из кеша
-      const cachedSettings = settingsCache.get('media-gallery-settings')
-      if (cachedSettings) {
-        setUserSettings(cachedSettings)
+        // Пытаемся загрузить из кеша
+        const cachedSettings = settingsCache.get('media-gallery-settings')
+        if (cachedSettings) {
+          setUserSettings(cachedSettings)
+          setSettingsLoading(false)
+          return
+        }
+
+        // Загружаем с сервера (можно расширить API для пользовательских настроек)
+        const defaultSettings: UserSettings = {
+          viewMode: 'medium',
+          sortMode: 'date',
+          filterMode: 'all'
+        }
+
+        setUserSettings(defaultSettings)
+        // Кешируем настройки по умолчанию
+        settingsCache.set('media-gallery-settings', defaultSettings)
+
+      } catch (_error) {
+
+        // Используем настройки по умолчанию в случае ошибки
+        setUserSettings({
+          viewMode: 'medium',
+          sortMode: 'date',
+          filterMode: 'all'
+        })
+      } finally {
         setSettingsLoading(false)
-        return
       }
-
-      // Загружаем с сервера (можно расширить API для пользовательских настроек)
-      const defaultSettings: UserSettings = {
-        viewMode: 'medium',
-        sortMode: 'date',
-        filterMode: 'all'
-      }
-
-      setUserSettings(defaultSettings)
-      // Кешируем настройки по умолчанию
-      settingsCache.set('media-gallery-settings', defaultSettings)
-
-    } catch (_error) {
-
-      // Используем настройки по умолчанию в случае ошибки
-      setUserSettings({
-        viewMode: 'medium',
-        sortMode: 'date',
-        filterMode: 'all'
-      })
-    } finally {
-      setSettingsLoading(false)
-    }
-  }
+    }, [])
 
   const saveUserSettings = async (newSettings: Partial<UserSettings>) => {
     try {

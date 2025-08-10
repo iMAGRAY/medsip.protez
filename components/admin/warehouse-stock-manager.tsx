@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -47,7 +47,7 @@ export function WarehouseStockManager({
   // Загрузка списка складов
   useEffect(() => {
     fetchWarehouses()
-  }, [])
+  }, [fetchWarehouses])
 
   // Загрузка остатков при изменении productId
   useEffect(() => {
@@ -66,18 +66,18 @@ export function WarehouseStockManager({
     }
   }, [productId, warehouses])
 
-  const fetchWarehouses = async () => {
-    try {
-      const response = await fetch('/api/warehouses')
-      if (response.ok) {
-        const data = await response.json()
-        setWarehouses(data)
+  const fetchWarehouses = useCallback(async () => {
+      try {
+        const response = await fetch('/api/warehouses')
+        if (response.ok) {
+          const data = await response.json()
+          setWarehouses(data)
+        }
+      } catch (error) {
+        console.error('Error fetching warehouses:', error)
+        toast.error('Ошибка загрузки складов')
       }
-    } catch (error) {
-      console.error('Error fetching warehouses:', error)
-      toast.error('Ошибка загрузки складов')
-    }
-  }
+    }, [])
 
   const fetchWarehouseStocks = async () => {
     if (!productId) return

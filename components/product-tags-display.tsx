@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, TrendingUp, Star, Percent, Crown, Gem, Leaf, ShieldCheck, Truck, Flag, Tag, ChevronDown, ChevronUp } from 'lucide-react'
 
@@ -50,50 +50,50 @@ export function ProductTagsDisplay({
 
   useEffect(() => {
     fetchProductTags()
-  }, [productId, variantId])
+  }, [fetchProductTags])
 
-  const fetchProductTags = async () => {
-    try {
-      const _allTags: ProductTag[] = []
-      const tagMap = new Map<number, ProductTag>()
-      
-      // Загружаем теги товара
-      const productResponse = await fetch(`/api/products/${productId}/tags`)
-      
-      if (productResponse.ok) {
-        const productData = await productResponse.json()
-        if (productData.success && Array.isArray(productData.data)) {
-          productData.data.forEach((tag: ProductTag) => {
-            tagMap.set(tag.id, tag)
-          })
-        }
-      }
-      
-      // Загружаем теги варианта, если variantId указан
-      if (variantId) {
-        const variantResponse = await fetch(`/api/variants/${variantId}/tags`)
+  const fetchProductTags = useCallback(async () => {
+      try {
+        const _allTags: ProductTag[] = []
+        const tagMap = new Map<number, ProductTag>()
         
-        if (variantResponse.ok) {
-          const variantData = await variantResponse.json()
-          if (variantData.success && Array.isArray(variantData.data)) {
-            variantData.data.forEach((tag: ProductTag) => {
-              tagMap.set(tag.id, tag) // Дубликаты автоматически заменятся
+        // Загружаем теги товара
+        const productResponse = await fetch(`/api/products/${productId}/tags`)
+        
+        if (productResponse.ok) {
+          const productData = await productResponse.json()
+          if (productData.success && Array.isArray(productData.data)) {
+            productData.data.forEach((tag: ProductTag) => {
+              tagMap.set(tag.id, tag)
             })
           }
         }
+        
+        // Загружаем теги варианта, если variantId указан
+        if (variantId) {
+          const variantResponse = await fetch(`/api/variants/${variantId}/tags`)
+          
+          if (variantResponse.ok) {
+            const variantData = await variantResponse.json()
+            if (variantData.success && Array.isArray(variantData.data)) {
+              variantData.data.forEach((tag: ProductTag) => {
+                tagMap.set(tag.id, tag) // Дубликаты автоматически заменятся
+              })
+            }
+          }
+        }
+        
+        // Преобразуем Map в массив и сортируем по sort_order
+        const uniqueTags = Array.from(tagMap.values()).sort((a, b) => a.sort_order - b.sort_order)
+        setTags(uniqueTags)
+        
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        setTags([])
+      } finally {
+        setIsLoading(false)
       }
-      
-      // Преобразуем Map в массив и сортируем по sort_order
-      const uniqueTags = Array.from(tagMap.values()).sort((a, b) => a.sort_order - b.sort_order)
-      setTags(uniqueTags)
-      
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      setTags([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [productId, variantId])
 
   const getIconComponent = (iconName?: string) => {
     if (!iconName) return null

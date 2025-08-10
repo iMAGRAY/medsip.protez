@@ -1,7 +1,7 @@
 import { SafeImage } from "@/components/safe-image"
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Trash2, Plus, Edit2 } from 'lucide-react'
@@ -56,117 +56,117 @@ export function ProductVariantsManager({ productId, productName }: ProductVarian
 
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
-      console.log('🔍 VARIANTS MANAGER - Запрос:', url)
-      
-      const response = await fetch(url)
-      const data = await response.json()
-      
-      console.log('📊 VARIANTS MANAGER - Ответ:', {
-        success: data.success,
-        totalCount: data.data?.length || 0,
-        rawVariants: data.data?.map((v: any) => ({
-          id: v.id,
-          name: v.name,
-          is_active: v.is_active,
-          master_id: v.master_id
-        }))
-      })
-      
-      if (data.success && data.data) {
-        // Преобразуем данные из нового формата в старый для совместимости
-        const transformedVariants = data.data.map((v: any) => {
-          // Извлекаем размер из характеристик
-          let sizeName = v.name;
-          let sizeValue = '';
-          
-          // Ищем характеристику "Размер" в массиве характеристик
-          const characteristics = v.attributes?.characteristics || v.characteristics || [];
-          console.log(`🔍 Variant ${v.id} characteristics:`, {
-            fromAttributes: v.attributes?.characteristics,
-            fromDirect: v.characteristics,
-            final: characteristics
-          });
-          const sizeChar = characteristics.find((char: any) => 
-            char.template_name === 'Размер' || 
-            char.name === 'Размер' ||
-            char.group_name === 'Размер'
-          );
-          
-          if (sizeChar) {
-            sizeName = sizeChar.text_value || sizeChar.enum_value_name || sizeChar.value || sizeName;
-            sizeValue = sizeChar.additional_value || '';
-          }
-          
-          // Если размер не найден в характеристиках, пробуем старый способ
-          if (!sizeChar && v.attributes?.size) {
-            sizeName = v.attributes.size;
-            sizeValue = v.attributes.size_value || '';
-          }
-          
-          return {
-            id: v.id,
-            productId: v.master_id,
-            sizeName: sizeName,
-            sizeValue: sizeValue,
-            name: v.name,
-            description: v.description,
-            sku: v.sku,
-            articleNumber: (v.attributes?.article_number) || '',
-            price: v.price,
-            discountPrice: v.discount_price,
-            stockQuantity: v.stock_quantity,
-            weight: v.weight,
-            dimensions: v.attributes?.dimensions,
-            specifications: v.attributes?.specifications,
-            isAvailable: v.is_active,
-            sortOrder: v.sort_order,
-            imageUrl: v.primary_image_url,
-            images: v.images || [],
-            warranty: v.warranty_months ? `${v.warranty_months} мес.` : null,
-            batteryLife: v.battery_life_hours ? `${v.battery_life_hours} ч.` : null,
-            metaTitle: v.meta_title,
-            metaDescription: v.meta_description,
-            metaKeywords: v.meta_keywords,
-            isFeatured: v.is_featured,
-            isNew: v.is_new,
-            isBestseller: v.is_bestseller,
-            customFields: v.custom_fields,
-            characteristics: characteristics,
-            selectionTables: v.attributes?.selection_tables || [],
-            stock_status: v.stock_status,
-            show_price: v.show_price
-          }
-        })
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
+        console.log('🔍 VARIANTS MANAGER - Запрос:', url)
         
-        console.log('🔄 VARIANTS MANAGER - После трансформации:', {
-          transformedCount: transformedVariants.length,
-          transformedVariants: transformedVariants.map((v: ProductVariant) => ({
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        console.log('📊 VARIANTS MANAGER - Ответ:', {
+          success: data.success,
+          totalCount: data.data?.length || 0,
+          rawVariants: data.data?.map((v: any) => ({
             id: v.id,
-            sizeName: v.sizeName,
             name: v.name,
-            isAvailable: v.isAvailable
+            is_active: v.is_active,
+            master_id: v.master_id
           }))
         })
         
-        setVariants(transformedVariants)
+        if (data.success && data.data) {
+          // Преобразуем данные из нового формата в старый для совместимости
+          const transformedVariants = data.data.map((v: any) => {
+            // Извлекаем размер из характеристик
+            let sizeName = v.name;
+            let sizeValue = '';
+            
+            // Ищем характеристику "Размер" в массиве характеристик
+            const characteristics = v.attributes?.characteristics || v.characteristics || [];
+            console.log(`🔍 Variant ${v.id} characteristics:`, {
+              fromAttributes: v.attributes?.characteristics,
+              fromDirect: v.characteristics,
+              final: characteristics
+            });
+            const sizeChar = characteristics.find((char: any) => 
+              char.template_name === 'Размер' || 
+              char.name === 'Размер' ||
+              char.group_name === 'Размер'
+            );
+            
+            if (sizeChar) {
+              sizeName = sizeChar.text_value || sizeChar.enum_value_name || sizeChar.value || sizeName;
+              sizeValue = sizeChar.additional_value || '';
+            }
+            
+            // Если размер не найден в характеристиках, пробуем старый способ
+            if (!sizeChar && v.attributes?.size) {
+              sizeName = v.attributes.size;
+              sizeValue = v.attributes.size_value || '';
+            }
+            
+            return {
+              id: v.id,
+              productId: v.master_id,
+              sizeName: sizeName,
+              sizeValue: sizeValue,
+              name: v.name,
+              description: v.description,
+              sku: v.sku,
+              articleNumber: (v.attributes?.article_number) || '',
+              price: v.price,
+              discountPrice: v.discount_price,
+              stockQuantity: v.stock_quantity,
+              weight: v.weight,
+              dimensions: v.attributes?.dimensions,
+              specifications: v.attributes?.specifications,
+              isAvailable: v.is_active,
+              sortOrder: v.sort_order,
+              imageUrl: v.primary_image_url,
+              images: v.images || [],
+              warranty: v.warranty_months ? `${v.warranty_months} мес.` : null,
+              batteryLife: v.battery_life_hours ? `${v.battery_life_hours} ч.` : null,
+              metaTitle: v.meta_title,
+              metaDescription: v.meta_description,
+              metaKeywords: v.meta_keywords,
+              isFeatured: v.is_featured,
+              isNew: v.is_new,
+              isBestseller: v.is_bestseller,
+              customFields: v.custom_fields,
+              characteristics: characteristics,
+              selectionTables: v.attributes?.selection_tables || [],
+              stock_status: v.stock_status,
+              show_price: v.show_price
+            }
+          })
+          
+          console.log('🔄 VARIANTS MANAGER - После трансформации:', {
+            transformedCount: transformedVariants.length,
+            transformedVariants: transformedVariants.map((v: ProductVariant) => ({
+              id: v.id,
+              sizeName: v.sizeName,
+              name: v.name,
+              isAvailable: v.isAvailable
+            }))
+          })
+          
+          setVariants(transformedVariants)
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить варианты товара",
+          variant: "destructive"
+        })
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить варианты товара",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [productId])
 
   const handleOpenForm = (variant?: ProductVariant) => {
     console.log('Opening variant form:', {

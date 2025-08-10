@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -101,27 +101,27 @@ export default function RolesPage() {
   useEffect(() => {
     loadRoles()
     loadPermissions()
-  }, [])
+  }, [loadRoles])
 
-  const loadRoles = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/admin/roles', {
-        credentials: 'include'
-      })
+  const loadRoles = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/admin/roles', {
+          credentials: 'include'
+        })
 
-      if (response.ok) {
-        const data = await response.json()
-        setRoles(data.roles || [])
-      } else {
-        setError('Ошибка загрузки ролей')
+        if (response.ok) {
+          const data = await response.json()
+          setRoles(data.roles || [])
+        } else {
+          setError('Ошибка загрузки ролей')
+        }
+      } catch (_error) {
+        setError('Ошибка соединения с сервером')
+      } finally {
+        setLoading(false)
       }
-    } catch (_error) {
-      setError('Ошибка соединения с сервером')
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   const loadPermissions = async () => {
     try {
