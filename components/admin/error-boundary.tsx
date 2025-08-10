@@ -22,7 +22,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
-    return { hasError: true, error }
+    return { hasError: true, error: _error }
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
