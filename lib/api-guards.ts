@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { executeQuery, testConnection } from '@/lib/db-connection'
+import { executeQuery, testConnection, isDatabaseAvailable } from '@/lib/db-connection'
 
 export function isDbConfigured(): boolean {
   return !!process.env.DATABASE_URL || (
@@ -13,6 +13,16 @@ export async function guardDbOr503(): Promise<NextResponse | null> {
   }
   const ok = await testConnection().catch(() => false)
   if (!ok) {
+    return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
+  }
+  return null
+}
+
+export function guardDbOr503Fast(): NextResponse | null {
+  if (!isDbConfigured()) {
+    return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+  }
+  if (!isDatabaseAvailable()) {
     return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
   }
   return null

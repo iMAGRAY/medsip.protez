@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
-import { guardDbOr503, tablesExist } from '@/lib/api-guards'
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 // GET /api/admin/characteristic-templates/[id] - получить шаблон с предустановленными значениями
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const templateId = parseInt(params.id);
@@ -86,7 +86,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const templateId = parseInt(params.id);
@@ -210,7 +210,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const templateId = parseInt(params.id);
