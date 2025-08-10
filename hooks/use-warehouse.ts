@@ -370,8 +370,8 @@ export function useWarehouse() {
     bulkOperationsData: state.bulkOperationsData || [],
 
     // Производные данные
-    treeData,
-    bulkOperations,
+    treeData: _treeData,
+    bulkOperations: _bulkOperations,
 
     // Экшены состояния
     actions,
@@ -382,19 +382,19 @@ export function useWarehouse() {
     loadBulkOperationsData,
 
     // CRUD операции
-    createRegion,
-    createCity,
-    createWarehouse,
-    createZone,
-    createSection,
+    createRegion: _createRegion,
+    createCity: _createCity,
+    createWarehouse: _createWarehouse,
+    createZone: _createZone,
+    createSection: _createSection,
     deleteNode,
 
     // Хендлеры
-    handleNodeSelect,
-    handleNodeCreate,
-    handleNodeEdit,
-    handleNodeDelete,
-    handleNodeMove,
-    executeBulkOperation
+    handleNodeSelect: _handleNodeSelect,
+    handleNodeCreate: _handleNodeCreate,
+    handleNodeEdit: _handleNodeEdit,
+    handleNodeDelete: _handleNodeDelete,
+    handleNodeMove: _handleNodeMove,
+    executeBulkOperation: _executeBulkOperation
   }
 }
