@@ -15,9 +15,12 @@ function toApiPath(absFilePath) {
   let segments = noFile.split(path.sep)
   // Ensure starts with api
   if (segments[0] !== 'api') return null
-  // Replace dynamic segments [id] → 1 (generic)
+  // Replace dynamic segments
   segments = segments.map(seg => {
-    if (/^\[.+\]$/.test(seg)) return '1'
+    if (/^\[.+\]$/.test(seg)) {
+      if (seg === '[table]') return 'products'
+      return '1'
+    }
     return seg
   })
   return '/' + segments.join('/')
