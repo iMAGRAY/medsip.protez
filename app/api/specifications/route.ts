@@ -90,7 +90,6 @@ export async function GET(request: NextRequest) {
         FROM product_categories c
         WHERE c.parent_id IS NULL
           AND c.is_active = true
-          AND c.type = 'specification'
 
         UNION ALL
 
@@ -105,7 +104,7 @@ export async function GET(request: NextRequest) {
           h.path || c.id
         FROM product_categories c
         JOIN hierarchy h ON c.parent_id = h.id
-        WHERE c.is_active = true AND c.type = 'specification'
+        WHERE c.is_active = true
       )
       SELECT
         id,
