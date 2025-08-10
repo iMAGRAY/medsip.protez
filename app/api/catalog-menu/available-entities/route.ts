@@ -108,13 +108,12 @@ FROM product_categories c
           m.id as entity_id,
           m.name,
           m.description,
-          m.is_active,
+          true as is_active,
           CASE WHEN cms.id IS NOT NULL THEN true ELSE false END as in_menu,
           m.country,
-          (SELECT COUNT(*) FROM model_series ml WHERE ml.manufacturer_id = m.id AND ml.is_active = true) as model_series_count
+          (SELECT COUNT(*) FROM model_series ml WHERE ml.manufacturer_id = m.id) as model_series_count
         FROM manufacturers m
         LEFT JOIN catalog_menu_settings cms ON cms.entity_type = 'manufacturer' AND cms.entity_id::integer = m.id
-        WHERE m.is_active = true
         ORDER BY m.name
       `
       const manufacturersResult = await executeQuery(manufacturersQuery)
@@ -144,13 +143,12 @@ FROM product_categories c
           ml.id as entity_id,
           ml.name,
           ml.description,
-          ml.is_active,
+          true as is_active,
           CASE WHEN cms.id IS NOT NULL THEN true ELSE false END as in_menu,
           ml.manufacturer_id,
           (SELECT m.name FROM manufacturers m WHERE m.id = ml.manufacturer_id) as manufacturer_name
-                  FROM model_series ml
+        FROM model_series ml
         LEFT JOIN catalog_menu_settings cms ON cms.entity_type = 'model_line' AND cms.entity_id::integer = ml.id
-        WHERE ml.is_active = true
         ORDER BY ml.name
       `
       const modelLinesResult = await executeQuery(modelLinesQuery)
@@ -188,7 +186,6 @@ FROM product_categories c
         const manufacturersCountQuery = `
           SELECT COUNT(*) as manufacturers_count
           FROM manufacturers
-          WHERE is_active = true
         `
         const countResult = await executeQuery(manufacturersCountQuery)
         const manufacturersCount = parseInt(countResult.rows[0].manufacturers_count)
