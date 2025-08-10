@@ -110,11 +110,6 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [deletedImages, setDeletedImages] = useState<Set<string>>(new Set())
 
-  // Загрузка пользовательских настроек
-  useEffect(() => {
-    loadUserSettings()
-  }, [loadUserSettings])
-
   const loadUserSettings = useCallback(async () => {
       try {
         setSettingsLoading(true)
@@ -150,6 +145,11 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
         setSettingsLoading(false)
       }
     }, [])
+
+  // Загрузка пользовательских настроек
+  useEffect(() => {
+    loadUserSettings()
+  }, [loadUserSettings])
 
   const saveUserSettings = async (newSettings: Partial<UserSettings>) => {
     try {
