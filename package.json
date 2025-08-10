@@ -44,6 +44,7 @@
     "lint:auto-fix:keys": "node scripts/tools/auto-fix-jsx-keys.js",
     "lint:auto-fix:all": "node scripts/tools/auto-fix-lint.js && node scripts/tools/auto-fix-hooks-deps.js && node scripts/tools/auto-fix-jsx-keys.js && node scripts/tools/auto-fix-callback-deps.js && node scripts/tools/auto-fix-shorthand-alias.js",
     "lint:auto-fix:shorthand": "node scripts/tools/auto-fix-shorthand-alias.js",
+    "lint:auto-fix:shorthand:tsc": "node scripts/tools/fix-shorthand-from-tsc.js",
     "type-check": "tsc --noEmit",
     "test": "node tests/run-all-tests.js",
     "test:watch": "node tests/run-all-tests.js",
