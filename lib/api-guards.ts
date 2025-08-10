@@ -30,6 +30,11 @@ export function guardDbOr503Fast(): NextResponse | null {
 
 export async function tablesExist(tableNames: string[]): Promise<Record<string, boolean>> {
   if (!tableNames || tableNames.length === 0) return {}
+  if (!isDatabaseAvailable()) {
+    const map: Record<string, boolean> = {}
+    for (const t of tableNames) map[t] = false
+    return map
+  }
   const placeholders = tableNames.map((_, i) => `$${i + 1}`).join(', ')
   const sql = `
     SELECT table_name
@@ -45,6 +50,11 @@ export async function tablesExist(tableNames: string[]): Promise<Record<string, 
 
 export async function columnsExist(table: string, columns: string[]): Promise<Record<string, boolean>> {
   if (!columns || columns.length === 0) return {}
+  if (!isDatabaseAvailable()) {
+    const map: Record<string, boolean> = {}
+    for (const c of columns) map[c] = false
+    return map
+  }
   const sql = `
     SELECT column_name FROM information_schema.columns
     WHERE table_schema='public' AND table_name = $1 AND column_name = ANY($2)
