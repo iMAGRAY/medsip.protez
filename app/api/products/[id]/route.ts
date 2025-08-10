@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery } from '@/lib/db-connection'
+import { executeQuery, testConnection } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
 import { getCacheManager } from '@/lib/dependency-injection'
 import { invalidateRelated } from '@/lib/cache-manager'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
+
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
 
 export async function GET(
   request: NextRequest,
@@ -12,9 +18,15 @@ export async function GET(
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
-    logger.info('Product GET request', { productId })
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+    const isConnected = await testConnection()
+    if (!isConnected) {
+      return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
+    }
 
+    const productId = parseInt(params.id)
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
         { success: false, error: 'Invalid product ID' },
@@ -22,26 +34,13 @@ export async function GET(
       )
     }
 
-    // Загружаем основную информацию о продукте
     const productQuery = `
       WITH RECURSIVE category_path AS (
-        -- Базовый случай: категория продукта
-        SELECT 
-          id,
-          name,
-          parent_id,
-          name::text as full_path
+        SELECT id, name, parent_id, name::text as full_path
         FROM product_categories
         WHERE id = (SELECT category_id FROM products WHERE id = $1)
-        
         UNION ALL
-        
-        -- Рекурсивный случай: поднимаемся вверх по иерархии
-        SELECT 
-          pc.id,
-          pc.name,
-          pc.parent_id,
-          pc.name || ' / ' || cp.full_path as full_path
+        SELECT pc.id, pc.name, pc.parent_id, pc.name || ' / ' || cp.full_path as full_path
         FROM product_categories pc
         INNER JOIN category_path cp ON pc.id = cp.parent_id
       )
@@ -61,7 +60,6 @@ export async function GET(
     const productResult = await executeQuery(productQuery, [productId])
 
     if (productResult.rows.length === 0) {
-      logger.warn('Product not found', { productId })
       return NextResponse.json(
         { success: false, error: 'Product not found' },
         { status: 404 }
@@ -69,50 +67,28 @@ export async function GET(
     }
 
     const product = productResult.rows[0]
-
-    // Устанавливаем базовые значения
     product.characteristics = {}
     product.imageUrls = []
 
-    // Загружаем изображения из JSON поля в таблице products (безопасно)
     try {
       if (product.images && Array.isArray(product.images)) {
-        product.imageUrls = product.images.map((img, index) => ({
+        product.imageUrls = product.images.map((img: any, index: number) => ({
           url: typeof img === 'string' ? img : img.url || img.image_url,
           alt: typeof img === 'object' ? img.alt || img.alt_text : `Product image ${index + 1}`,
           isPrimary: index === 0,
           order: index
         }))
       } else if (product.image_url) {
-        product.imageUrls = [{
-          url: product.image_url,
-          alt: product.name,
-          isPrimary: true,
-          order: 0
-        }]
+        product.imageUrls = [{ url: product.image_url, alt: product.name, isPrimary: true, order: 0 }]
       }
-    } catch (imgError) {
-      logger.warn('Could not parse product images', { productId, error: imgError.message })
+    } catch (_) {
       product.imageUrls = []
     }
 
-    const duration = Date.now() - startTime
-    logger.info('Product loaded successfully', { productId, duration })
-
-    return NextResponse.json({
-      success: true,
-      data: product
-    })
+    return NextResponse.json({ success: true, data: product })
 
   } catch (error) {
-    const duration = Date.now() - startTime
-    logger.error('Error fetching product', error, 'API')
-
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error',
-      message: 'Failed to load product'
-    }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -125,54 +101,36 @@ export async function PUT(
   const cacheManager = getCacheManager()
 
   try {
-    // Проверяем аутентификацию
-    const session = await requireAuth(request)
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+    const isConnected = await testConnection()
+    if (!isConnected) {
+      return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
     }
 
-    // Проверяем права доступа
+    const session = await requireAuth(request)
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     if (!hasPermission(session.user, 'products.update') &&
         !hasPermission(session.user, 'products.*') &&
         !hasPermission(session.user, '*')) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     if (isNaN(productId) || productId <= 0) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid product ID' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'Invalid product ID' }, { status: 400 })
     }
 
     let data
-    try {
-      data = await request.json()
-    } catch (parseError) {
-      logger.error('Failed to parse request body', parseError)
-      return NextResponse.json(
-        { success: false, error: 'Invalid JSON in request body' },
-        { status: 400 }
-      )
-    }
+    try { data = await request.json() } catch { return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 }) }
 
-    // Валидация обязательных полей
     if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Product name is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'Product name is required' }, { status: 400 })
     }
 
-    logger.info('Product PUT request', { productId, name: data.name })
-
-    // Проверяем что продукт существует перед обновлением
     const checkQuery = `
       SELECT id, name FROM products
       WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL)
@@ -180,18 +138,8 @@ export async function PUT(
 
     const checkResult = await executeQuery(checkQuery, [productId])
     if (checkResult.rows.length === 0) {
-      logger.warn('Product not found for update', { productId })
-      return NextResponse.json(
-        { success: false, error: 'Product not found or already deleted' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Product not found or already deleted' }, { status: 404 })
     }
-
-    logger.info('Product exists, proceeding with update', {
-      productId,
-      currentName: checkResult.rows[0].name,
-      newName: data.name
-    })
 
     const query = `
       UPDATE products SET
@@ -219,36 +167,21 @@ export async function PUT(
       RETURNING *
     `
 
-    // Валидация и преобразование числовых полей
     const validateAndParseNumber = (value: any, fieldName: string, maxValue: number) => {
       if (value === null || value === undefined || value === '') return null;
       const parsed = parseFloat(value);
-      if (isNaN(parsed)) {
-        throw new Error(`Поле "${fieldName}" должно быть числом`);
-      }
-      if (parsed < 0) {
-        throw new Error(`Поле "${fieldName}" не может быть отрицательным`);
-      }
-      if (parsed > maxValue) {
-        const formattedMax = maxValue.toLocaleString('ru-RU');
-        throw new Error(`Поле "${fieldName}" не может превышать ${formattedMax}`);
-      }
+      if (isNaN(parsed)) { throw new Error(`Поле "${fieldName}" должно быть числом`) }
+      if (parsed < 0) { throw new Error(`Поле "${fieldName}" не может быть отрицательным`) }
+      if (parsed > maxValue) { throw new Error(`Поле "${fieldName}" не может превышать ${maxValue.toLocaleString('ru-RU')}`) }
       return parsed;
     };
 
     const validateAndParseInteger = (value: any, fieldName: string, maxValue: number = 2147483647) => {
       if (value === null || value === undefined || value === '') return null;
       const parsed = parseInt(value);
-      if (isNaN(parsed)) {
-        throw new Error(`Поле "${fieldName}" должно быть целым числом`);
-      }
-      if (parsed < 0) {
-        throw new Error(`Поле "${fieldName}" не может быть отрицательным`);
-      }
-      if (parsed > maxValue) {
-        const formattedMax = maxValue.toLocaleString('ru-RU');
-        throw new Error(`Поле "${fieldName}" не может превышать ${formattedMax}`);
-      }
+      if (isNaN(parsed)) { throw new Error(`Поле "${fieldName}" должно быть целым числом`) }
+      if (parsed < 0) { throw new Error(`Поле "${fieldName}" не может быть отрицательным`) }
+      if (parsed > maxValue) { throw new Error(`Поле "${fieldName}" не может превышать ${maxValue.toLocaleString('ru-RU')}`) }
       return parsed;
     };
 
@@ -275,114 +208,49 @@ export async function PUT(
       productId
     ]
 
-    logger.info('Executing product update query', { productId, valuesLength: values.length })
-
     const result = await executeQuery(query, values)
 
-    logger.info('Product update query completed', {
-      productId,
-      rowsAffected: result.rows.length,
-      duration: Date.now() - startTime
-    })
-
     if (result.rows.length === 0) {
-      logger.warn('Product update returned no rows', { productId })
-      return NextResponse.json(
-        { success: false, error: 'Product not found or could not be updated' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Product not found or could not be updated' }, { status: 404 })
     }
 
-    // Инвалидируем кэш после успешного обновления
     try {
-      logger.info('Invalidating product cache after update', { productId })
-
-      // Очищаем кэш продуктов
       await invalidateRelated([
         'medsip:products:*',
         'products:*',
         'product:*'
       ])
+      getCacheManager().clearAll()
+    } catch {}
 
-      // Очищаем кэш через cache manager
-      cacheManager.clearAll()
-
-      logger.info('Cache invalidated successfully', { productId })
-    } catch (cacheError) {
-      logger.warn('Failed to invalidate cache after product update', {
-        productId,
-        error: cacheError.message
-      })
-      // Не блокируем ответ из-за ошибки кэша
-    }
-
-    const duration = Date.now() - startTime
-    logger.info('Product updated successfully', { productId, duration })
-
-    return NextResponse.json({
-      success: true,
-      data: result.rows[0],
-      message: 'Product updated successfully'
-    })
+    return NextResponse.json({ success: true, data: result.rows[0], message: 'Product updated successfully' })
 
   } catch (error) {
-    logger.error('Failed to update product:', error);
-
-    // Ошибки валидации данных
     if (error.message && (
       error.message.includes('должно быть числом') ||
       error.message.includes('не может быть отрицательным') ||
       error.message.includes('не может превышать') ||
       error.message.includes('должно быть целым числом')
     )) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // Ошибки ограничений базы данных
-    if (error.code === '23514') {
-      if (error.constraint === 'check_stock_status_new') {
-        return NextResponse.json(
-          { error: 'Недопустимое значение статуса склада. Допустимые значения: В наличии, Нет в наличии, На заказ, Дальний склад, Ближний склад' },
-          { status: 400 }
-        );
+    if ((error as any).code === '23514') {
+      if ((error as any).constraint === 'check_stock_status_new') {
+        return NextResponse.json({ error: 'Недопустимое значение статуса склада. Допустимые значения: В наличии, Нет в наличии, На заказ, Дальний склад, Ближний склад' }, { status: 400 })
       } else {
-        return NextResponse.json(
-          { error: 'Данные не соответствуют ограничениям базы данных' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Данные не соответствуют ограничениям базы данных' }, { status: 400 })
       }
     }
 
-    // Ошибки уникальности
-    if (error.code === '23505') {
-      if (error.constraint === 'unique_product_name_manufacturer') {
-        return NextResponse.json(
-          { error: 'Продукт с таким именем уже существует у данного производителя' },
-          { status: 409 }
-        );
-      } else if (error.detail?.includes('sku')) {
-        return NextResponse.json(
-          { error: 'Продукт с таким SKU уже существует' },
-          { status: 409 }
-        );
-      } else {
-        return NextResponse.json(
-          { error: 'Продукт с такими данными уже существует' },
-          { status: 409 }
-        );
+    if ((error as any).code === '23505') {
+      if ((error as any).detail?.includes('sku')) {
+        return NextResponse.json({ error: 'Продукт с таким SKU уже существует' }, { status: 409 })
       }
+      return NextResponse.json({ error: 'Продукт с такими данными уже существует' }, { status: 409 })
     }
 
-    return NextResponse.json(
-      {
-        error: 'Failed to update product',
-        details: error.message
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update product', details: (error as any).message }, { status: 500 })
   }
 }
 
@@ -394,60 +262,39 @@ export async function DELETE(
   const cacheManager = getCacheManager()
 
   try {
-    // Проверяем аутентификацию
-    const session = await requireAuth(request)
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+    const isConnected = await testConnection()
+    if (!isConnected) {
+      return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
     }
 
-    // Проверяем права доступа
+    const session = await requireAuth(request)
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     if (!hasPermission(session.user, 'products.delete') &&
         !hasPermission(session.user, 'products.*') &&
         !hasPermission(session.user, '*')) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const productId = parseInt(params.id)
-
     if (isNaN(productId) || productId <= 0) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid product ID' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'Invalid product ID' }, { status: 400 })
     }
 
-    logger.info('Product DELETE request', { productId })
-
-    // Проверяем, существует ли продукт
-    const checkQuery = `
-      SELECT id, name
-      FROM products
-      WHERE id = $1
-    `
-
+    const checkQuery = `SELECT id, name FROM products WHERE id = $1`
     const checkResult = await executeQuery(checkQuery, [productId])
-
     if (checkResult.rows.length === 0) {
-      logger.warn('Product not found', { productId })
-      return NextResponse.json(
-        { success: false, error: 'Product not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 })
     }
 
-    const product = checkResult.rows[0]
-
-    // Полное удаление - удаляем все связанные данные в транзакции
     await executeQuery('BEGIN')
 
     try {
-      // Проверяем существование таблиц перед удалением
       const tablesToCheck = [
         'product_characteristics',
         'product_characteristics_simple',
@@ -458,10 +305,8 @@ export async function DELETE(
         'product_specifications'
       ]
 
-      // Удаляем связанные данные только если таблицы существуют
       for (const tableName of tablesToCheck) {
         try {
-          // Проверяем существование таблицы
           const tableExists = await executeQuery(`
             SELECT EXISTS (
               SELECT FROM information_schema.tables
@@ -472,7 +317,7 @@ export async function DELETE(
 
           if (tableExists.rows[0]?.exists) {
             let deleteQuery = ''
-            let params = [productId]
+            let paramsArr = [productId]
 
             switch (tableName) {
               case 'product_characteristics':
@@ -498,105 +343,33 @@ export async function DELETE(
                 break
             }
 
-            if (deleteQuery) {
-              await executeQuery(deleteQuery, params)
-              logger.info(`Deleted from ${tableName}`, { productId })
-            }
-          } else {
-            logger.info(`Table ${tableName} does not exist, skipping`, { productId })
+            if (deleteQuery) { await executeQuery(deleteQuery, paramsArr) }
           }
-        } catch (error) {
-          logger.warn(`Error deleting from ${tableName}`, { productId, error: error.message })
-          // Продолжаем с другими таблицами
-        }
+        } catch (_) { /* skip individual table errors */ }
       }
 
-      // Удаляем сам продукт
-      const deleteResult = await executeQuery(
-        'DELETE FROM products WHERE id = $1 RETURNING id, name',
-        [productId]
-      )
-
+      const deleteResult = await executeQuery('DELETE FROM products WHERE id = $1 RETURNING id, name', [productId])
       if (deleteResult.rows.length === 0) {
         await executeQuery('ROLLBACK')
-        logger.warn('Product could not be deleted', { productId })
-        return NextResponse.json(
-          { success: false, error: 'Failed to delete product' },
-          { status: 500 }
-        )
+        return NextResponse.json({ success: false, error: 'Failed to delete product' }, { status: 500 })
       }
 
       await executeQuery('COMMIT')
 
-      // Инвалидируем кэш после удаления
       try {
-        logger.info('Invalidating product cache after deletion', { productId })
-
-        // Очищаем кэш продуктов через Redis
-        await invalidateRelated([
-          'medsip:products:*',
-          'products:*',
-          'product:*',
-          'products-fast:*',
-          'products-full:*',
-          'products-detailed:*',
-          'products-basic:*'
-        ])
-
-        // Очищаем кэш через cache manager
+        await invalidateRelated(['medsip:products:*','products:*','product:*','products-fast:*','products-full:*','products-detailed:*','products-basic:*'])
         cacheManager.clearAll()
+        try { const { redisClient } = await import('@/lib/redis-client'); await redisClient.flushPattern('products-*'); await redisClient.flushPattern('product-*'); await redisClient.flushPattern('medsip:products-*') } catch {}
+      } catch {}
 
-        // Принудительно очищаем Redis кэш продуктов
-        try {
-          const { redisClient } = await import('@/lib/redis-client')
-          await redisClient.flushPattern('products-*')
-          await redisClient.flushPattern('product-*')
-          await redisClient.flushPattern('medsip:products-*')
-          logger.info('Redis cache cleared for products', { productId })
-        } catch (redisError) {
-          logger.warn('Failed to clear Redis cache', { productId, error: redisError.message })
-        }
-
-        logger.info('Cache invalidated successfully after deletion', { productId })
-      } catch (cacheError) {
-        logger.warn('Failed to invalidate cache after product deletion', {
-          productId,
-          error: cacheError.message
-        })
-      }
-
-      const duration = Date.now() - startTime
-      logger.info('Product completely deleted', { productId, duration })
-
-      return NextResponse.json({
-        success: true,
-        message: 'Product completely deleted',
-        data: deleteResult.rows[0]
-      })
+      return NextResponse.json({ success: true, message: 'Product completely deleted', data: deleteResult.rows[0] })
 
     } catch (error) {
       await executeQuery('ROLLBACK')
-      logger.error('Transaction rollback due to error', { productId, error: error.message })
       throw error
     }
 
   } catch (error) {
-    const duration = Date.now() - startTime
-    logger.error('Product DELETE error', {
-      productId: parseInt(params.id),
-      error: error.message,
-      stack: error.stack,
-      duration
-    }, 'API')
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to delete product',
-        message: error.message || 'Database operation failed',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Failed to delete product', message: (error as any).message || 'Database operation failed' }, { status: 500 })
   }
 }
