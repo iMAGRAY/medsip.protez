@@ -1,8 +1,6 @@
 "use client"
 
-import type React, { useCallback } from "react"
-
-import { useState, useEffect, createContext, useContext } from "react"
+import React, { useCallback, useState, useEffect, createContext, useContext } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -70,12 +68,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Загрузка сохраненных данных при инициализации
-  useEffect(() => {
-    loadSavedCredentials()
-    checkAuthStatus()
-  }, [loadSavedCredentials])
-
   const loadSavedCredentials = useCallback(() => {
       try {
         const savedUsername = localStorage.getItem(STORAGE_KEYS.REMEMBERED_USERNAME)
@@ -89,6 +81,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
         console.warn('Failed to load saved credentials:', error)
       }
     }, [])
+
+  // Загрузка сохраненных данных при инициализации
+  useEffect(() => {
+    loadSavedCredentials()
+    checkAuthStatus()
+  }, [loadSavedCredentials])
 
   const saveSavedCredentials = (username: string, remember: boolean) => {
     try {
@@ -316,8 +314,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   const contextValue: AuthContextType = {
     authStatus,
-    hasPermission,
-    handleLogout
+    hasPermission: _hasPermission,
+    handleLogout: _handleLogout
   }
 
   return (
