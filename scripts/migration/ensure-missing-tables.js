@@ -287,6 +287,35 @@ async function createWarehouseCore(pool) {
   ])
 }
 
+async function createCatalogMenuSettings(pool) {
+  const name = 'catalog_menu_settings'
+  if (await tableExists(pool, name)) {
+    console.log(`Skip: table ${name} already exists`)
+    return
+  }
+  console.log(`Creating table ${name} ...`)
+  await pool.query(`
+    CREATE TABLE catalog_menu_settings (
+      id SERIAL PRIMARY KEY,
+      entity_type VARCHAR(64) NOT NULL,
+      entity_id VARCHAR(64),
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      sort_order INTEGER DEFAULT 0,
+      is_visible BOOLEAN DEFAULT true,
+      is_expanded BOOLEAN DEFAULT false,
+      show_in_main_menu BOOLEAN DEFAULT true,
+      parent_id INTEGER NULL REFERENCES catalog_menu_settings(id) ON DELETE SET NULL,
+      icon VARCHAR(64),
+      css_class VARCHAR(64),
+      custom_url VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+  await pool.query(`CREATE INDEX IF NOT EXISTS catalog_menu_settings_parent_idx ON catalog_menu_settings(parent_id);`)
+}
+
 async function main() {
   const pool = buildPool()
   try {
@@ -296,6 +325,7 @@ async function main() {
     await createWarehouseSettings(pool)
     await createProductTags(pool)
     await createWarehouseCore(pool)
+    await createCatalogMenuSettings(pool)
     console.log('✅ ensure-missing-tables completed')
   } catch (e) {
     console.error('❌ ensure-missing-tables failed:', e.message)
