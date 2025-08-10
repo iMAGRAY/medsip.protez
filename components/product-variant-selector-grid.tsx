@@ -82,10 +82,6 @@ export function ProductVariantSelectorGrid({
   const [loading, setLoading] = useState(true)
   const [showAll, setShowAll] = useState(false)
 
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -122,6 +118,10 @@ export function ProductVariantSelectorGrid({
         setLoading(false)
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
 
   const handleVariantSelect = (variant: ProductVariantV2 | null) => {
     setSelectedVariant(variant)
