@@ -153,7 +153,7 @@ export function useCharacteristicsCreator(
   }, [specGroups, productCharacteristics, productId, findEnumById])
 
   return {
-    createCharacteristicsFromSelection,
+    createCharacteristicsFromSelection: _createCharacteristicsFromSelection,
     findEnumById
   }
 }
