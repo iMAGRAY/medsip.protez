@@ -2,11 +2,15 @@
 // GET /api/specifications - Get all specification groups and enums with hierarchical structure
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    const fast = guardDbOr503Fast()
+    if (fast) return fast
+
     const pool = getPool();
     const client = await pool.connect();
 
@@ -21,7 +25,7 @@ export async function GET(request: NextRequest) {
     const names = new Set(exists.rows.map((r: any) => r.table_name))
     if (!names.has('characteristics_groups_simple') || !names.has('characteristics_values_simple')) {
       client.release()
-      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
+      return NextResponse.json({ success: true, data: [], hierarchical: true, total_groups: 0, characteristic_groups_count: 0, manufacturers_count: 0 })
     }
 
     const characteristicGroupsQuery = await client.query(`
@@ -86,6 +90,7 @@ export async function GET(request: NextRequest) {
       LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
       GROUP BY st.id, st.name, st.description, st.parent_id, st.sort_order, st.show_in_main_params, st.main_params_priority, st.main_params_label_override, st.level, st.path
       ORDER BY st.path, st.sort_order
+      LIMIT 1000
     `);
 
     let manufacturersQuery = { rows: [] }
@@ -128,6 +133,7 @@ export async function GET(request: NextRequest) {
           (SELECT COUNT(*) FROM product_categories WHERE parent_id = hierarchy.id) as children_count
         FROM hierarchy
         ORDER BY path, sort_order
+        LIMIT 2000
       `);
     }
 

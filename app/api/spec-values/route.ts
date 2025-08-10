@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 // GET - Получить все значения характеристик для товара/варианта из новой EAV системы
 export async function GET(request: NextRequest) {
 try {
+    const fast = guardDbOr503Fast()
+    if (fast) return fast
+
+    const need = await tablesExist(['product_characteristics_simple','characteristics_values_simple','characteristics_groups_simple','products'])
+    if (!need.product_characteristics_simple || !need.characteristics_values_simple || !need.characteristics_groups_simple || !need.products) {
+      return NextResponse.json({ success: true, data: [], total: 0, system: 'eav_simple' })
+    }
+
     const pool = getPool()
     const client = await pool.connect()
     const { searchParams } = new URL(request.url)
@@ -50,7 +59,7 @@ try {
       paramIndex++
     }
 
-    query += ` ORDER BY cg.sort_order ASC, cv.sort_order ASC, pc.value_id ASC`
+    query += ` ORDER BY cg.sort_order ASC, cv.sort_order ASC, pc.value_id ASC LIMIT 1000`
 
     const result = await client.query(query, params)
     client.release()

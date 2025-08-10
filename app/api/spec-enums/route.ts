@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
-import { guardDbOr503, tablesExist } from '@/lib/api-guards'
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const guard = await guardDbOr503()
+    const guard = guardDbOr503Fast()
     if (guard) return guard
 
     const { searchParams } = new URL(request.url)
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       params.push(parseInt(groupId))
     }
 
-    query += ` ORDER BY cv.sort_order, cv.value`
+    query += ` ORDER BY cv.sort_order, cv.value LIMIT 500`
 
     const result = await pool.query(query, params)
     return NextResponse.json({ success: true, data: result.rows })
