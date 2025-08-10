@@ -1,0 +1,91 @@
+{
+  "timestamp": "2025-08-10T01:06:48.515Z",
+  "issues": {
+    "duplicateSystems": [
+      {
+        "system": "variants",
+        "table": "product_sizes",
+        "records": "1"
+      },
+      {
+        "system": "variants",
+        "table": "product_variants",
+        "records": "33"
+      }
+    ],
+    "legacyUsage": [
+      {
+        "table": "characteristic_groups_legacy",
+        "records": "23"
+      },
+      {
+        "table": "characteristic_values_legacy",
+        "records": "125"
+      },
+      {
+        "table": "spec_groups",
+        "records": "79"
+      },
+      {
+        "table": "spec_enums",
+        "records": "94"
+      }
+    ],
+    "inconsistentAPIs": [],
+    "emptyTables": [],
+    "recommendations": [
+      "migrate_variants",
+      "migrate_characteristics"
+    ]
+  },
+  "apiAnalysis": {
+    "totalEndpoints": 0,
+    "usingProductSizes": 0,
+    "usingProductVariants": 0,
+    "usingSpecTables": 0,
+    "usingLegacyChars": 0,
+    "endpoints": []
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Варианты товаров",
+      "actions": [
+        "Запустить скрипт migrate-sizes-to-variants.js",
+        "Обновить все API endpoints для использования product_variants",
+        "Обновить фронтенд компоненты",
+        "Удалить таблицу product_sizes"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "category": "Система характеристик",
+      "actions": [
+        "Мигрировать данные из spec_groups/spec_enums в characteristics_*_simple",
+        "Обновить API /api/spec-groups на использование новых таблиц",
+        "Обновить API /api/specifications",
+        "Архивировать legacy таблицы"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "API консистентность",
+      "actions": [
+        "Создать API v3 с единой структурой",
+        "Использовать типы из lib/api/types.ts",
+        "Добавить middleware для валидации",
+        "Внедрить единую обработку ошибок"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "category": "Очистка БД",
+      "actions": [
+        "Удалить пустые таблицы",
+        "Оптимизировать индексы",
+        "Настроить автоматическую очистку логов",
+        "Внедрить партиционирование для больших таблиц"
+      ]
+    }
+  ]
+}
