@@ -64,11 +64,7 @@ export function ProductVariantSelectorHorizontal({
   const [variants, setVariants] = useState<ProductVariantV2[]>([])
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
+ 
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -112,6 +108,10 @@ export function ProductVariantSelectorHorizontal({
         setLoading(false)
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
 
   const handleVariantSelect = (variant: ProductVariantV2) => {
     setSelectedVariant(variant)
