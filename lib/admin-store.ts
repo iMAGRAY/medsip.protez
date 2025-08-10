@@ -148,8 +148,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   },
 
   // Basic actions
-  setLoading: (_loading) => set({ loading }),
-  setError: (_error) => set({ error }),
+  setLoading: (_loading) => set({ loading: _loading }),
+  setError: (_error) => set({ error: _error }),
 
   // Принудительное обновление данных
   forceRefresh: async () => {
@@ -441,7 +441,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       const result = await response.json()
       const apiModelLines = result.success ? result.data : (Array.isArray(result) ? result : [])
       const _modelLines = apiModelLines.map(transformApiModelLine)
-      set({ modelLines })
+      set({ modelLines: _modelLines })
     } catch (_error) {
 
       set({ modelLines: [] })
@@ -578,7 +578,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const _endTime = performance.now()
 
-      set({ products })
+      set({ products: _products })
     } catch (error) {
       console.error('❌ Ошибка при загрузке товаров:', error)
       set({ products: [] })
