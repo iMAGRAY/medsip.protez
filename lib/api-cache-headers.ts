@@ -160,7 +160,7 @@ export class ApiCacheHeaders {
 
     const _headers = this.conditionalCache(etag, lastModified)
 
-    return { notModified, headers }
+    return { notModified, headers: _headers }
   }
 
   // Кеширование с компрессией
