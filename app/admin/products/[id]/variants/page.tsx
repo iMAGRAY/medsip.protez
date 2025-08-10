@@ -321,10 +321,6 @@ export default function ProductVariantsPage() {
     fetchProduct()
   }, [fetchProduct])
 
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -361,6 +357,10 @@ export default function ProductVariantsPage() {
         setLoading(false)
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
 
   const handleSaveVariant = async (formData: any) => {
     try {

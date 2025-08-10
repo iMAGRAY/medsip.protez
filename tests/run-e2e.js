@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-const { spawn } = require('child_process')
+const { spawn, execSync } = require('child_process')
+const net = require('net')
 const path = require('path')
 const fetch = require('node-fetch')
 const dotenv = require('dotenv')
@@ -10,13 +11,22 @@ dotenv.config({ path: 'database.env' })
 
 async function wait(ms) { return new Promise(r => setTimeout(r, ms)) }
 
-async function isServerUp(baseUrl) {
-  try {
-    const res = await fetch(baseUrl + '/')
-    return res.ok
-  } catch (_) {
-    return false
+async function isPortFree(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer()
+    server.once('error', () => resolve(false))
+    server.once('listening', () => server.close(() => resolve(true)))
+    server.listen(port, '0.0.0.0')
+  })
+}
+
+async function findFreePort(preferred = 3010, max = 3050) {
+  for (let p = preferred; p <= max; p++) {
+    // eslint-disable-next-line no-await-in-loop
+    const free = await isPortFree(p)
+    if (free) return p
   }
+  throw new Error('No free port found in range')
 }
 
 function runCmd(cmd, args, env) {
@@ -28,35 +38,32 @@ function runCmd(cmd, args, env) {
 }
 
 async function run() {
-  // Пробрасываем безопасные переменные окружения для only-read режима
   const env = { ...process.env }
   env.READONLY_SQL = env.READONLY_SQL || 'true'
 
-  // Выбираем тестовый порт и BASE_URL
-  const port = String(process.env.TEST_PORT || 3010)
+  // Выбираем свободный тестовый порт
+  const preferred = Number(process.env.TEST_PORT || 3010)
+  const port = await findFreePort(preferred, preferred + 100)
   const baseUrl = `http://localhost:${port}`
   env.TEST_BASE_URL = baseUrl
 
-  // 1) Сборка приложения (гарантируем актуальный код)
+  // Сборка
   const buildCode = await runCmd(process.execPath, [path.join('node_modules', 'next', 'dist', 'bin', 'next'), 'build'], env)
   if (buildCode !== 0) {
     console.error('❌ Build failed')
     process.exit(buildCode)
   }
 
-  // 2) Запуск сервера на тестовом порту
+  // Запуск сервера
   let server
-  let startedLocally = false
-
   server = spawn(process.execPath, [
     path.join('node_modules', 'next', 'dist', 'bin', 'next'),
     'start',
-    '-p', port
+    '-p', String(port)
   ], {
     env,
     stdio: ['ignore', 'pipe', 'pipe']
   })
-  startedLocally = true
 
   let ready = false
   server.stdout.on('data', (d) => {
@@ -66,7 +73,7 @@ async function run() {
   })
   server.stderr.on('data', (d) => process.stderr.write(d.toString()))
 
-  // Ждём готовность максимум 60с и пингуем /api/health на тестовом порту
+  // Ждём готовность максимум 60с и пингуем /api/health
   for (let i = 0; i < 60 && !ready; i++) {
     await wait(1000)
     try {
@@ -80,7 +87,7 @@ async function run() {
     process.exit(1)
   }
 
-  // 3) Запускаем API тесты
+  // E2E API тесты
   const tests = [
     'tests/api/db-status.test.js',
     'tests/api/manufacturers.test.js',
@@ -94,9 +101,7 @@ async function run() {
     if (code !== 0) failed++
   }
 
-  if (startedLocally && server) {
-    try { server.kill('SIGTERM') } catch (_) {}
-  }
+  try { server.kill('SIGTERM') } catch (_) {}
   process.exit(failed === 0 ? 0 : 1)
 }
 
