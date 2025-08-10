@@ -61,10 +61,6 @@ export function ProductVariantSelector({
   const [viewingVariant, setViewingVariant] = useState<ProductVariant | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'gallery'>('list')
 
-  useEffect(() => {
-    fetchVariants()
-  }, [fetchVariants])
-
   const fetchVariants = useCallback(async () => {
       try {
         setLoading(true)
@@ -142,6 +138,10 @@ export function ProductVariantSelector({
         setLoading(false)
       }
     }, [productId])
+
+  useEffect(() => {
+    fetchVariants()
+  }, [fetchVariants])
 
   const handleVariantChange = (variantId: string) => {
     const variant = variants.find(v => v.id.toString() === variantId)
