@@ -51,12 +51,13 @@ export const GET = withCache(async function GET(request: NextRequest) {
         name,
         description,
         parent_id,
-        (is_deleted = false OR is_deleted IS NULL) as is_active,
+        is_active,
         sort_order as display_order,
         created_at,
         updated_at
       FROM product_categories
       WHERE (is_deleted = false OR is_deleted IS NULL)
+        AND is_active = true
       ORDER BY sort_order, name
     `;
 
