@@ -11,7 +11,7 @@ export const CACHE_TTL = {
 }
 
 // Версия кеша для инвалидации при изменении структуры
-const CACHE_VERSION = 'v4' // Changed to v4 to clear all cached data
+const CACHE_VERSION = 'v5' // Changed to v5 to clear all cached data
 
 // Генерация ключей кеша
 export const cacheKeys = {

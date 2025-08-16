@@ -15,9 +15,10 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 // GET /api/products/[id]/characteristics-simple - получить характеристики продукта из упрощенной системы
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const { id } = await params
+  const productId = parseInt(id);
 
   try {
     if (isNaN(productId)) {

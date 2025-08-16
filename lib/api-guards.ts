@@ -9,12 +9,21 @@ export function isDbConfigured(): boolean {
 
 export async function guardDbOr503(): Promise<NextResponse | null> {
   if (!isDbConfigured()) {
+    console.error('🚨 Database config is not provided')
     return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
   }
-  const ok = await testConnection().catch(() => false)
-  if (!ok) {
+  
+  try {
+    const ok = await testConnection()
+    if (!ok) {
+      console.error('🚨 Database connection test failed')
+      return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
+    }
+  } catch (error) {
+    console.error('🚨 Database connection error:', error)
     return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
   }
+  
   return null
 }
 

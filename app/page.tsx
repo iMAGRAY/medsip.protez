@@ -694,17 +694,26 @@ export default function HomePage() {
 
   // Обновляем отфильтрованные товары и сбрасываем пагинацию при изменении фильтров
   useEffect(() => {
-    const newProducts = [...processedProducts]
-    setFilteredProducts(newProducts)
-    filteredProductsRef.current = newProducts  // Синхронизируем ref
+    // Дедупликация товаров по ID
+    const seenIds = new Set()
+    const uniqueProducts = processedProducts.filter(product => {
+      if (seenIds.has(product.id)) {
+        return false
+      }
+      seenIds.add(product.id)
+      return true
+    })
+    
+    setFilteredProducts(uniqueProducts)
+    filteredProductsRef.current = uniqueProducts  // Синхронизируем ref
     setCurrentPage(1)
     setHasMore(true)
     hasMoreRef.current = true
 
     // Показываем первую порцию товаров
-    const initialProducts = newProducts.slice(0, PRODUCTS_PER_PAGE)
+    const initialProducts = uniqueProducts.slice(0, PRODUCTS_PER_PAGE)
     setDisplayedProducts(initialProducts)
-    const newHasMore = newProducts.length > PRODUCTS_PER_PAGE
+    const newHasMore = uniqueProducts.length > PRODUCTS_PER_PAGE
     setHasMore(newHasMore)
     hasMoreRef.current = newHasMore
   }, [processedProducts])
@@ -729,7 +738,12 @@ export default function HomePage() {
         const newProducts = currentFiltered.slice(startIndex, endIndex)
 
         if (newProducts.length > 0) {
-          setDisplayedProducts(prev => [...prev, ...newProducts])
+          setDisplayedProducts(prev => {
+            // Дедупликация по ID для предотвращения дублированных ключей React
+            const existingIds = new Set(prev.map(p => p.id))
+            const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id))
+            return [...prev, ...uniqueNewProducts]
+          })
           const newHasMore = endIndex < currentFiltered.length
           setHasMore(newHasMore)
           hasMoreRef.current = newHasMore

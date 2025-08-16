@@ -147,8 +147,7 @@ const HeroVideo = () => {
     <div className="relative w-full h-full overflow-hidden">
       <video
         ref={videoRef}
-        className="relative w-full h-full object-cover transition-transform duration-75 ease-out
-          sm:object-center object-left-center"
+        className="relative w-full h-full object-cover transition-transform duration-75 ease-out sm:object-center object-left-center"
         style={{
           transform: `translateY(${scrollY * 0.1}px)`,
           objectPosition: 'left center',

@@ -17,8 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем IP и User-Agent для безопасности
-    const ipAddress = request.ip ||
-      request.headers.get('x-forwarded-for') ||
+    const ipAddress = request.headers.get('x-forwarded-for') ||
       request.headers.get('x-real-ip') ||
       'unknown'
 

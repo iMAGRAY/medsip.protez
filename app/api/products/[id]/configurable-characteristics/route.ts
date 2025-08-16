@@ -6,10 +6,11 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 // GET - получить конфигурируемые характеристики
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: paramId } = await params
+    const id = parseInt(paramId);
     const pool = getPool();
     
     // Сначала проверяем, является ли это ID варианта товара

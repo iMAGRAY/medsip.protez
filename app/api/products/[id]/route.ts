@@ -12,7 +12,7 @@ function isDbConfigured() {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!isDbConfigured()) {
@@ -23,7 +23,8 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 503 })
     }
 
-    const productId = parseInt(params.id)
+    const { id } = await params
+    const productId = parseInt(id)
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
         { success: false, error: 'Invalid product ID' },
