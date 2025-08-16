@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -261,9 +262,11 @@ export default function ModelLineProductsPage() {
           {/* Product Image */}
           <div className="h-48 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={300}
+                height={200}
                 className="max-h-full max-w-full object-contain p-4"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -369,9 +372,11 @@ export default function ModelLineProductsPage() {
               {/* Image */}
               <div className="w-20 h-20 bg-slate-50 flex items-center justify-center rounded-lg flex-shrink-0">
                 {product.primary_image_url || product.image_url ? (
-                  <img
+                  <Image
                     src={product.primary_image_url || product.image_url || ''}
                     alt={product.name}
+                    width={80}
+                    height={80}
                     className="max-h-full max-w-full object-contain p-2"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
@@ -444,9 +449,11 @@ export default function ModelLineProductsPage() {
           {/* Large Image */}
           <div className="h-64 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={200}
+                height={200}
                 className="max-h-full max-w-full object-contain p-6"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -548,9 +555,11 @@ export default function ModelLineProductsPage() {
           {/* Small Image */}
           <div className="h-32 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={120}
+                height={120}
                 className="max-h-full max-w-full object-contain p-2"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement

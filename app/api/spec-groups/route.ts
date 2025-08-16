@@ -4,7 +4,7 @@ import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
-function isDbConfigured() {
+function _isDbConfigured() {
   return !!process.env.DATABASE_URL || (
     !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
   )

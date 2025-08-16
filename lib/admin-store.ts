@@ -48,7 +48,7 @@ const transformApiProduct = (apiProduct: any): Prosthetic => {
   }
 }
 
-const transformApiCategory = (apiCategory: any): Category => ({
+const _transformApiCategory = (apiCategory: any): Category => ({
   id: apiCategory.id.toString(),
   name: apiCategory.name,
   description: apiCategory.description || "",
@@ -76,7 +76,7 @@ const transformApiModelLine = (apiModelLine: any): ModelLine => ({
   updatedAt: apiModelLine.updatedAt || apiModelLine.updated_at,
 })
 
-const transformApiSiteSettings = (apiSettings: any): SiteSettings => ({
+const _transformApiSiteSettings = (apiSettings: any): SiteSettings => ({
   id: apiSettings.id || 0,
   siteName: apiSettings.siteName || apiSettings.site_name || "",
   siteDescription: apiSettings.siteDescription || apiSettings.site_description || "",

@@ -17,6 +17,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const fast = searchParams.get('fast') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
     const _detailed = searchParams.get('detailed') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
 
@@ -60,20 +61,25 @@ export const GET = withCache(async function GET(request: NextRequest) {
             WHERE pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
             AND (pv.name IS NULL OR pv.name NOT ILIKE '%standard%')
           )::int as variants_count,
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', ps.id,
-                'price', ps.price,
-                'discountPrice', ps.discount_price,
-                'isAvailable', ps.is_available
-              ) ORDER BY ps.sort_order, ps.size_name
-            )
-            FROM product_sizes ps
-            WHERE ps.product_id = p.id
+          COALESCE(
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'id', pv.id,
+                'price', pv.price,
+                'discountPrice', pv.discount_price,
+                'isAvailable', pv.is_active,
+                'sizeName', pv.size_name,
+                'sizeValue', pv.size_value,
+                'stockQuantity', pv.stock_quantity,
+                'sku', pv.sku
+              ) ORDER BY pv.sort_order, pv.size_name
+            ) FILTER (WHERE pv.id IS NOT NULL),
+            '[]'::json
           ) as variants
         FROM products p
+        LEFT JOIN product_variants pv ON pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
         WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
+        GROUP BY p.id
         ORDER BY p.created_at DESC
       `;
     } else {
@@ -103,37 +109,57 @@ export const GET = withCache(async function GET(request: NextRequest) {
             ) FILTER (WHERE prch.id IS NOT NULL),
             '[]'::json
           ) as specifications,` : `('[]'::json) as specifications,`}
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', ps.id,
-                'price', ps.price,
-                'discountPrice', ps.discount_price,
-                'isAvailable', ps.is_available
-              ) ORDER BY ps.sort_order, ps.size_name
-            )
-            FROM product_sizes ps
-            WHERE ps.product_id = p.id
+          COALESCE(
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'id', pv.id,
+                'price', pv.price,
+                'discountPrice', pv.discount_price,
+                'isAvailable', pv.is_active,
+                'sizeName', pv.size_name,
+                'sizeValue', pv.size_value,
+                'stockQuantity', pv.stock_quantity,
+                'sku', pv.sku
+              ) ORDER BY pv.sort_order, pv.size_name
+            ) FILTER (WHERE pv.id IS NOT NULL),
+            '[]'::json
           ) as variants
         FROM products p
         LEFT JOIN model_series ms ON p.series_id = ms.id
         LEFT JOIN manufacturers m ON p.manufacturer_id = m.id
         LEFT JOIN product_categories pc ON p.category_id = pc.id
+        LEFT JOIN product_variants pv ON pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
         ${joinSimple ? `LEFT JOIN product_characteristics_simple prch ON p.id = prch.product_id
         LEFT JOIN characteristics_values_simple cv ON prch.value_id = cv.id AND cv.is_active = true
         LEFT JOIN characteristics_groups_simple cg ON cv.group_id = cg.id AND cg.is_active = true` : ''}
         WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
-        ${joinSimple ? `GROUP BY p.id, ms.name, m.name, pc.name` : ''}
+        GROUP BY p.id, ms.name, m.name, pc.name
         ORDER BY p.created_at DESC
       `;
     }
 
     if (limit) {
-      query += ` LIMIT $1`;
-      queryParams.push(limit);
+      if (offset) {
+        query += ` LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+        queryParams.push(limit, offset);
+      } else {
+        query += ` LIMIT $${queryParams.length + 1}`;
+        queryParams.push(limit);
+      }
+    } else if (offset) {
+      query += ` OFFSET $${queryParams.length + 1}`;
+      queryParams.push(offset);
     }
 
-      const result = await executeQuery(query, queryParams);
+      // Добавляем timeout 30s для предотвращения hang
+      const queryTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout after 30 seconds')), 30000)
+      );
+      
+      const result = await Promise.race([
+        executeQuery(query, queryParams),
+        queryTimeout
+      ]) as any;
 
       const responseData = {
         success: true,

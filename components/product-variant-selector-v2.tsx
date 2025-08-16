@@ -117,20 +117,20 @@ export function ProductVariantSelectorV2({
       } finally {
         setLoading(false)
       }
-    }, [productId])
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
   }, [fetchVariants])
 
-  const handleVariantSelect = (variant: ProductVariantV2) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2) => {
     setImageLoading(true)
     setSelectedVariant(variant)
     onVariantChange(variant)
     
     // Имитация загрузки изображения
     setTimeout(() => setImageLoading(false), 300)
-  }
+  }, [onVariantChange])
 
   const handleReturnToMaster = () => {
     setSelectedVariant(null)

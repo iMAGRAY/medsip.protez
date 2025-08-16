@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 
 const HeroImage = () => {
   const [imageError, setImageError] = useState(false)
@@ -92,9 +93,10 @@ const HeroImage = () => {
     <div className="relative w-full h-full overflow-hidden">
       {/* Фоновый слой - медленное движение */}
       {!backImageError && (
-        <img
+        <Image
           src="/images/hero-family_back.webp"
           alt="Фон семьи"
+          fill
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-75 ease-out"
           style={{
             transform: `translateY(${scrollY * 0.3}px) scale(1.1)`,
@@ -104,9 +106,10 @@ const HeroImage = () => {
       )}
 
       {/* Основной слой - быстрое движение */}
-      <img
+      <Image
         src={imageError ? fallbackSVG : "/images/hero-family.webp"}
         alt="Семья с протезом идет вместе"
+        fill
         className="relative w-full h-full object-contain transition-transform duration-75 ease-out"
         style={{
           transform: `translateY(${scrollY * 0.1}px)`,

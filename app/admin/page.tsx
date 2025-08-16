@@ -142,7 +142,7 @@ return {
     }
   }
 
-  const generateFallbackStats = (): DashboardStats => ({
+  const generateFallbackStats = useCallback((): DashboardStats => ({
     products: {
       total: products.length || 26, // Реальное количество товаров
       inStock: Math.floor((products.length || 26) * 0.85), // 85% в наличии
@@ -176,7 +176,7 @@ return {
       lastSync: new Date().toLocaleTimeString('ru-RU'),
       uptime: calculateRealisticUptime()
     }
-  })
+  }), [products.length])
 
   const loadDashboardData = useCallback(async () => {
     setLoadingStats(true)
@@ -211,7 +211,7 @@ return {
     } finally {
       setLoadingStats(false)
     }
-  }, [products.length, modelLines?.length, isLoading, initializeData])
+  }, [products.length, modelLines?.length, isLoading, initializeData, generateFallbackStats])
 
   // Инициализация дашборда (перемещен после объявления loadDashboardData)
   useEffect(() => {

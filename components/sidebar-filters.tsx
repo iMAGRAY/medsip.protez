@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button"
 import { apiClient } from "@/lib/api-client"
 
 // Интерфейсы для типизации данных
-interface Category {
+interface _Category {
   id: number
   name: string
   is_active: boolean
 }
 
-interface Feature {
+interface _Feature {
   id: number
   name: string
   is_active: boolean

@@ -116,7 +116,7 @@ const CharacteristicsSelectorComponent = ({
       setLocalSelected(selectedCharacteristics ? [...selectedCharacteristics] : [])
       initializedRef.current = true
     }
-  }, [loadSpecGroups])
+  }, [loadSpecGroups, selectedCharacteristics])
 
   // Переключение раскрытия группы
   const toggleGroupExpansion = (groupId: string | number) => {

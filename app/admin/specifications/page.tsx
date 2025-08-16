@@ -78,8 +78,8 @@ interface ProductCharacteristic {
 
 export default function SpecificationsAdmin() {
   const [specGroups, setSpecGroups] = useState<SpecGroup[]>([])
-  const [productSizes, setProductSizes] = useState<ProductSize[]>([])
-  const [productCharacteristics, setProductCharacteristics] = useState<ProductCharacteristic[]>([])
+  const [_productSizes, setProductSizes] = useState<ProductSize[]>([])
+  const [_productCharacteristics, setProductCharacteristics] = useState<ProductCharacteristic[]>([])
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
 
@@ -88,7 +88,7 @@ export default function SpecificationsAdmin() {
   const [isEnumDialogOpen, setIsEnumDialogOpen] = useState(false)
   const [editingGroup, setEditingGroup] = useState<SpecGroup | null>(null)
   const [editingEnum, setEditingEnum] = useState<SpecEnum | null>(null)
-  const [isCreatingSection, setIsCreatingSection] = useState(false) // Флаг для создания раздела
+  const [_isCreatingSection, setIsCreatingSection] = useState(false) // Флаг для создания раздела
 
   // Состояния для удаления
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -154,8 +154,110 @@ export default function SpecificationsAdmin() {
     return colorMap[normalizedName] || '#E5E7EB' // По умолчанию серый
   }
 
+  // Функция для построения иерархической структуры
+  const buildHierarchy = useCallback((flatGroups: SpecGroup[]): SpecGroup[] => {
+
+    // Логируем все группы для отладки
+    flatGroups.forEach(_group => {
+      // Debug logging можно добавить здесь при необходимости
+    })
+
+    // Создаем карту групп по ID для быстрого поиска
+    const groupMap = new Map<string | number, SpecGroup>()
+    flatGroups.forEach(group => {
+      groupMap.set(group.id, { ...group, children: [] })
+    })
+
+    const rootGroups: SpecGroup[] = []
+
+    // Строим дерево, устанавливая связи parent-child
+    flatGroups.forEach(group => {
+      const currentGroup = groupMap.get(group.id)!
+      
+      if (group.parent_id && groupMap.has(group.parent_id)) {
+        const parentGroup = groupMap.get(group.parent_id)!
+        parentGroup.children!.push(currentGroup)
+      } else {
+        rootGroups.push(currentGroup)
+      }
+    })
+
+    // Сортируем группы по ordering
+    const sortGroups = (groups: SpecGroup[]) => {
+      groups.sort((a, b) => {
+        return (a.ordering || 0) - (b.ordering || 0)
+      })
+      
+      groups.forEach(group => {
+        if (group.children && group.children.length > 0) {
+          sortGroups(group.children)
+        }
+      })
+    }
+
+    sortGroups(rootGroups)
+
+    // Устанавливаем уровни рекурсивно
+    const setLevels = (groups: SpecGroup[], level: number = 0) => {
+      groups.forEach(group => {
+        group.level = level
+
+        if (group.children && group.children.length > 0) {
+          setLevels(group.children, level + 1)
+        }
+      })
+    }
+
+    setLevels(rootGroups)
+
+    // Логируем финальную структуру
+    const logHierarchy = (groups: SpecGroup[], indent = '') => {
+      groups.forEach(group => {
+if (group.children && group.children.length > 0) {
+          logHierarchy(group.children, indent + '  ')
+        }
+      })
+    }
+
+    logHierarchy(rootGroups)
+
+    return rootGroups
+  }, [])
+
+  // Функция для обработки данных из API characteristics
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    const processGroup = (group: any): SpecGroup => {
+      // API возвращает "enums", но мы используем "enum_values" в интерфейсе
+      const enumValues = group.enums || group.enum_values || []
+      const enumCount = group.enum_values_count || enumValues.length || 0
+
+      const processedGroup: SpecGroup = {
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        enum_count: enumCount,
+        enum_values: enumValues, // Используем данные из API
+        enums: enumValues,       // Дублируем для совместимости
+        parent_id: group.parent_id,
+        level: 0, // Будет вычислен в buildHierarchy
+        source_type: 'spec_group',
+        original_id: typeof group.id === 'string' && group.id.startsWith('section_') ? group.id : group.id,
+        ordering: group.ordering || 0,
+        children: [],
+        is_section: group.is_section || false // Добавляем флаг для определения раздела
+      }
+
+      return processedGroup
+    }
+
+    const processedGroups = groups.map(processGroup)
+
+    // Строим иерархическую структуру из плоского списка
+    return buildHierarchy(processedGroups)
+  }, [buildHierarchy])
+
   // Загрузка данных
-  const loadSpecGroups = async () => {
+  const loadSpecGroups = useCallback(async () => {
     try {
 
       const res = await fetch("/api/characteristics")
@@ -237,110 +339,7 @@ allGroups.push({
         variant: "destructive"
       })
     }
-  }
-
-  // Функция для обработки данных из API characteristics
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    const processGroup = (group: any): SpecGroup => {
-      // API возвращает "enums", но мы используем "enum_values" в интерфейсе
-      const enumValues = group.enums || group.enum_values || []
-      const enumCount = group.enum_values_count || enumValues.length || 0
-
-      const processedGroup: SpecGroup = {
-        id: group.id,
-        name: group.name,
-        description: group.description,
-        enum_count: enumCount,
-        enum_values: enumValues, // Используем данные из API
-        enums: enumValues,       // Дублируем для совместимости
-        parent_id: group.parent_id,
-        level: 0, // Будет вычислен в buildHierarchy
-        source_type: 'spec_group',
-        original_id: typeof group.id === 'string' && group.id.startsWith('section_') ? group.id : group.id,
-        ordering: group.ordering || 0,
-        children: [],
-        is_section: group.is_section || false // Добавляем флаг для определения раздела
-      }
-
-      return processedGroup
-    }
-
-    const processedGroups = groups.map(processGroup)
-
-    // Строим иерархическую структуру из плоского списка
-    return buildHierarchy(processedGroups)
-  }
-
-  // Функция для построения иерархической структуры
-  const buildHierarchy = (flatGroups: SpecGroup[]): SpecGroup[] => {
-
-    // Логируем все группы для отладки
-    flatGroups.forEach(_group => {
-})
-
-    // Создаем карту групп по ID для быстрого поиска
-    const groupMap = new Map<string | number, SpecGroup>()
-    flatGroups.forEach(group => {
-      groupMap.set(group.id, { ...group, children: [] })
-    })
-
-    const rootGroups: SpecGroup[] = []
-
-    // Строим дерево, устанавливая связи parent-child
-    flatGroups.forEach(group => {
-      const currentGroup = groupMap.get(group.id)!
-
-      if (group.parent_id && groupMap.has(group.parent_id)) {
-        // Это дочерняя группа
-        const parentGroup = groupMap.get(group.parent_id)!
-        if (!parentGroup.children) {
-          parentGroup.children = []
-        }
-        parentGroup.children.push(currentGroup)
-} else {
-        // Это корневая группа
-        rootGroups.push(currentGroup)
-}
-    })
-
-    // Сортируем группы по ordering
-    const sortGroups = (groups: SpecGroup[]) => {
-      groups.sort((a, b) => (a.ordering || 0) - (b.ordering || 0))
-      groups.forEach(group => {
-        if (group.children && group.children.length > 0) {
-          sortGroups(group.children)
-        }
-      })
-    }
-
-    sortGroups(rootGroups)
-
-    // Устанавливаем уровни рекурсивно
-    const setLevels = (groups: SpecGroup[], level: number = 0) => {
-      groups.forEach(group => {
-        group.level = level
-
-        if (group.children && group.children.length > 0) {
-          setLevels(group.children, level + 1)
-        }
-      })
-    }
-
-    setLevels(rootGroups)
-
-    // Логируем финальную структуру
-    const logHierarchy = (groups: SpecGroup[], indent = '') => {
-      groups.forEach(group => {
-if (group.children && group.children.length > 0) {
-          logHierarchy(group.children, indent + '  ')
-        }
-      })
-    }
-
-    logHierarchy(rootGroups)
-
-    return rootGroups
-  }
+  }, [processHierarchicalGroups])
 
   const loadProductSizes = async () => {
     try {
@@ -370,7 +369,7 @@ if (group.children && group.children.length > 0) {
                 loadProductCharacteristics()
               ])
               setLoading(false)
-            }, [])
+            }, [loadSpecGroups])
 
 
   useEffect(() => {

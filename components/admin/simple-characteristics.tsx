@@ -54,7 +54,7 @@ interface CharacteristicSection {
   }[]
 }
 
-export function SimpleCharacteristics({ productId, onSave, readonly = false }: SimpleCharacteristicsProps) {
+export function SimpleCharacteristics({ productId, onSave: _onSave, readonly = false }: SimpleCharacteristicsProps) {
   const [availableCharacteristics, setAvailableCharacteristics] = useState<CharacteristicGroup[]>([])
   const [selectedCharacteristics, setSelectedCharacteristics] = useState<SelectedCharacteristic[]>([])
   const [characteristicSections, setCharacteristicSections] = useState<CharacteristicSection[]>([])
@@ -129,7 +129,7 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
   }, [loadCharacteristics])
 
   // Переключение выбора характеристики
-  const toggleCharacteristic = (value: CharacteristicValue, _groupName: string) => {
+  const toggleCharacteristic = (value: CharacteristicValue) => {
     const isCurrentlySelected = selectedCharacteristics.some(c => c.value_id === value.id)
 
     if (isCurrentlySelected) {
@@ -335,7 +335,7 @@ export function SimpleCharacteristics({ productId, onSave, readonly = false }: S
                             <Checkbox
                               id={`char-${value.id}`}
                               checked={isSelected}
-                              onCheckedChange={() => toggleCharacteristic(value, group.group_name)}
+                              onCheckedChange={() => toggleCharacteristic(value)}
                             />
                             <label
                               htmlFor={`char-${value.id}`}

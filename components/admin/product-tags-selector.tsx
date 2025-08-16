@@ -109,14 +109,7 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
       }
     }, [productId])
 
-  useEffect(() => {
-    fetchAllTags()
-    if (productId) {
-      fetchProductTags()
-    }
-  }, [fetchAllTags])
-
-  const fetchProductTags = async () => {
+  const fetchProductTags = useCallback(async () => {
     try {
       const response = await fetch(`/api/products/${productId}/tags`, {
         credentials: 'include', // Важно для передачи cookies
@@ -131,7 +124,14 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [productId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (productId) {
+      fetchProductTags()
+    }
+  }, [fetchAllTags, fetchProductTags, productId])
 
   const handleTagToggle = async (tag: ProductTag, checked: boolean) => {
     // Личные теги товара всегда выбраны и не могут быть сняты

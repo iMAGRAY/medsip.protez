@@ -176,7 +176,7 @@ export default function SettingsAdmin() {
     }
 
     loadData()
-  }, [])
+  }, [loadSiteSettings])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]

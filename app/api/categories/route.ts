@@ -7,7 +7,7 @@ import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
-function isDbConfigured() {
+function _isDbConfigured() {
   return !!process.env.DATABASE_URL || (
     !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
   )
@@ -216,7 +216,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { id, name, description, parent_id, image_url, sort_order } = body;
+    const { id, name, description, parent_id, image_url: _image_url, sort_order } = body;
 
     if (!id || !name) {
       return NextResponse.json(

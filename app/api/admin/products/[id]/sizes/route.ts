@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
+import { generateUniqueSlug, generateSizeSlug } from '@/lib/utils/slug-generator'
+import {
+  mapLegacySizeToVariant,
+  mapVariantToLegacySize,
+  generateInsertFields,
+  generateInsertPlaceholders,
+  generateUpdateFields,
+  type LegacySizeInput
+} from '@/lib/utils/field-mapper'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -11,66 +20,77 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const productId = params.id
-    const body = await request.json()
+    const masterProductId = parseInt(params.id)
+    const body: LegacySizeInput = await request.json()
+
+    if (!body.sizeName) {
+      return NextResponse.json(
+        { success: false, error: 'Size name is required' },
+        { status: 400 }
+      )
+    }
+
+    // Генерируем уникальный slug для варианта
+    const baseName = body.name || body.sizeName
+    const slug = await generateUniqueSlug(baseName, masterProductId)
+
+    // Конвертируем legacy данные в формат product_variants
+    const variantData = mapLegacySizeToVariant(body, masterProductId, slug)
 
     const query = `
-      INSERT INTO product_sizes (
-        product_id, size_name, size_value, name, description,
-        sku, price, discount_price, stock_quantity, weight,
-        dimensions, specifications, is_available, sort_order,
-        image_url, images, warranty, battery_life,
-        meta_title, meta_description, meta_keywords,
-        is_featured, is_new, is_bestseller,
-        custom_fields, characteristics, selection_tables
+      INSERT INTO product_variants (
+        ${generateInsertFields()}
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16, $17, $18,
-        $19, $20, $21, $22, $23, $24, $25, $26, $27
+        ${generateInsertPlaceholders()}
       )
       RETURNING *
     `
 
     const values = [
-      productId,
-      body.sizeName,
-      body.sizeValue || null,
-      body.name || null,
-      body.description || null,
-      body.sku || null,
-      body.price || null,
-      body.discountPrice || null,
-      body.stockQuantity || null,
-      body.weight || null,
-      body.dimensions || null,
-      body.specifications || null,
-      body.isAvailable !== false,
-      body.sortOrder || 0,
-      body.imageUrl || null,
-      JSON.stringify(body.images || []),
-      body.warranty || null,
-      body.batteryLife || null,
-      body.metaTitle || null,
-      body.metaDescription || null,
-      body.metaKeywords || null,
-      body.isFeatured || false,
-      body.isNew || false,
-      body.isBestseller || false,
-      JSON.stringify(body.customFields || {}),
-      JSON.stringify(body.characteristics || []),
-      JSON.stringify(body.selectionTables || [])
+      variantData.master_id,
+      variantData.name,
+      variantData.slug,
+      variantData.sku,
+      variantData.description,
+      variantData.price,
+      variantData.discount_price,
+      variantData.stock_quantity,
+      variantData.reserved_quantity,
+      JSON.stringify(variantData.attributes),
+      variantData.primary_image_url,
+      JSON.stringify(variantData.images),
+      variantData.is_active,
+      variantData.is_featured,
+      variantData.is_new,
+      variantData.is_bestseller,
+      variantData.sort_order,
+      variantData.size_name,
+      variantData.size_value,
+      JSON.stringify(variantData.dimensions),
+      JSON.stringify(variantData.specifications),
+      variantData.weight,
+      variantData.warranty_months,
+      variantData.battery_life_hours,
+      variantData.meta_title,
+      variantData.meta_description,
+      variantData.meta_keywords,
+      JSON.stringify(variantData.custom_fields),
+      variantData.cost_price
     ]
 
     const result = await executeQuery(query, values)
     
+    // Конвертируем результат обратно в legacy формат для API compatibility
+    const legacyResponse = mapVariantToLegacySize(result.rows[0])
+    
     return NextResponse.json({
       success: true,
-      data: result.rows[0]
+      data: legacyResponse
     })
   } catch (error) {
-    logger.error('Error creating product size:', error)
+    logger.error('Error creating product variant:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to create product size' },
+      { success: false, error: 'Failed to create product variant' },
       { status: 500 }
     )
   }
@@ -82,7 +102,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json()
+    const masterProductId = parseInt(params.id)
+    const body: LegacySizeInput & { variantId: number } = await request.json()
     const { variantId } = body
 
     if (!variantId) {
@@ -92,67 +113,71 @@ export async function PUT(
       )
     }
 
+    if (!body.sizeName) {
+      return NextResponse.json(
+        { success: false, error: 'Size name is required' },
+        { status: 400 }
+      )
+    }
+
+    // Получаем текущий вариант для проверки существования и текущего slug
+    const currentVariantQuery = `
+      SELECT slug FROM product_variants 
+      WHERE id = $1 AND master_id = $2
+    `
+    const currentVariantResult = await executeQuery(currentVariantQuery, [variantId, masterProductId])
+    
+    if (currentVariantResult.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Variant not found' },
+        { status: 404 }
+      )
+    }
+
+    const currentSlug = currentVariantResult.rows[0].slug
+
+    // Генерируем новый slug если name изменился
+    const baseName = body.name || body.sizeName
+    const newSlug = await generateUniqueSlug(baseName, masterProductId, currentSlug)
+
+    // Конвертируем legacy данные в формат product_variants
+    const variantData = mapLegacySizeToVariant(body, masterProductId, newSlug)
+
     const query = `
-      UPDATE product_sizes SET
-        size_name = $2,
-        size_value = $3,
-        name = $4,
-        description = $5,
-        sku = $6,
-        price = $7,
-        discount_price = $8,
-        stock_quantity = $9,
-        weight = $10,
-        dimensions = $11,
-        specifications = $12,
-        is_available = $13,
-        sort_order = $14,
-        image_url = $15,
-        images = $16,
-        warranty = $17,
-        battery_life = $18,
-        meta_title = $19,
-        meta_description = $20,
-        meta_keywords = $21,
-        is_featured = $22,
-        is_new = $23,
-        is_bestseller = $24,
-        custom_fields = $25,
-        characteristics = $26,
-        selection_tables = $27,
-        updated_at = CURRENT_TIMESTAMP
+      UPDATE product_variants SET
+        ${generateUpdateFields()}
       WHERE id = $1
       RETURNING *
     `
 
     const values = [
       variantId,
-      body.sizeName,
-      body.sizeValue || null,
-      body.name || null,
-      body.description || null,
-      body.sku || null,
-      body.price || null,
-      body.discountPrice || null,
-      body.stockQuantity || null,
-      body.weight || null,
-      body.dimensions || null,
-      body.specifications || null,
-      body.isAvailable !== false,
-      body.sortOrder || 0,
-      body.imageUrl || null,
-      JSON.stringify(body.images || []),
-      body.warranty || null,
-      body.batteryLife || null,
-      body.metaTitle || null,
-      body.metaDescription || null,
-      body.metaKeywords || null,
-      body.isFeatured || false,
-      body.isNew || false,
-      body.isBestseller || false,
-      JSON.stringify(body.customFields || {}),
-      JSON.stringify(body.characteristics || []),
-      JSON.stringify(body.selectionTables || [])
+      variantData.name,
+      variantData.slug,
+      variantData.sku,
+      variantData.description,
+      variantData.price,
+      variantData.discount_price,
+      variantData.stock_quantity,
+      JSON.stringify(variantData.attributes),
+      variantData.primary_image_url,
+      JSON.stringify(variantData.images),
+      variantData.is_active,
+      variantData.is_featured,
+      variantData.is_new,
+      variantData.is_bestseller,
+      variantData.sort_order,
+      variantData.size_name,
+      variantData.size_value,
+      JSON.stringify(variantData.dimensions),
+      JSON.stringify(variantData.specifications),
+      variantData.weight,
+      variantData.warranty_months,
+      variantData.battery_life_hours,
+      variantData.meta_title,
+      variantData.meta_description,
+      variantData.meta_keywords,
+      JSON.stringify(variantData.custom_fields)
     ]
 
     const result = await executeQuery(query, values)
@@ -164,14 +189,17 @@ export async function PUT(
       )
     }
 
+    // Конвертируем результат обратно в legacy формат для API compatibility
+    const legacyResponse = mapVariantToLegacySize(result.rows[0])
+
     return NextResponse.json({
       success: true,
-      data: result.rows[0]
+      data: legacyResponse
     })
   } catch (error) {
-    logger.error('Error updating product size:', error)
+    logger.error('Error updating product variant:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to update product size' },
+      { success: false, error: 'Failed to update product variant' },
       { status: 500 }
     )
   }
@@ -183,6 +211,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const masterProductId = parseInt(params.id)
     const { searchParams } = new URL(request.url)
     const variantId = searchParams.get('variantId')
 
@@ -194,12 +223,12 @@ export async function DELETE(
     }
 
     const query = `
-      DELETE FROM product_sizes
-      WHERE id = $1 AND product_id = $2
+      DELETE FROM product_variants
+      WHERE id = $1 AND master_id = $2
       RETURNING id
     `
 
-    const result = await executeQuery(query, [variantId, params.id])
+    const result = await executeQuery(query, [variantId, masterProductId])
     
     if (result.rows.length === 0) {
       return NextResponse.json(
@@ -213,9 +242,9 @@ export async function DELETE(
       message: 'Variant deleted successfully'
     })
   } catch (error) {
-    logger.error('Error deleting product size:', error)
+    logger.error('Error deleting product variant:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to delete product size' },
+      { success: false, error: 'Failed to delete product variant' },
       { status: 500 }
     )
   }

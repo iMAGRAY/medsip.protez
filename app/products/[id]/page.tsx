@@ -94,8 +94,8 @@ export default function ProductPage() {
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false)
   const [quickViewProduct, setQuickViewProduct] = useState<Prosthetic | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
-  const [variantsLoading, setVariantsLoading] = useState(true)
-  const [hasVariants, setHasVariants] = useState(false)
+  const [_variantsLoading, _setVariantsLoading] = useState(true)
+  const [_hasVariants, _setHasVariants] = useState(false)
   const [referrerUrl, setReferrerUrl] = useState<string | null>(null)
   const [productImage, setProductImage] = useState<string | null>(null)
   const [selectedConfiguration, setSelectedConfiguration] = useState<Record<string, any>>({})
@@ -125,7 +125,7 @@ export default function ProductPage() {
   // Загружаем варианты товара при загрузке страницы
   const loadProductVariants = async (productId: string) => {
     try {
-      setVariantsLoading(true)
+      _setVariantsLoading(true)
       const response = await fetch(
         `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
       )
@@ -138,19 +138,19 @@ export default function ProductPage() {
         )
         
         if (filteredVariants.length > 0) {
-          setHasVariants(true)
+          _setHasVariants(true)
           console.log(`Loaded ${filteredVariants.length} variants for product ${productId}`)
         } else {
-          setHasVariants(false)
+          _setHasVariants(false)
         }
       } else {
-        setHasVariants(false)
+        _setHasVariants(false)
       }
     } catch (error) {
       console.error('Error loading product variants:', error)
-      setHasVariants(false)
+      _setHasVariants(false)
     } finally {
-      setVariantsLoading(false)
+      _setVariantsLoading(false)
     }
   }
 
@@ -235,13 +235,13 @@ export default function ProductPage() {
   }
 
   // Навигация в полноэкранном режиме
-  const nextFullscreenImage = () => {
+  const nextFullscreenImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length)
-  }
+  }, [images.length])
 
-  const prevFullscreenImage = () => {
+  const prevFullscreenImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
-  }
+  }, [images.length])
 
   // Открытие полноэкранного просмотра
   const openFullscreen = () => {
@@ -271,7 +271,7 @@ export default function ProductPage() {
 
 
   // Загрузка изображений продукта
-  const loadProductImages = async (productId: string) => {
+  const loadProductImages = useCallback(async (productId: string) => {
     setImagesLoading(true)
     try {
       // Сначала пытаемся загрузить из API изображений
@@ -300,7 +300,7 @@ export default function ProductPage() {
     } finally {
       setImagesLoading(false)
     }
-  }
+  }, [productImage])
 
   // Сохраняем referrer при первой загрузке
   useEffect(() => {
@@ -344,7 +344,7 @@ export default function ProductPage() {
         setIsLoading(false)
       })
     }
-  }, [params?.id, products])
+  }, [params?.id, products, loadProductImages])
 
   useEffect(() => {
     if (product) {
@@ -517,7 +517,7 @@ export default function ProductPage() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isFullscreenOpen])
+  }, [isFullscreenOpen, nextFullscreenImage, prevFullscreenImage])
 
   // Загружаем конфигурируемые характеристики при изменении товара или варианта
     const loadConfigurableCharacteristics = useCallback(async () => {
@@ -548,7 +548,7 @@ export default function ProductPage() {
                 console.error('❌ Ошибка загрузки конфигурируемых характеристик:', error)
                 setConfigurableCharacteristics([])
               }
-            }, [product?.id, selectedVariant?.id])
+            }, [product?.id, selectedVariant])
 
   useEffect(() => {
     loadConfigurableCharacteristics()

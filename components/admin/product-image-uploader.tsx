@@ -52,7 +52,7 @@ export function ProductImageUploader({
   })
   
   const [files, setFiles] = useState<File[]>([])
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
+  const [_uploadProgress, __setUploadProgress] = useState<{ [key: string]: number }>({})
   const [uploading, setUploading] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [selectedIndices, setSelectedIndices] = useState<number[]>([])
@@ -229,7 +229,7 @@ export function ProductImageUploader({
           folder: 'products',
           checkDuplicates: true,
           onProgress: (progress) => {
-            setUploadProgress(prev => ({
+            __setUploadProgress(prev => ({
               ...prev,
               [file.name]: progress
             }))
@@ -262,7 +262,7 @@ export function ProductImageUploader({
 
     // Очищаем состояние
     setFiles([])
-    setUploadProgress({})
+    __setUploadProgress({})
     setUploading(false)
   }
 
@@ -286,7 +286,7 @@ export function ProductImageUploader({
         folder: 'products',
         checkDuplicates: true,
         onProgress: (progress) => {
-          setUploadProgress(prev => ({
+          __setUploadProgress(prev => ({
             ...prev,
             [file.name]: progress
           }))
@@ -326,7 +326,7 @@ export function ProductImageUploader({
     } catch (error) {
       console.error('Error replacing image:', error)
     } finally {
-      setUploadProgress({})
+      __setUploadProgress({})
       setUploading(false)
       setReplacingIndex(null)
       // Очищаем input

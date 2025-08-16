@@ -62,24 +62,7 @@ export function WarehouseStockManager({
     fetchWarehouses()
   }, [fetchWarehouses])
 
-  // Загрузка остатков при изменении productId
-  useEffect(() => {
-    if (productId) {
-      fetchWarehouseStocks()
-    } else {
-      // Для нового товара показываем склады с нулевыми остатками
-      setWarehouseStocks(warehouses.map(w => ({
-        warehouse_id: w.id,
-        warehouse_name: w.name,
-        warehouse_code: w.code,
-        city: w.city,
-        quantity: 0,
-        reserved_quantity: 0
-      })))
-    }
-  }, [productId, warehouses])
-
-  const fetchWarehouseStocks = async () => {
+  const fetchWarehouseStocks = useCallback(async () => {
     if (!productId) return
 
     setLoading(true)
@@ -96,7 +79,24 @@ export function WarehouseStockManager({
     } finally {
       setLoading(false)
     }
-  }
+  }, [productId])
+
+  // Загрузка остатков при изменении productId
+  useEffect(() => {
+    if (productId) {
+      fetchWarehouseStocks()
+    } else {
+      // Для нового товара показываем склады с нулевыми остатками
+      setWarehouseStocks(warehouses.map(w => ({
+        warehouse_id: w.id,
+        warehouse_name: w.name,
+        warehouse_code: w.code,
+        city: w.city,
+        quantity: 0,
+        reserved_quantity: 0
+      })))
+    }
+  }, [productId, warehouses, fetchWarehouseStocks])
 
   const handleQuantityChange = (warehouseId: number, quantity: string) => {
     const numQuantity = parseInt(quantity) || 0

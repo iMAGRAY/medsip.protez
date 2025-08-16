@@ -137,17 +137,17 @@ export function ProductVariantSelector({
       } finally {
         setLoading(false)
       }
-    }, [productId])
+    }, [productId, onVariantSelect])
 
   useEffect(() => {
     fetchVariants()
   }, [fetchVariants])
 
-  const handleVariantChange = (variantId: string) => {
+  const handleVariantChange = useCallback((variantId: string) => {
     const variant = variants.find(v => v.id.toString() === variantId)
     setSelectedVariant(variant || null)
     onVariantSelect(variant || null)
-  }
+  }, [variants, onVariantSelect])
 
   const handleViewDetails = (variant: ProductVariant, e: React.MouseEvent) => {
     e.stopPropagation()

@@ -302,7 +302,7 @@ export function useOptimizedMedia(options: UseOptimizedMediaOptions = {}): UseOp
         abortControllerRef.current.abort()
       }
     }
-  }, []) // Только при монтировании
+  }, [throttledLoadMedia]) // Только при монтировании
 
   // Мониторинг производительности
   useEffect(() => {

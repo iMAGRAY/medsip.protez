@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -54,7 +54,7 @@ export function ProductSelector({ selectedProduct, onProductSelect, trigger }: P
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
 
-  const fetchProducts = async (reset = false) => {
+  const fetchProducts = useCallback(async (reset = false) => {
     try {
       setLoading(true)
       setError(null)
@@ -88,13 +88,13 @@ export function ProductSelector({ selectedProduct, onProductSelect, trigger }: P
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchTerm, categoryFilter, manufacturerFilter, showOnlyWithoutSku, page])
 
   useEffect(() => {
     if (isOpen) {
       fetchProducts(true)
     }
-  }, [isOpen, searchTerm, categoryFilter, manufacturerFilter, showOnlyWithoutSku])
+  }, [isOpen, searchTerm, categoryFilter, manufacturerFilter, showOnlyWithoutSku, fetchProducts])
 
   const handleProductSelect = (product: Product) => {
     onProductSelect(product)

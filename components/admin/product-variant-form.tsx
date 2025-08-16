@@ -120,7 +120,7 @@ export function ProductVariantForm({
     setActiveTab(value)
   }
   const [saving, setSaving] = useState(false)
-  const [attemptedSave, setAttemptedSave] = useState(false)
+  const [_attemptedSave, setAttemptedSave] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   // Функция валидации формы

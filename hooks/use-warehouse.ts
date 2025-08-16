@@ -9,8 +9,6 @@ import {
   Copy,
   Move,
   Download,
-  Users,
-  Settings,
   ToggleLeft
 } from 'lucide-react'
 
@@ -202,7 +200,7 @@ export function useWarehouse() {
 
   const _handleNodeCreate = useCallback((parentId: string, type: string) => {
     // Извлекаем ID родительского элемента
-    const [parentType, id] = parentId.split('-')
+    const [_parentType, id] = parentId.split('-')
     const parentIdNum = parseInt(id)
 
     // Устанавливаем выбранные ID для создания дочерних элементов

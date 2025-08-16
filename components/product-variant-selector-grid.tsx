@@ -80,7 +80,7 @@ export function ProductVariantSelectorGrid({
   const [variants, setVariants] = useState<ProductVariantV2[]>([])
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showAll, setShowAll] = useState(false)
+  const [_showAll, _setShowAll] = useState(false)
 
   const fetchVariants = useCallback(async () => {
       try {
@@ -117,16 +117,16 @@ export function ProductVariantSelectorGrid({
       } finally {
         setLoading(false)
       }
-    }, [productId])
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
   }, [fetchVariants])
 
-  const handleVariantSelect = (variant: ProductVariantV2 | null) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2 | null) => {
     setSelectedVariant(variant)
     onVariantChange(variant)
-  }
+  }, [onVariantChange])
 
   if (loading) {
     return (
@@ -160,7 +160,7 @@ export function ProductVariantSelectorGrid({
 
   // Определяем, сколько элементов показывать изначально на мобильных устройствах
   const mobileInitialCount = 6
-  const _itemsToShow = showAll ? allItems : allItems.slice(0, mobileInitialCount)
+  const _itemsToShow = _showAll ? allItems : allItems.slice(0, mobileInitialCount)
   const _hasMoreItems = allItems.length > mobileInitialCount
 
   return (

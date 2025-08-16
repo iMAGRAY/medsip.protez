@@ -95,8 +95,8 @@ interface ProductSpecificationsManagerProps {
 
 export function ProductSpecificationsManagerNew({
   productId,
-  productName,
-  specifications = [],
+  productName: _productName,
+  specifications: _specifications = [],
   onSpecificationsChange,
   isNewProduct = false
 }: ProductSpecificationsManagerProps) {
@@ -111,7 +111,7 @@ export function ProductSpecificationsManagerNew({
   const [activeStep, setActiveStep] = useState<'groups' | 'configure' | 'manage'>('groups')
   const [selectedGroups, setSelectedGroups] = useState<Set<number>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+  const [_expandedGroups, _setExpandedGroups] = useState<Set<string>>(new Set())
 
   // Диалоги
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false)
@@ -141,7 +141,25 @@ export function ProductSpecificationsManagerNew({
 
   // ID редактируемой характеристики (метка)
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null)
-  const [editingLabelValue, setEditingLabelValue] = useState<string>('')
+  const [editingLabelValue, setEditingLabelValue] = useState<string>('')  
+
+  // Функция для обработки данных характеристик из API (должна быть выше использования)
+  const processApiCharacteristics = useCallback((apiData: any[]): ProductCharacteristic[] => {
+    return apiData.map(item => ({
+      id: `char_${item.id}`,
+      group_id: item.group_id,
+      group_name: item.group_name,
+      characteristic_type: item.type === 'enum' ? 'select' : item.type,
+      label: item.label || item.group_name,
+      value_numeric: item.value_numeric,
+      value_text: item.value_text,
+      selected_enum_value: item.enum_value,
+      unit_code: item.unit_code,
+      is_primary: false,
+      is_required: false,
+      sort_order: 0
+    }))
+  }, [])
 
   // Функция для инициализации свернутых групп
   useEffect(() => {
@@ -173,7 +191,7 @@ export function ProductSpecificationsManagerNew({
               } finally {
                 setLoading(false)
               }
-            }, [productId, isNewProduct])
+            }, [isNewProduct])
 
   useEffect(() => {
     loadData()
@@ -183,9 +201,42 @@ export function ProductSpecificationsManagerNew({
   useEffect(() => {
 
     onSpecificationsChange(productCharacteristics)
-  }, [productCharacteristics]) // Убираем onSpecificationsChange из зависимостей
+  }, [productCharacteristics, onSpecificationsChange])
 
-  const loadSpecGroups = async () => {
+  // Вспомогательная функция для обработки иерархических групп (перемещена выше использования)
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    const processGroup = (group: any, _index: number): SpecGroup | null => {
+      let groupId: number;
+
+      // Обрабатываем разные форматы ID
+      if (typeof group.id === 'string' && group.id.startsWith('spec_')) {
+        // Извлекаем числовую часть из формата spec_XXX
+        const numericPart = group.id.replace('spec_', '');
+        groupId = Number(numericPart);
+      } else {
+        // Обычное преобразование в число
+        groupId = Number(group.id);
+      }
+
+      // Если ID не является корректным числом, пропускаем эту группу
+      if (isNaN(groupId) || groupId <= 0) {
+        console.warn(`⚠️ Skipping group with invalid ID: ${group.name} (id: ${group.id})`)
+        return null
+      }
+
+      const processedGroup: SpecGroup = {
+        id: groupId,
+        name: group.name || `Group ${groupId}`,
+        description: group.description || ''
+      }
+
+      return processedGroup
+    }
+
+    return groups.map((group, index) => processGroup(group, index)).filter(Boolean) as SpecGroup[]
+  }, [])
+
+  const loadSpecGroups = useCallback(async () => {
     try {
       const res = await fetch('/api/specifications')
       if (res.ok) {
@@ -203,9 +254,9 @@ export function ProductSpecificationsManagerNew({
       console.error('Error loading spec groups:', error)
       toast.error('Не удалось загрузить группы характеристик')
     }
-  }
+  }, [processHierarchicalGroups])
 
-  const loadProductCharacteristics = async () => {
+  const loadProductCharacteristics = useCallback(async () => {
     if (!productId || isNewProduct) {
               // Для новых товаров не загружаем характеристики
       if (process.env.NODE_ENV === 'development') {
@@ -240,7 +291,7 @@ export function ProductSpecificationsManagerNew({
     } catch (error) {
       console.error('Error loading product characteristics:', error)
     }
-  }
+  }, [productId, isNewProduct, processApiCharacteristics])
 
   const loadTemplates = async () => {
     try {
@@ -257,69 +308,8 @@ export function ProductSpecificationsManagerNew({
     }
   }
 
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    const processGroup = (group: any, _index: number): SpecGroup | null => {
-      let groupId: number;
-
-      // Обрабатываем разные форматы ID
-      if (typeof group.id === 'string' && group.id.startsWith('spec_')) {
-        // Извлекаем числовую часть из формата spec_XXX
-        const numericPart = group.id.replace('spec_', '');
-        groupId = Number(numericPart);
-      } else {
-        // Обычное преобразование в число
-        groupId = Number(group.id);
-      }
-
-      // Если ID не является корректным числом, пропускаем эту группу
-      if (isNaN(groupId) || groupId <= 0) {
-        console.warn(`⚠️ Skipping group with invalid ID: ${group.name} (id: ${group.id})`)
-        return null
-      }
-
-      const finalId = groupId
-
-      if (process.env.NODE_ENV === 'development') {
-
-      }
-
-      const processedGroup = {
-        id: finalId,
-        name: group.name || 'Unnamed Group',
-        description: group.description || '',
-        enum_count: group.enum_count || 0,
-        enum_values: group.enum_values || group.enums || [],
-        parent_id: group.parent_id || null,
-        level: group.level || 0,
-        children: group.children ? group.children.map((child: any, childIndex: number) => processGroup(child, childIndex + 100)).filter(Boolean) : [],
-        source_type: 'spec_group' as const,
-        original_id: finalId,
-        enums: group.enums || group.enum_values || [],
-        ordering: group.ordering || 0
-      }
-
-      return processedGroup
-    }
-
-    return groups.map((group, index) => processGroup(group, index)).filter(Boolean) as SpecGroup[]
-  }
-
-  const processApiCharacteristics = (apiData: any[]): ProductCharacteristic[] => {
-    return apiData.map(item => ({
-      id: `char_${item.id}`,
-      group_id: item.group_id,
-      group_name: item.group_name,
-      characteristic_type: item.type === 'enum' ? 'select' : item.type,
-      label: item.label || item.group_name,
-      value_numeric: item.value_numeric,
-      value_text: item.value_text,
-      selected_enum_value: item.enum_value,
-      unit_code: item.unit_code,
-      is_primary: false,
-      is_required: false,
-      sort_order: 0
-    }))
-  }
+  // УДАЛЕНА дублированная функция processHierarchicalGroups - уже определена выше
+  // УДАЛЕНА дублированная функция processApiCharacteristics - уже определена выше
 
   // Управление выбором групп
   const handleGroupToggle = (groupId: number, event?: React.MouseEvent) => {

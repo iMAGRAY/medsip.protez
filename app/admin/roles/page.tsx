@@ -443,7 +443,7 @@ export default function RolesPage() {
 // Компонент формы роли
 function RoleForm({
   role,
-  permissions,
+  permissions: _permissions,
   permissionsByCategory,
   onSuccess,
   onCancel

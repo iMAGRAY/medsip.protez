@@ -55,7 +55,7 @@ export function ProductRecommendations({
     if (!currentProduct || sourceProducts.length === 0) return []
     const engine = new RecommendationEngine(sourceProducts)
     return engine.getMixedRecommendations(currentProduct, 8)
-  }, [currentProduct?.id, sourceProducts]) // Добавляем ID товара как зависимость
+  }, [currentProduct, sourceProducts]) // Добавляем currentProduct как зависимость
 
   // Анимация появления и сброс состояния при смене товара
   useEffect(() => {
@@ -254,7 +254,7 @@ export function ProductRecommendationsSidebar({
     if (!currentProduct || sourceProducts.length === 0) return []
     const engine = new RecommendationEngine(sourceProducts)
     return engine.getRecommendations(currentProduct, 3)
-  }, [currentProduct?.id, sourceProducts])
+  }, [currentProduct, sourceProducts])
 
   if (sidebarRecommendations.length === 0) {
     return null

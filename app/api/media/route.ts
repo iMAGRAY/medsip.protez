@@ -22,7 +22,7 @@ const s3Client = new S3Client({
 const S3_BUCKET = process.env.S3_BUCKET || ''
 
 // Контроль ресурсов
-const MAX_WORKERS = Math.min(cpus().length, 4) // Не более 4 воркеров
+const _MAX_WORKERS = Math.min(cpus().length, 4) // Не более 4 воркеров
 const BATCH_SIZE = 50 // Обрабатываем файлы батчами
 const MAX_DB_CONNECTIONS = 2 // Ограничиваем подключения к БД
 
@@ -33,19 +33,30 @@ const CACHE_TTL = 60000 // 1 минута
 // Semaphore для ограничения параллельных операций
 class Semaphore {
   private count: number
-  private waiting: Array<() => void> = []
+  private waiting: Array<{ resolve: () => void; timeout: NodeJS.Timeout }> = []
+  private readonly WAIT_TIMEOUT = 30000 // 30 секунд timeout для waiting promises
 
   constructor(count: number) {
     this.count = count
   }
 
   async acquire(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.count > 0) {
         this.count--
         resolve()
       } else {
-        this.waiting.push(resolve)
+        // Добавляем timeout для предотвращения бесконечного ожидания
+        const timeout = setTimeout(() => {
+          // Удаляем из очереди при timeout
+          const index = this.waiting.findIndex(w => w.timeout === timeout)
+          if (index >= 0) {
+            this.waiting.splice(index, 1)
+          }
+          reject(new Error('Semaphore acquire timeout after 30 seconds'))
+        }, this.WAIT_TIMEOUT)
+
+        this.waiting.push({ resolve, timeout })
       }
     })
   }
@@ -53,14 +64,46 @@ class Semaphore {
   release(): void {
     this.count++
     if (this.waiting.length > 0) {
-      const resolve = this.waiting.shift()!
+      const waiter = this.waiting.shift()!
+      clearTimeout(waiter.timeout) // Очищаем timeout
       this.count--
-      resolve()
+      waiter.resolve()
+    }
+  }
+
+  // Cleanup метод для очистки накопленных waiting promises
+  cleanup(): void {
+    // Отменяем все ожидающие promises
+    for (const waiter of this.waiting) {
+      clearTimeout(waiter.timeout)
+    }
+    this.waiting = []
+    console.log('Semaphore cleanup: cleared waiting promises')
+  }
+
+  // Метод для мониторинга состояния
+  getStats(): { count: number; waiting: number } {
+    return {
+      count: this.count,
+      waiting: this.waiting.length
     }
   }
 }
 
 const dbSemaphore = new Semaphore(MAX_DB_CONNECTIONS)
+
+// Cleanup semaphore при shutdown процесса
+process.on('SIGINT', () => {
+  console.log('Shutting down media API...')
+  dbSemaphore.cleanup()
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  console.log('Terminating media API...')
+  dbSemaphore.cleanup()
+  process.exit(0)
+})
 
 // Параллельная обработка файлов
 async function processFilesInParallel(files: any[], batchSize: number = BATCH_SIZE) {

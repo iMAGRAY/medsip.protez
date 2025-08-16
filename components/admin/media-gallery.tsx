@@ -37,7 +37,7 @@ import { toast } from "sonner"
 // Простой кеш настроек в памяти для клиентской стороны
 const settingsCache = new Map<string, any>()
 
-interface MediaFile {
+interface _MediaFile {
   name: string
   url: string
   size: number
@@ -49,7 +49,7 @@ interface MediaFile {
   key?: string
 }
 
-interface PerformanceData {
+interface _PerformanceData {
   totalTime: number
   s3Time?: number
   sortTime?: number
@@ -105,20 +105,20 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
     filterMode: 'all'
   })
 
-  const [settingsLoading, setSettingsLoading] = useState(true)
+  const [_settingsLoading, _setSettingsLoading] = useState(true)
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set())
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [deletedImages, setDeletedImages] = useState<Set<string>>(new Set())
 
   const loadUserSettings = useCallback(async () => {
       try {
-        setSettingsLoading(true)
+        _setSettingsLoading(true)
 
         // Пытаемся загрузить из кеша
         const cachedSettings = settingsCache.get('media-gallery-settings')
         if (cachedSettings) {
           setUserSettings(cachedSettings)
-          setSettingsLoading(false)
+          _setSettingsLoading(false)
           return
         }
 
@@ -142,7 +142,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
           filterMode: 'all'
         })
       } finally {
-        setSettingsLoading(false)
+        _setSettingsLoading(false)
       }
     }, [])
 
@@ -151,7 +151,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
     loadUserSettings()
   }, [loadUserSettings])
 
-  const saveUserSettings = async (newSettings: Partial<UserSettings>) => {
+  const saveUserSettings = useCallback(async (newSettings: Partial<UserSettings>) => {
     try {
       const updatedSettings = { ...userSettings, ...newSettings }
       setUserSettings(updatedSettings)
@@ -163,20 +163,20 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
 
       toast.error('Ошибка сохранения настроек')
     }
-  }
+  }, [userSettings])
 
   // Обработчики изменения настроек
   const handleViewModeChange = useCallback((_viewMode: ViewMode) => {
     saveUserSettings({ viewMode: _viewMode })
-  }, [userSettings])
+  }, [saveUserSettings])
 
   const handleSortModeChange = useCallback((_sortMode: SortMode) => {
     saveUserSettings({ sortMode: _sortMode })
-  }, [userSettings])
+  }, [saveUserSettings])
 
   const handleFilterModeChange = useCallback((_filterMode: FilterMode) => {
     saveUserSettings({ filterMode: _filterMode })
-  }, [userSettings])
+  }, [saveUserSettings])
 
   // Загрузка дополнительных файлов (теперь через оптимизированный хук)
   const handleLoadMore = useCallback(async () => {

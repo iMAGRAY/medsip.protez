@@ -44,17 +44,19 @@ export async function GET(
 
     const sizesQuery = `
       SELECT
-        ps.id,
-        ps.size_name,
-        ps.size_value,
-        ps.weight,
-        ps.price,
-        ps.stock_quantity,
-        ps.dimensions,
-        ps.specifications
-      FROM product_sizes ps
-      WHERE ps.product_id = $1
-      ORDER BY ps.size_name
+        pv.id,
+        pv.size_name,
+        pv.size_value,
+        pv.weight,
+        pv.price,
+        pv.stock_quantity,
+        pv.dimensions,
+        pv.specifications
+      FROM product_variants pv
+      WHERE pv.master_id = $1
+        AND pv.is_active = true
+        AND pv.is_deleted = false
+      ORDER BY pv.size_name
     `;
 
     const [characteristicsResult, sizesResult] = await Promise.all([

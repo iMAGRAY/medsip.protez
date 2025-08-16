@@ -96,7 +96,7 @@ export default function RedisMonitorPage() {
         setLoading(false)
         setRefreshing(false)
       }
-    }, [autoUpdateEnabled])
+    }, [loading, refreshing, toast])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -301,7 +301,7 @@ export default function RedisMonitorPage() {
         clearInterval(interval)
       }
     }
-  }, [fetchRedisStats])
+  }, [fetchRedisStats, autoUpdateEnabled])
 
   if (loading) {
     return (

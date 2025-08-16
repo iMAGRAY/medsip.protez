@@ -60,7 +60,7 @@ interface SelectionTablesEditorProps {
 export function SelectionTablesEditor({
   productId,
   productSku = '',
-  productName = '',
+  productName: _productName = '',
   onSave,
   isNewProduct = false,
   onNewProductChange,
@@ -103,15 +103,8 @@ export function SelectionTablesEditor({
       setActiveTab(allTableKeys[0]);
     }
   }, [allTableKeys, activeTab]);
-  // Load existing selection tables
-  useEffect(() => {
-    if (productId) {
-      loadSelectionTables()
-    } else {
-      setIsLoading(false) // Stop loading if no productId
-    }
-  }, [productId])
-  const loadSelectionTables = async () => {
+  
+  const loadSelectionTables = useCallback(async () => {
     if (!productId) return
     try {
       setIsLoading(true)
@@ -127,10 +120,20 @@ export function SelectionTablesEditor({
         console.error('Failed to fetch selection tables')
       }
     } catch (_error) {
+      console.error('Error loading selection tables')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [productId])
+
+  // Load existing selection tables
+  useEffect(() => {
+    if (productId) {
+      loadSelectionTables()
+    } else {
+      setIsLoading(false) // Stop loading if no productId
+    }
+  }, [productId, loadSelectionTables])
 
   // Хелпер для отложенного уведомления об изменениях
   const scheduleChangeNotification = useCallback(() => {

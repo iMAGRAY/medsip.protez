@@ -110,16 +110,16 @@ export function ProductVariantSelectorModal({
       } finally {
         setLoading(false)
       }
-    }, [productId])
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
   }, [fetchVariants])
 
-  const handleVariantSelect = (variant: ProductVariantV2 | null) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2 | null) => {
     setSelectedVariant(variant)
     onVariantChange(variant)
-  }
+  }, [onVariantChange])
 
   if (loading) {
     return (

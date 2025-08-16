@@ -107,16 +107,16 @@ export function ProductVariantSelectorHorizontal({
       } finally {
         setLoading(false)
       }
-    }, [productId])
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
   }, [fetchVariants])
 
-  const handleVariantSelect = (variant: ProductVariantV2) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2) => {
     setSelectedVariant(variant)
     onVariantChange(variant)
-  }
+  }, [onVariantChange])
 
   const handleReturnToMaster = () => {
     setSelectedVariant(null)
@@ -223,7 +223,7 @@ export function ProductVariantSelectorHorizontal({
               {variants[0].attributes && Object.keys(variants[0].attributes).length > 0 && (
                 <div className="flex gap-2 mt-1">
                   {Object.entries(variants[0].attributes)
-                    .filter(([key, value]) => {
+                    .filter(([_key, value]) => {
                       // Показываем только простые значения (строки, числа, булевы)
                       return typeof value !== 'object' && !Array.isArray(value) && value !== null
                     })
@@ -379,7 +379,7 @@ export function ProductVariantSelectorHorizontal({
                           // Если атрибуты - это объект
                           if (typeof attrs === 'object' && !Array.isArray(attrs)) {
                             return Object.entries(attrs)
-                              .filter(([key, value]) => {
+                              .filter(([_key, value]) => {
                                 // Показываем только простые значения (строки, числа, булевы)
                                 return typeof value !== 'object' && !Array.isArray(value) && value !== null
                               })

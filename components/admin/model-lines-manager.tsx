@@ -95,19 +95,9 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
       } finally {
         setLoading(false);
       }
-    }, []);
+    }, [apiClient, logger, toast]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    if (manufacturerId) {
-      loadModelLinesForManufacturer();
-    }
-  }, [manufacturerId]);
-
-  const loadModelLinesForManufacturer = async () => {
+  const loadModelLinesForManufacturer = useCallback(async () => {
     if (!manufacturerId) return;
 
     try {
@@ -125,7 +115,17 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
     } finally {
       setLoading(false);
     }
-  };
+  }, [manufacturerId, apiClient, logger, toast]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    if (manufacturerId) {
+      loadModelLinesForManufacturer();
+    }
+  }, [manufacturerId, loadModelLinesForManufacturer]);
 
   const resetModelLineForm = () => {
     setModelLineForm({

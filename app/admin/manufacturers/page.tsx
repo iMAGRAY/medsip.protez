@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -349,9 +350,11 @@ export default function ManufacturersAdminPage() {
                 {/* Logo */}
                 {manufacturer.logo_url && (
                   <div className="h-32 bg-slate-50 flex items-center justify-center p-4">
-                    <img
+                    <Image
                       src={manufacturer.logo_url}
                       alt={manufacturer.name}
+                      width={200}
+                      height={100}
                       className="max-h-full max-w-full object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement

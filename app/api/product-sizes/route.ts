@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
 import { executeQuery } from "@/lib/db-connection"
 
+/**
+ * @deprecated This API is deprecated. Use /api/admin/products/[id]/sizes instead
+ * which uses the unified product_variants table. This endpoint will be removed in v2.0
+ */
+
 // GET /api/product-sizes - получить все размеры или размеры для конкретного продукта
 export async function GET() {
   try {
@@ -20,7 +25,10 @@ export async function GET() {
     `
 
     const result = await executeQuery(query)
-    return NextResponse.json(result.rows)
+    return NextResponse.json({
+      data: result.rows,
+      warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
+    })
   } catch (error) {
     console.error("Database error in product-sizes GET:", error)
     return NextResponse.json({ error: "Failed to fetch product sizes" }, { status: 500 })
@@ -133,7 +141,10 @@ export async function POST(request: NextRequest) {
       updatedAt: newSize.updated_at
     }
 
-    return NextResponse.json(response, { status: 201 })
+    return NextResponse.json({
+      data: response,
+      warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
+    }, { status: 201 })
   } catch (error: any) {
     console.error('Error creating product size:', error)
 

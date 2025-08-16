@@ -89,7 +89,7 @@ export function SafeImage({
     setHasError(false)
     setErrorCount(0) // Сбрасываем счетчик при успешной загрузке
     onLoad?.(e)
-  }, [currentSrc, useUnoptimized, onLoad])
+  }, [onLoad])
 
   // Обновляем src при изменении пропа
   React.useEffect(() => {

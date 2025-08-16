@@ -43,23 +43,24 @@ export async function GET(request: NextRequest) {
             WHEN ${includeVariants} THEN (
               SELECT json_agg(
                 json_build_object(
-                  'id', ps.id,
-                  'sizeName', ps.size_name,
-                  'sizeValue', ps.size_value,
-                  'sku', ps.sku,
-                  'price', ps.price,
-                  'discountPrice', ps.discount_price,
-                  'stockQuantity', ps.stock_quantity,
-                  'isAvailable', ps.is_available
-                ) ORDER BY ps.sort_order, ps.size_name
+                  'id', pv.id,
+                  'sizeName', pv.size_name,
+                  'sizeValue', pv.size_value,
+                  'sku', pv.sku,
+                  'price', pv.price,
+                  'discountPrice', pv.discount_price,
+                  'stockQuantity', pv.stock_quantity,
+                  'isAvailable', pv.is_active
+                ) ORDER BY pv.sort_order, pv.size_name
               )
-              FROM product_sizes ps
-              WHERE ps.product_id = p.id
-                AND ps.is_available = true
+              FROM product_variants pv
+              WHERE pv.master_id = p.id
+                AND pv.is_active = true
+                AND pv.is_deleted = false
                 AND (
-                  LOWER(ps.size_name) LIKE LOWER($1)
-                  OR LOWER(ps.size_value) LIKE LOWER($1)
-                  OR LOWER(ps.sku) LIKE LOWER($1)
+                  LOWER(pv.size_name) LIKE LOWER($1)
+                  OR LOWER(pv.size_value) LIKE LOWER($1)
+                  OR LOWER(pv.sku) LIKE LOWER($1)
                 )
             )
             ELSE NULL
@@ -78,13 +79,14 @@ export async function GET(request: NextRequest) {
           ${includeVariants ? `
             OR EXISTS (
               SELECT 1 
-              FROM product_sizes ps 
-              WHERE ps.product_id = p.id 
-                AND ps.is_available = true
+              FROM product_variants pv 
+              WHERE pv.master_id = p.id 
+                AND pv.is_active = true
+                AND pv.is_deleted = false
                 AND (
-                  LOWER(ps.size_name) LIKE LOWER($1)
-                  OR LOWER(ps.size_value) LIKE LOWER($1)
-                  OR LOWER(ps.sku) LIKE LOWER($1)
+                  LOWER(pv.size_name) LIKE LOWER($1)
+                  OR LOWER(pv.size_value) LIKE LOWER($1)
+                  OR LOWER(pv.sku) LIKE LOWER($1)
                 )
             )
           ` : ''}

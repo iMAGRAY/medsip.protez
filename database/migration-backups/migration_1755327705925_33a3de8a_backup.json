@@ -1,0 +1,4177 @@
+{
+  "migrationId": "migration_1755327705925_33a3de8a",
+  "timestamp": "2025-08-16T07:01:47.357Z",
+  "product_sizes": [
+    {
+      "id": 128,
+      "product_id": 457,
+      "size_name": "Премиум версия",
+      "size_value": "XL",
+      "sku": "PREM-001",
+      "price": 150000,
+      "stock_quantity": 10,
+      "weight": 2.5,
+      "dimensions": {
+        "width": 20,
+        "height": 15,
+        "length": 30
+      },
+      "specifications": {
+        "color": "Серебристый",
+        "material": "Титан"
+      },
+      "is_available": true,
+      "sort_order": 1,
+      "created_at": "2025-07-23T08:51:17.445294+03:00",
+      "updated_at": "2025-07-23T08:51:17.445294+03:00",
+      "discount_price": 135000,
+      "name": "Премиум версия с расширенными функциями",
+      "description": "Это премиум версия продукта с улучшенными характеристиками, дополнительными аксессуарами и расширенной гарантией. Идеально подходит для профессионального использования.",
+      "image_url": "https://example.com/premium-image.jpg",
+      "images": [
+        "https://example.com/premium-1.jpg",
+        "https://example.com/premium-2.jpg",
+        "https://example.com/premium-3.jpg"
+      ],
+      "warranty": "3 года",
+      "battery_life": "48 часов",
+      "meta_title": "Премиум версия - лучший выбор",
+      "meta_description": "Премиум версия продукта с расширенными возможностями и гарантией",
+      "meta_keywords": "премиум, профессиональный, расширенная гарантия",
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": false,
+      "custom_fields": {
+        "awards": [
+          "Best Product 2024"
+        ],
+        "certification": "ISO 9001"
+      },
+      "characteristics": [
+        {
+          "name": "Материал корпуса",
+          "value": "Титановый сплав"
+        },
+        {
+          "name": "Водонепроницаемость",
+          "value": "IP68"
+        },
+        {
+          "name": "Максимальная нагрузка",
+          "value": "150 кг"
+        }
+      ],
+      "selection_tables": []
+    }
+  ],
+  "product_variants_before": [
+    {
+      "id": 167,
+      "master_id": 456,
+      "sku": "FBK-65 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T16:50:23.151977+03:00",
+      "updated_at": "2025-07-28T16:50:23.151977+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-005-титан",
+      "name": "Коленный модуль PPK-005 (Титан)",
+      "description": "Коленный модуль PPK-005 — это пневматическая модель с усовершенствованной 5-звенной конструкцией, ориентированная на пользователей с уровнем активности 2–3. Инженерная геометрия обеспечивает стабильную опору и управляемое движение в фазе переноса, позволяя пользователю чувствовать уверенность на разных типах поверхности. Угол сгибания до 135° обеспечивает хорошую амплитуду движения, делая модуль удобным при ходьбе по лестницам и в условиях ограниченного пространства. \n\nПневматическая система автоматически адаптируется к ритму шагов, обеспечивая мягкую и сбалансированную динамику при ходьбе. PPK-005 подойдёт для активных пользователей, которым важны надёжность, комфорт и естественность движений в повседневной жизни.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753699747895_go9yre.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-005 (Титан)",
+        "size_value": "Титан",
+        "article_number": "PPK-005",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 366,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "1000",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 355,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "135",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 300,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 172,
+      "master_id": 479,
+      "sku": "12334",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-30T01:27:09.620552+03:00",
+      "updated_at": "2025-07-30T01:27:09.620552+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-014-алюминий-1",
+      "name": "Коленный модуль MPK-014 (Алюминий) - 1",
+      "description": "23",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753809758935_puxnv7.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "142",
+        "size_value": "",
+        "article_number": "2312",
+        "characteristics": [],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 111,
+      "master_id": 474,
+      "sku": "",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-25T11:56:07.650783+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "124-1",
+      "name": "124",
+      "description": "",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "12",
+        "size_value": "43123",
+        "article_number": "",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": false,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 113,
+      "master_id": 474,
+      "sku": "12",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-25T12:19:34.463389+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-2",
+      "name": "Коленный модуль MPK-018 - 2",
+      "description": "24124",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "51",
+        "size_value": "235123",
+        "article_number": "15",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": true,
+      "is_recommended": false,
+      "warranty_months": 213,
+      "battery_life_hours": 5,
+      "custom_fields": {},
+      "is_active": false,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 112,
+      "master_id": 474,
+      "sku": "23",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-25T11:56:34.978632+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-5",
+      "name": "Коленный модуль MPK-018 - 5",
+      "description": "123",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": 23,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753423000463_6ebnt2.webp",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753423000463_6ebnt2.webp"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "5123",
+        "size_value": "5213",
+        "article_number": "1235",
+        "selection_tables": []
+      },
+      "meta_title": "423",
+      "meta_description": "21312",
+      "meta_keywords": null,
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": true,
+      "is_recommended": false,
+      "warranty_months": 123,
+      "battery_life_hours": 5123,
+      "custom_fields": {},
+      "is_active": false,
+      "price": 2312,
+      "discount_price": 31323,
+      "stock_quantity": 523,
+      "sort_order": 213,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 134,
+      "master_id": 425,
+      "sku": "3F18 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:32:46.371593+03:00",
+      "updated_at": "2025-07-28T16:10:09.117688+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-008-титан",
+      "name": "Коленный модуль MPK-008 (Титан)",
+      "description": "Моноцентрический коленный модуль MPK-008 выполнен из стальной каркасной конструкции и углом сгибания 120°. Этот одноосный модуль предназначен для пользователей с низким уровнем активности 1-2, обеспечивая надежность и долговечность.\n\nВстроенное голенооткидное устройство обеспечивает эффективный контроль фазы переноса, а функция фиксации под нагрузкой значительно повышает стабильность в фазе опоры, что гарантирует уверенную и безопасную ходьбу.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753623350698_5drovs.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753623350698_5drovs.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-008 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-008",
+        "characteristics": [
+          {
+            "group_id": 95,
+            "value_id": 292,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Моноцентрическая (одноосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 309,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 329,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "470",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 330,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Голеннооткидное устройство",
+            "additional_value": null
+          },
+          {
+            "group_id": 94,
+            "value_id": 331,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Фиксация под нагрузкой",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 332,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "75",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 348,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "150°",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 415,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "100",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 165,
+      "master_id": 477,
+      "sku": "3F26P (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T14:12:43.927343+03:00",
+      "updated_at": "2025-07-28T20:16:27.341077+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-002-титан",
+      "name": "Коленный модуль PPK-010 (Титан)",
+      "description": "Коленный модуль PPK-010 — пневматическая 4-звенная конструкция, предназначенная для пользователей с уровнем активности 2–3. Оптимальная кинематика обеспечивает устойчивость в фазе опоры и плавное движение при переносе конечности. Угол сгибания до 135° позволяет выполнять широкий диапазон движений, необходимых для комфортной ходьбы в повседневной среде.\n\nКорпус выполнен из титана, что делает модуль прочным и легким. Пневматическая система автоматически адаптирует сопротивление в зависимости от ритма шага, обеспечивая уверенное и стабильное движение. \n\nPPK-002 подходит для пользователей, которым требуется надёжный, адаптивный и эргономичный модуль при умеренной физической активности.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753690060169_pgiffg.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-010 (Титан)",
+        "size_value": "Титан",
+        "article_number": "PPK-010",
+        "characteristics": [
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 296,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "210",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": null
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 334,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 363,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "740",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 415,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "100",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 118,
+      "master_id": 322,
+      "sku": "3F23 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T06:41:57.005008+03:00",
+      "updated_at": "2025-07-28T16:13:01.215573+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-003-титан",
+      "name": "Коленный модуль MPK-003 (Титан)",
+      "description": "Механический коленный модуль MPK-003 — четырёхзвенный с углом сгибания 110°, выполненный из титана. Он рассчитан на нагрузку до 110 кг. и предназначен для пользователей, которым нужна надёжная и долговечная поддержка при ходьбе.\n\nОбеспечивает стабильность и комфорт за счёт продуманной механики и качественных материалов. Этот модуль отличается высокой прочностью и подходит для повседневного использования в различных условиях.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752918984076_pqtuey.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752918984076_pqtuey.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-003 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-003",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 309,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 340,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "500",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 313,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "125",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 314,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "110°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 85000,
+      "discount_price": 73470,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 168,
+      "master_id": 461,
+      "sku": "3F25P-1 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T20:36:16.719553+03:00",
+      "updated_at": "2025-07-28T20:43:57.877894+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-011-титан",
+      "name": "Коленный модуль PPK-011 (Титан)",
+      "description": "Коленный модуль PPK-011 представляет собой пневматическое решение с 4-звенной конструкцией, предназначенное для пользователей с уровнем активности 2–3. Благодаря грамотно рассчитанной геометрии и углу сгибания до 145°, модуль обеспечивает плавное и контролируемое движение при ходьбе, а также устойчивость в фазе опоры. Конструкция способствует естественному распределению нагрузки, снижая напряжение на культе и смежных компонентах протеза.\n\nИзготовленный из прочного алюминиевого сплава, PPK-011 сочетает в себе лёгкость и надёжность. Пневматическая система адаптируется под темп шага, обеспечивая динамичную и комфортную походку. Модуль подойдёт для тех, кто ищет баланс между стабильностью, простотой обслуживания и функциональностью в повседневном использовании.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753713834335_z4rvm9.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753713834335_z4rvm9.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-011 (Титан)",
+        "size_value": "Титан",
+        "article_number": "PPK-011 ",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 415,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "100",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 361,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "800",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 362,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "235",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 300,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 294,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "145°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 117,
+      "master_id": 272,
+      "sku": "3FM11 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T06:09:27.671467+03:00",
+      "updated_at": "2025-07-29T03:00:07.942586+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-002-нерж-сталь",
+      "name": "Коленный модуль MPK-002 (Нерж. сталь)",
+      "description": "Механический четырёхзвенный коленный модуль с отключаемым замком предназначен для пользователей с низким и умеренным уровнем активности (1–2) и специально адаптирован для использования в составе купальных протезов. Полицентрическая конструкция обеспечивает базовую стабильность при ходьбе и стоянии.\n\nКлючевой особенностью является ручной замок с возможностью отключения, что позволяет фиксировать колено в выпрямленном положении при необходимости или освобождать его для свободного движения. Такая функция особенно полезна в условиях, где требуется повышенная устойчивость или, наоборот, больше свободы движения. Надежность и простота эксплуатации делают этот модуль практичным решением для гигиенических и водных процедур.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753734800825_0cwbt7.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753734800825_0cwbt7.jpg",
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753734802048_yns6xq.jpg",
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753734803218_yzqjlp.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-002 (Нерж. сталь)",
+        "size_value": "",
+        "article_number": "MPK-002",
+        "characteristics": [
+          {
+            "group_id": 86,
+            "value_id": 285,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминий",
+            "additional_value": null
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 305,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "160",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": null
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 330,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Голеннооткидное устройство",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 334,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 414,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "165°",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 415,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "100",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 361,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "800",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 103,
+      "master_id": 457,
+      "sku": "PREM-001",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-23T08:51:17.445+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "премиум-версия-с-расширенными-функциями",
+      "name": "Премиум версия с расширенными функциями",
+      "description": "Это премиум версия продукта с улучшенными характеристиками, дополнительными аксессуарами и расширенной гарантией. Идеально подходит для профессионального использования.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": 2.5,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://example.com/premium-image.jpg",
+      "images": [
+        "https://example.com/premium-1.jpg",
+        "https://example.com/premium-2.jpg",
+        "https://example.com/premium-3.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Премиум версия",
+        "dimensions": {
+          "width": 20,
+          "height": 15,
+          "length": 30
+        },
+        "size_value": "XL",
+        "specifications": {
+          "color": "Серебристый",
+          "material": "Титан"
+        },
+        "characteristics": [
+          {
+            "name": "Материал корпуса",
+            "value": "Титановый сплав"
+          },
+          {
+            "name": "Водонепроницаемость",
+            "value": "IP68"
+          },
+          {
+            "name": "Максимальная нагрузка",
+            "value": "150 кг"
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": "Премиум версия - лучший выбор",
+      "meta_description": "Премиум версия продукта с расширенными возможностями и гарантией",
+      "meta_keywords": "премиум, профессиональный, расширенная гарантия",
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 3,
+      "battery_life_hours": 48,
+      "custom_fields": {
+        "awards": [
+          "Best Product 2024"
+        ],
+        "certification": "ISO 9001"
+      },
+      "is_active": false,
+      "price": 150000,
+      "discount_price": 135000,
+      "stock_quantity": 10,
+      "sort_order": 1,
+      "category_id": 88,
+      "stock_status": "in_stock",
+      "show_price": true,
+      "short_name": "Премиум версия с расширенными функциями"
+    },
+    {
+      "id": 114,
+      "master_id": 474,
+      "sku": "235",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-25T13:24:16.63983+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-2-1",
+      "name": "Коленный модуль MPK-018 - 2",
+      "description": "21312312",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": 51252,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753428381483_g6re22.png",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753428381483_g6re22.png"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "213123123123123",
+        "size_value": "1423124",
+        "article_number": "1231251",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": true,
+      "is_recommended": false,
+      "warranty_months": 12312,
+      "battery_life_hours": 4123,
+      "custom_fields": {
+        "configurableCharacteristics": [
+          {
+            "group_id": 10,
+            "value_id": 228,
+            "color_hex": null,
+            "group_name": "Размеры и вес",
+            "value_name": "Очень маленький",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 290,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминий / Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 291,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминиево-магниевый сплав",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 286,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Нержавеющая сталь",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 289,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Нержавеющая сталь / Алюминий",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 288,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Нержавеющая сталь / Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 10,
+            "value_id": 229,
+            "color_hex": null,
+            "group_name": "Размеры и вес",
+            "value_name": "Маленький",
+            "additional_value": ""
+          }
+        ]
+      },
+      "is_active": false,
+      "price": 121125,
+      "discount_price": 5213,
+      "stock_quantity": 3125151,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 127,
+      "master_id": 476,
+      "sku": null,
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:17:10.39674+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "test-variant",
+      "name": "Test Variant",
+      "description": null,
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "test.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {},
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": false,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "in_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 128,
+      "master_id": 476,
+      "sku": "MPH-020-L",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:17:25.583759+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "тазобедренный-модуль-mph-020-размер-l",
+      "name": "Тазобедренный модуль MPH-020 - Размер L",
+      "description": "Вариант L",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": 1.5,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "/uploads/mph-020-l.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "L",
+        "dimensions": {
+          "width": 20,
+          "height": 15,
+          "length": 30
+        },
+        "size_value": "40-45",
+        "article_number": "MPH-020-L",
+        "specifications": {
+          "material": "titanium"
+        },
+        "characteristics": [],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 24,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": false,
+      "price": 150000,
+      "discount_price": null,
+      "stock_quantity": 10,
+      "sort_order": 2,
+      "category_id": null,
+      "stock_status": "in_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 137,
+      "master_id": 474,
+      "sku": "234",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:36:25.084477+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-нерж-сталь-5",
+      "name": "Коленный модуль MPK-018 (Нерж. сталь) - 5",
+      "description": "234234",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": {},
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "52342523",
+        "size_value": "52345",
+        "article_number": "234",
+        "characteristics": [],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 234,
+      "battery_life_hours": 623,
+      "custom_fields": {},
+      "is_active": false,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 121,
+      "master_id": 371,
+      "sku": "4F20 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T09:42:20.412476+03:00",
+      "updated_at": "2025-08-02T17:19:42.203637+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-006-титан",
+      "name": "Коленный модуль MPK-006 (Титан)",
+      "description": "Механический полицентрический коленный модуль MPK-006 с геометрическим замыканием и регулируемой фазой сгибания и разгибания разработан для использования при протезировании после односторонней или двусторонней ампутации бедра на уровне средней и нижней трети. Модель предназначена для пациентов с низким уровнем активности.\n\nИзготовленный из титана, этот четырёхзвенный шарнир с углом сгибания 120° рассчитан на нагрузку до 110 кг. О обеспечивает надежную поддержку и комфорт в процессе повседневного использования.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753086504765_ip5wl1.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753086504765_ip5wl1.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-006 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-006",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 60000,
+      "discount_price": 51500,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 160,
+      "master_id": 452,
+      "sku": "3F28P (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T12:04:21.849863+03:00",
+      "updated_at": "2025-07-28T17:20:23.912237+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-001-титан",
+      "name": "Коленный модуль PPK-001 (Титан)",
+      "description": "Пневматический полицентрический коленный модуль предназначен для пользователей с уровнем активности 2 и 3, обеспечивая оптимальный баланс между стабильностью и подвижностью. Благодаря геометрическому замыканию в фазе опоры модуль гарантирует уверенную поддержку и безопасность при ходьбе, снижая риск нежелательного сгибания колена. Полицентрическая конструкция способствует естественному перемещению конечности, особенно на неровных поверхностях и при смене темпа шага.\n\nСистема пневматического контроля регулирует движение в фазе переноса, обеспечивая плавность и адаптацию к различным условиям передвижения. Возможность индивидуальной настройки геометрии и динамики коленного модуля позволяет точно подстроить его под потребности пользователя, повышая комфорт и эффективность использования в повседневной жизни.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753681806147_2w4cd1.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-001 (Титан)",
+        "size_value": "Титан",
+        "article_number": "PPK-001",
+        "characteristics": [
+          {
+            "group_id": 86,
+            "value_id": 290,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминий / Титан",
+            "additional_value": null
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 300,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Пневматика",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 318,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "900",
+            "additional_value": null
+          },
+          {
+            "group_id": 94,
+            "value_id": 321,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрическое замыкание",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 334,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 347,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "129",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 348,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "150°",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 115,
+      "master_id": 474,
+      "sku": "7Е6",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-26T06:03:09.92531+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-титан",
+      "name": "Коленный модуль MPK-018 (Титан)",
+      "description": "Коленный модуль MPK-018 представляет собой механическую 4-х звенную конструкцию с углом сгибания 135°, изготовленную из титана. Такая конструкция обеспечивает высокую прочность и долговечность, что делает модуль надёжным выбором для пользователей со средним уровнем активности. \n\nЭтот коленный модуль обеспечивает стабильность и комфорт при ходьбе, поддерживая естественную амплитуду движений и эффективно распределяя нагрузку. Использование качественных материалов и продуманная механика гарантируют долгий срок эксплуатации и уверенность в любых условиях.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753096168414_bgiv4o.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753096168414_bgiv4o.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-018",
+        "size_value": "Титан",
+        "article_number": "MPK-018",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": true,
+      "is_new": true,
+      "is_bestseller": true,
+      "is_recommended": true,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {
+        "configurableCharacteristics": [
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 10,
+            "value_id": 204,
+            "color_hex": null,
+            "group_name": "Размеры и вес",
+            "value_name": "1600",
+            "additional_value": ""
+          }
+        ]
+      },
+      "is_active": false,
+      "price": 50000,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 123,
+      "master_id": 434,
+      "sku": "3F17 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T10:20:49.232998+03:00",
+      "updated_at": "2025-08-02T17:32:58.932986+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-009-титан",
+      "name": "Коленный модуль MPK-009 (Титан)",
+      "description": "Коленный модуль MPK-009 представляет собой одноосный механический модуль с углом сгибания 120°, изготовленный из нержавеющей стали или титана. Рассчитан на максимальную нагрузку до 110 кг и подходит для пользователей, нуждающихся в надежной поддержке при передвижении.\n\nБлагодаря прочным материалам и эргономичной конструкции, этот модуль обеспечивает стабильность и комфорт в повседневной эксплуатации, гарантируя безопасность и долговечность в различных условиях.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752989034206_htp6ta.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752989034206_htp6ta.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-009 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-009",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 60000,
+      "discount_price": 54405,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 166,
+      "master_id": 454,
+      "sku": "FBK-56 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T15:36:00.096406+03:00",
+      "updated_at": "2025-07-28T15:39:53.621761+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-004-титан",
+      "name": "Коленный модуль PPK-004 (Титан)",
+      "description": "Коленный модуль PPK-004 — это надёжное пневматическое решение с 4-звенной конструкцией, предназначенное для пользователей с уровнем активности 2–3. Благодаря продуманной кинематике и широкому углу сгибания до 140°, модуль обеспечивает плавную и комфортную походку в условиях повседневной активности. Конструкция из алюминия сочетает в себе высокую прочность и лёгкость.\n\nПневматическая система управления автоматически адаптируется под ритм и темп ходьбы, обеспечивая стабильность в фазе опоры и мягкость при переносе. Многозвенная механика повышает устойчивость и снижает нагрузку на другие элементы протеза, создавая комфортное и безопасное решение для активных пользователей.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753695268631_f71wnf.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-004 (Титан)",
+        "size_value": "Титан",
+        "article_number": "PPK-004",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 363,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "740",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 300,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 303,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "140°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 338,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "180",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 145,
+      "master_id": 450,
+      "sku": "WPK-001 (Ss)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:48:11.541159+03:00",
+      "updated_at": "2025-07-29T09:29:37.196236+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-012w-нерж-сталь",
+      "name": "Коленный модуль MPK-012W (Нерж. сталь)",
+      "description": "Одноосный коленный модуль для купальных протезов предназначен для пользователей с уровнем активности 1–2 и специально адаптирован для использования во влажной среде. Простая и надёжная одноосная конструкция обеспечивает стабильную опору при ходьбе и стоянии, а компактность и устойчивость к воздействию воды делают его оптимальным решением для гигиенических процедур, плавания и нахождения на открытом воздухе в условиях повышенной влажности.\n\nМодуль оснащён ручным замком, который фиксирует колено в выпрямленном положении, обеспечивая дополнительную безопасность и контроль при перемещении. Надёжность, устойчивость к коррозии и удобство в эксплуатации делают этот модуль практичным выбором для пользователей, которым требуется функциональность и простота в условиях повседневного и водного использования.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753759742413_xmvl4t.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753759742413_xmvl4t.jpg",
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753759743870_rfobpw.jpg",
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753759745141_tjbc9y.jpg",
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753759747019_1plu9w.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-012W (Нерж. сталь)",
+        "size_value": "Нерж. сталь",
+        "article_number": "MPK-012W",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 101,
+            "value_id": 337,
+            "color_hex": "#0bb1d7",
+            "group_name": "Защита от воды",
+            "value_name": "✓",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 292,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Моноцентрическая (одноосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 416,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "420",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 286,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Нержавеющая сталь",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 334,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 345,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "155",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 161,
+      "master_id": 477,
+      "sku": "3F26P (Al)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-28T14:04:43.58778+03:00",
+      "updated_at": "2025-07-30T05:54:29.089981+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-ppk-002-алюминий",
+      "name": "Коленный модуль PPK-010 (Алюминий)",
+      "description": "Коленный модуль PPK-010 — пневматическая 4-звенная конструкция, предназначенная для пользователей с уровнем активности 2–3. Оптимальная кинематика обеспечивает устойчивость в фазе опоры и плавное движение при переносе конечности. Угол сгибания до 135° позволяет выполнять широкий диапазон движений, необходимых для комфортной ходьбы в повседневной среде.\n\nКорпус выполнен из алюминия, что делает модуль лёгким. Пневматическая система автоматически адаптирует сопротивление в зависимости от ритма шага, обеспечивая уверенное и стабильное движение. \n\nPPK-002 подходит для пользователей, которым требуется надёжный, адаптивный и эргономичный модуль при умеренной физической активности.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль PPK-010 (Алюминий)",
+        "article_number": "",
+        "characteristics": [
+          {
+            "group_id": 86,
+            "value_id": 285,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминий",
+            "additional_value": null
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 296,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "210",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 300,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Пневматика",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 334,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 349,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Пневматика",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 413,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "680",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 415,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "100",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 116,
+      "master_id": 284,
+      "sku": "FBK-12G (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T04:59:26.584328+03:00",
+      "updated_at": "2025-07-28T16:18:21.6692+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-001-титан",
+      "name": "Коленный модуль MPK-001 (Титан)",
+      "description": "Механический коленный модуль MPK-001 представляет собой механическое изделие с четырёхзвенной конструкцией, предназначенное для пользователей с уровнем активности 2–3. Благодаря широкому углу сгибания в 145°, модуль обеспечивает удобство при выполнении повседневных движений и способствует более естественной походке. Геометрия звеньев обеспечивает надёжную опору и устойчивость, особенно при начальной нагрузке. \n\nКорпус из прочного и лёгкого титана позволяет выдерживать нагрузки до 120 кг. без потери прочности или функциональности. Механизм не требует сложной настройки и отлично подходит для тех, кто ищет надёжное и простое в эксплуатации решение с хорошей биомеханикой и стабильной работой в различных условиях.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753570514907_jr779j.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753570514907_jr779j.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-001 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-001",
+        "characteristics": [
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 294,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "145°",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 305,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "160",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": null
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 330,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Голеннооткидное устройство",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 413,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "680",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 95000,
+      "discount_price": 79050,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 169,
+      "master_id": 463,
+      "sku": "FBK-86G (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-29T12:02:56.68203+03:00",
+      "updated_at": "2025-07-29T12:07:18.753519+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-hpk-007-титан",
+      "name": "Коленный модуль HPK-007 (Титан)",
+      "description": "Коленный модуль HPK-007 с мультиосной гидравлической конструкцией предназначен для пользователей с уровнем активности 2–3. Угол сгибания 145° обеспечивает расширенную подвижность и комфорт при выполнении различных движений — от повседневной ходьбы до подъёмов и присаживаний. Благодаря мультиосной геометрии достигается высокая устойчивость в фазе опоры и плавность в фазе переноса.\n\nИзделие выполнено из прочного, но лёгкого титана, что обеспечивает надёжность без утяжеления конструкции. Гидравлический механизм стабилизирует движения в реальном времени, подстраиваясь под темп и ритм пользователя, что делает HPK-007 оптимальным выбором для тех, кто ценит устойчивость, адаптивность и уверенность при передвижении.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753019930120_kgxz5z.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль HPK-007 (Титан)",
+        "size_value": "Титан",
+        "article_number": "HPK-007",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 309,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 368,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "300",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 299,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Гидравлика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 294,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "145°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 364,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Гидравлическая система",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 371,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "1230",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 124,
+      "master_id": 447,
+      "sku": "3F35B (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T10:31:27.993216+03:00",
+      "updated_at": "2025-07-28T16:09:09.696069+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-010-титан",
+      "name": "Коленный модуль MPK-010 (Титан)",
+      "description": "Коленный модуль MPK-010 оснащён четырёхзвенной механической конструкцией, рассчитанной на уровень активности 2–3. Угол сгибания до 140° обеспечивает достаточную подвижность для повседневной ходьбы, в том числе при подъёмах, спусках и перемещении в ограниченных пространствах. Продуманная кинематика звеньев способствует надёжной стабилизации в фазе опоры и уверенной работе модуля при  смене темпа. \n\nКорпус из титана гарантирует прочность и устойчивость к износу при сохранении умеренного веса. MPK-010 подойдёт пользователям, которым важны надёжность, стабильность и простота\nэксплуатации без необходимости сложной настройки или обслуживания.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753000493299_eatn7w.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753000493299_eatn7w.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-010 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-010",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 340,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "500",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 338,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "180",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 303,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "140°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 79050,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 170,
+      "master_id": 466,
+      "sku": "3FH65 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-29T13:04:51.680767+03:00",
+      "updated_at": "2025-07-29T13:04:51.680767+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-hpk-011-титан",
+      "name": "Коленный модуль HPK-011 (Титан)",
+      "description": "Коленный модуль HPK-011 представляет собой 4-звенную гидравлическую конструкцию, рассчитанную на уровень активности 2–3 и максимальную нагрузку до 120 кг. Благодаря расширенному углу сгибания до 140°, модуль обеспечивает свободу движений и комфорт при повседневной активности.\n\nИспользование титана в конструкции позволяет достичь оптимального соотношения прочности и веса, делая модуль надёжным и долговечным решением. \n\nГидравлическая система управления фазами опоры и переноса работает плавно и точно, обеспечивая предсказуемую реакцию и устойчивость при ходьбе.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753021310251_jg6yxj.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль HPK-011 (Титан)",
+        "size_value": "Титан",
+        "article_number": "HPK-011",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 309,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 295,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "120",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 351,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "850",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 359,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "250",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 299,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Гидравлика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 294,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "145°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 308,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "2-3",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 373,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Гидравлическая система",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 364,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Гидравлическая система",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 141,
+      "master_id": 474,
+      "sku": "4123",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T19:40:54.378591+03:00",
+      "updated_at": "2025-07-30T05:23:55.818422+03:00",
+      "is_deleted": true,
+      "slug": "коленный-модуль-mpk-018-нерж-сталь-1",
+      "name": "Коленный модуль MPK-018 (Нерж. сталь) - 1",
+      "description": "213",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": {},
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "123",
+        "size_value": "4123",
+        "article_number": "123",
+        "characteristics": [],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": false,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 0,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 125,
+      "master_id": 462,
+      "sku": "3F32",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T18:41:20.710227+03:00",
+      "updated_at": "2025-07-30T05:48:34.990203+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-hpk-001-титан",
+      "name": "Коленный модуль HPK-001 (Титан)",
+      "description": "Пятизвенный гидравлический коленный модуль оснащён геометрическим замыканием и механизмом упругого подгибания колена на начальном этапе фазы опоры. Данное решение предназначено для пользователей с уровнем активности 3 и 4 и массой тела до 120 кг, обеспечивая высокую стабильность и комфорт при ходьбе. \n\nВстроенное голенооткидное устройство гарантирует точный контроль фазы переноса конечности, способствуя плавности и безопасности движений. Оптимальная геометрия вместе с дополнительным демпфером повышает устойчивость колена в фазе опоры, обеспечивая уверенную и естественную походку.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753620376371_mjyiua.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753620376371_mjyiua.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль HPK-001 (Титан)",
+        "size_value": "Титан",
+        "article_number": "HPK-001",
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 251100,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 120,
+      "master_id": 366,
+      "sku": "3F21 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T08:37:58.090362+03:00",
+      "updated_at": "2025-07-28T16:11:48.880504+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-005-титан",
+      "name": "Коленный модуль MPK-005 (Титан)",
+      "description": "Механический полицентрический коленный модуль специально разработан для пациентов с вычленением коленного сустава и уровнем активности 1–2. Благодаря многозвенной конструкции он обеспечивает повышенную устойчивость в фазе опоры, что особенно важно для пользователей с ограниченной подвижностью и сниженной мышечной активностью. Геометрия модуля способствует устойчивому положению при стоянии и уверенной поддержке во время медленной ходьбы. \n\nКонструкция адаптирована под особенности протезирования при вычленении коленного сустава, обеспечивая оптимальную высоту сборки и комфорт при повседневной эксплуатации. Надежность, стабильность и простота использования делают данный модуль подходящим выбором для пациентов, которым требуется безопасное и функциональное решение при низком уровне физической активности.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752972997464_9zux50.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752972997464_9zux50.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-005 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-005",
+        "characteristics": [
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 314,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "110°",
+            "additional_value": null
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 319,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Под ламинацию",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 320,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 355,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "135",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 413,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "680",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 60450,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 119,
+      "master_id": 331,
+      "sku": "3F22 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T06:52:48.853825+03:00",
+      "updated_at": "2025-07-28T16:12:24.34963+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-004-титан",
+      "name": "Коленный модуль MPK-004 (Титан)",
+      "description": "Механический четырехзвенный модуль для пользователей с низким и умеренным уровнем активности.\n\nПолицентрическая конструкция обеспечивает базовую стабильность при ходьбе и состоянии покоя.\n\nНадежность и простота эксплуатации  делают этот коленный модуль практичным решением для ежедневного использования.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752939638465_j5o7ct.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752939638465_j5o7ct.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-004 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-004",
+        "characteristics": [
+          {
+            "group_id": 86,
+            "value_id": 286,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Нержавеющая сталь",
+            "additional_value": null
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": null
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 88,
+            "value_id": 313,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "125",
+            "additional_value": null
+          },
+          {
+            "group_id": 90,
+            "value_id": 314,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "110°",
+            "additional_value": null
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": null
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": null
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": null
+          },
+          {
+            "group_id": 89,
+            "value_id": 318,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "900",
+            "additional_value": null
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": null
+          },
+          {
+            "group_id": 91,
+            "value_id": 319,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Под ламинацию",
+            "additional_value": null
+          },
+          {
+            "group_id": 92,
+            "value_id": 320,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Адаптер пирамида",
+            "additional_value": null
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 80000,
+      "discount_price": 60450,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    },
+    {
+      "id": 171,
+      "master_id": 476,
+      "sku": "7Е4 (Al)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-29T15:37:01.897736+03:00",
+      "updated_at": "2025-07-29T15:37:01.897736+03:00",
+      "is_deleted": false,
+      "slug": "тазобедренный-модуль-mph-020-алюминий",
+      "name": "Тазобедренный модуль MPH-020 (Алюминий)",
+      "description": "Тазобедренный модуль МРН-020 разработан для пациентов с дисартикуляцией тазобедренного сустава и/или гемипелвэктомией. \n\nОн предлагает дополнительные функциональные преимущества для пользователей с подвижностью 2 степени.\n\nКлючевые особенности:\n• Система контроля шага с боковыми латексными лентами\n• Регулируемый бампер для индивидуальной настройки\n• Ограничитель диапазона движений, повышающий безопасность при ходьбе\n\nРекомендован для пользователей с уровнем подвижности 2 (ограниченная ходьба на открытом воздухе). Оптимизирован для потребностей пациентов с ограниченной подвижностью. ",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753781749243_c0254y.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Тазобедренный модуль MPH-020 (Алюминий)",
+        "size_value": "Алюминий",
+        "article_number": "MPH-020",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 351,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "850",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 285,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Алюминий",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 174,
+      "master_id": 474,
+      "sku": "7Е6 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-30T10:13:47.885461+03:00",
+      "updated_at": "2025-07-30T10:13:47.885461+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-018-титан-1",
+      "name": "Коленный модуль MPK-018 (Титан)",
+      "description": "Коленный модуль MPK-018 представляет собой механическую 4-х звенную конструкцию с углом сгибания 135°, изготовленную из нержавеющей стали. Такая конструкция обеспечивает высокую прочность и долговечность, что делает модуль надёжным выбором для пользователей со средним уровнем активности.\n\nЭтот коленный модуль обеспечивает стабильность и комфорт при ходьбе, поддерживая естественную амплитуду движений и эффективно распределяя нагрузку. Использование качественных материалов и продуманная механика гарантируют долгий срок эксплуатации и уверенность в любых условиях.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": null,
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753096168414_bgiv4o.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-018 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-018",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 307,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Втулка 30 мм.",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 293,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Полицентрическая (многоосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 340,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "500",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 319,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Под ламинацию",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 338,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "180",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 315,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Геометрический замок",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 316,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Механика",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": 12,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": null,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "distant_warehouse",
+      "show_price": false,
+      "short_name": null
+    },
+    {
+      "id": 122,
+      "master_id": 405,
+      "sku": "3F15 (Ti)",
+      "price_override": null,
+      "stock_override": null,
+      "attributes_json": null,
+      "created_at": "2025-07-27T10:08:28.769974+03:00",
+      "updated_at": "2025-07-28T16:10:43.575978+03:00",
+      "is_deleted": false,
+      "slug": "коленный-модуль-mpk-007-титан",
+      "name": "Коленный модуль MPK-007 (Титан)",
+      "description": "Моноцентрический коленный модуль MPK-007 с фиксацией под нагрузкой выполнен на основе прочного стального каркаса, обеспечивая надежность и долговечность. Этот одноосный механизм с углом сгибания 150° предназначен для пользователей с низким уровнем активности (1-2).\n\nВстроенное голенооткидное устройство гарантирует точный контроль фазы переноса, а функция фиксации под нагрузкой повышает стабильность и безопасность в фазе опоры, обеспечивая уверенную и комфортную ходьбу.",
+      "short_description": null,
+      "cost_price": null,
+      "reserved_quantity": 0,
+      "min_stock_level": 0,
+      "max_stock_level": null,
+      "weight": null,
+      "length": null,
+      "width": null,
+      "height": null,
+      "primary_image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752985513675_xlgpiq.jpg",
+      "images": [
+        "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1752985513675_xlgpiq.jpg"
+      ],
+      "videos": [],
+      "documents": [],
+      "attributes": {
+        "size": "Коленный модуль MPK-007 (Титан)",
+        "size_value": "Титан",
+        "article_number": "MPK-007",
+        "characteristics": [
+          {
+            "group_id": 92,
+            "value_id": 309,
+            "color_hex": null,
+            "group_name": "Дист. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 95,
+            "value_id": 292,
+            "color_hex": null,
+            "group_name": "Конструктивная схема",
+            "value_name": "Моноцентрическая (одноосная)",
+            "additional_value": ""
+          },
+          {
+            "group_id": 87,
+            "value_id": 317,
+            "color_hex": null,
+            "group_name": "Максимальный вес пациента, кг.",
+            "value_name": "110",
+            "additional_value": ""
+          },
+          {
+            "group_id": 89,
+            "value_id": 329,
+            "color_hex": null,
+            "group_name": "Масса, гр.",
+            "value_name": "470",
+            "additional_value": ""
+          },
+          {
+            "group_id": 86,
+            "value_id": 312,
+            "color_hex": null,
+            "group_name": "Материал",
+            "value_name": "Титан",
+            "additional_value": ""
+          },
+          {
+            "group_id": 91,
+            "value_id": 306,
+            "color_hex": null,
+            "group_name": "Прокс. соединение",
+            "value_name": "Пирамида",
+            "additional_value": ""
+          },
+          {
+            "group_id": 88,
+            "value_id": 332,
+            "color_hex": null,
+            "group_name": "Рабочая высота конструкции, мм.",
+            "value_name": "75",
+            "additional_value": ""
+          },
+          {
+            "group_id": 99,
+            "value_id": 301,
+            "color_hex": null,
+            "group_name": "ТИП",
+            "value_name": "Механика",
+            "additional_value": ""
+          },
+          {
+            "group_id": 90,
+            "value_id": 304,
+            "color_hex": null,
+            "group_name": "Угол сгибания",
+            "value_name": "135°",
+            "additional_value": ""
+          },
+          {
+            "group_id": 100,
+            "value_id": 322,
+            "color_hex": null,
+            "group_name": "Уровень активности",
+            "value_name": "1-2",
+            "additional_value": ""
+          },
+          {
+            "group_id": 94,
+            "value_id": 331,
+            "color_hex": null,
+            "group_name": "Фаза опоры",
+            "value_name": "Фиксация под нагрузкой",
+            "additional_value": ""
+          },
+          {
+            "group_id": 93,
+            "value_id": 330,
+            "color_hex": null,
+            "group_name": "Фаза переноса",
+            "value_name": "Голеннооткидное устройство",
+            "additional_value": ""
+          }
+        ],
+        "selection_tables": []
+      },
+      "meta_title": null,
+      "meta_description": null,
+      "meta_keywords": null,
+      "is_featured": false,
+      "is_new": false,
+      "is_bestseller": false,
+      "is_recommended": false,
+      "warranty_months": null,
+      "battery_life_hours": null,
+      "custom_fields": {},
+      "is_active": true,
+      "price": 58590,
+      "discount_price": null,
+      "stock_quantity": 100,
+      "sort_order": 0,
+      "category_id": null,
+      "stock_status": "out_of_stock",
+      "show_price": true,
+      "short_name": null
+    }
+  ],
+  "schema_version": [
+    {
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "nextval('product_sizes_id_seq'::regclass)"
+    },
+    {
+      "column_name": "product_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "size_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "size_value",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "sku",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "price",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "stock_quantity",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "weight",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dimensions",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "specifications",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "is_available",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true"
+    },
+    {
+      "column_name": "sort_order",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "column_name": "discount_price",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "image_url",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "images",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "warranty",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "battery_life",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "meta_title",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "meta_description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "meta_keywords",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "is_featured",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "is_new",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "is_bestseller",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "custom_fields",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "characteristics",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "selection_tables",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "nextval('product_variants_id_seq'::regclass)"
+    },
+    {
+      "column_name": "master_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "sku",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "price_override",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "stock_override",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "attributes_json",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "column_name": "is_deleted",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "column_name": "slug",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "short_description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "cost_price",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "reserved_quantity",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "min_stock_level",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "max_stock_level",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "weight",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "length",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "width",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "height",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "primary_image_url",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "images",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "videos",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "documents",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "attributes",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "meta_title",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "meta_description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "meta_keywords",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "is_featured",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "is_new",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "is_bestseller",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "is_recommended",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false"
+    },
+    {
+      "column_name": "warranty_months",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "battery_life_hours",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "custom_fields",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true"
+    },
+    {
+      "column_name": "price",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "discount_price",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "stock_quantity",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "sort_order",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0"
+    },
+    {
+      "column_name": "category_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "stock_status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'in_stock'::character varying"
+    },
+    {
+      "column_name": "show_price",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true"
+    },
+    {
+      "column_name": "short_name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ]
+}

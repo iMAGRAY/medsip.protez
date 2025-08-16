@@ -83,8 +83,8 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   items,
   operations,
   onBulkOperation,
-  onItemUpdate,
-  loading = false
+  onItemUpdate: _onItemUpdate,
+  loading: _loading = false
 }) => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
@@ -105,7 +105,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   })
   const [showProgressDialog, setShowProgressDialog] = useState(false)
   const [showBulkEditDialog, setShowBulkEditDialog] = useState(false)
-  const [bulkEditForm, setBulkEditForm] = useState({
+  const [_bulkEditForm, _setBulkEditForm] = useState({
     status: '',
     description: '',
     notes: ''

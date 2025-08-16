@@ -420,6 +420,6 @@ function buildHierarchy(items: any[], parentId: number | null = null): any[] {
     })
 }
 
-async function expandManufacturersCategories(menuItems: any[]): Promise<any[]> {
+async function _expandManufacturersCategories(menuItems: any[]): Promise<any[]> {
   return menuItems
 }

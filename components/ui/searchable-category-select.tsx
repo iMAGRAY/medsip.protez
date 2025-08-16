@@ -40,7 +40,7 @@ export function SearchableCategorySelect({
   maxHeight = "300px"
 }: SearchableCategorySelectProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
+  const [_isOpen, setIsOpen] = useState(false)
 
   // Фильтрация категорий по поисковому запросу
   const filteredCategories = useMemo(() => {

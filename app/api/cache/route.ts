@@ -17,9 +17,9 @@ const cacheUtils = {
     return null
   },
 
-  set: (key: string, _data: any, ttl: number = 300) => { // TTL в секундах
+  set: (key: string, data: any, ttl: number = 300) => { // TTL в секундах
     serverCache.set(key, {
-      data: _data,
+      data,
       expires: Date.now() + (ttl * 1000)
     })
   },
@@ -37,7 +37,7 @@ const cacheUtils = {
     let expiredEntries = 0
     const now = Date.now()
 
-    for (const [key, value] of serverCache.entries()) {
+    for (const [, value] of serverCache.entries()) {
       if (value.expires > now) {
         validEntries++
       } else {
@@ -77,8 +77,8 @@ export async function GET(request: NextRequest) {
       exists: data !== null
     })
 
-  } catch (_error) {
-    logger.error('Cache GET API error', { error: _error })
+  } catch (error) {
+    logger.error('Cache GET API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -110,10 +110,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'stats') {
-      const _stats = cacheUtils.getStats()
+      const stats = cacheUtils.getStats()
       return NextResponse.json({
         success: true,
-        stats: _stats
+        stats
       })
     }
 
@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     )
 
-  } catch (_error) {
-    logger.error('Cache POST API error', { error: _error })
+  } catch (error) {
+    logger.error('Cache POST API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -162,8 +162,8 @@ export async function DELETE(request: NextRequest) {
       message: success ? 'Cache deleted successfully' : 'Key not found'
     })
 
-  } catch (_error) {
-    logger.error('Cache DELETE API error', { error: _error })
+  } catch (error) {
+    logger.error('Cache DELETE API error', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -60,14 +60,14 @@ interface ProductSpecificationsManagerProps {
 }
 
 export function ProductSpecificationsManager({
-  productId,
+  productId: _productId,
   productName,
   specifications,
   onSpecificationsChange,
-  isNewProduct
+  isNewProduct: _isNewProduct
 }: ProductSpecificationsManagerProps) {
   const [specGroups, setSpecGroups] = useState<SpecGroup[]>([])
-  const [characteristics, setCharacteristics] = useState<Characteristic[]>([])
+  const [_characteristics, _setCharacteristics] = useState<Characteristic[]>([])
   const [search, setSearch] = useState("")
   const [activeTab, setActiveTab] = useState("groups")
   const [loading, setLoading] = useState(true)
@@ -75,10 +75,10 @@ export function ProductSpecificationsManager({
   // Диалоги
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false)
   const [isEnumDialogOpen, setIsEnumDialogOpen] = useState(false)
-  const [isCharacteristicDialogOpen, setIsCharacteristicDialogOpen] = useState(false)
+  const [_isCharacteristicDialogOpen, _setIsCharacteristicDialogOpen] = useState(false)
   const [editingGroup, setEditingGroup] = useState<SpecGroup | null>(null)
   const [editingEnum, setEditingEnum] = useState<SpecEnum | null>(null)
-  const [editingCharacteristic, setEditingCharacteristic] = useState<Characteristic | null>(null)
+  const [_editingCharacteristic, _setEditingCharacteristic] = useState<Characteristic | null>(null)
 
   // Формы
   const [groupFormData, setGroupFormData] = useState({
@@ -95,7 +95,7 @@ export function ProductSpecificationsManager({
     color_value: ""
   })
 
-  const [characteristicFormData, setCharacteristicFormData] = useState<Characteristic>({
+  const [_characteristicFormData, _setCharacteristicFormData] = useState<Characteristic>({
     name: "",
     type: "text",
     unit: "",

@@ -82,7 +82,7 @@ export function WarehouseSettings() {
         if (response.ok) {
           const result = await response.json()
           if (result.success) {
-            setSettings({ ...settings, ...result.data })
+            setSettings(prev => ({ ...prev, ...result.data }))
           }
         }
       } catch (error) {

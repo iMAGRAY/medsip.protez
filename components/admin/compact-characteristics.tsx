@@ -80,7 +80,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
   const [openDropdownGroup, setOpenDropdownGroup] = useState<number | null>(null)
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null)
   const [dropdownSearchTerm, setDropdownSearchTerm] = useState<string>('')
-  const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [_expandedSections, _setExpandedSections] = useState<string[]>([])
   const [editingCharacteristic, setEditingCharacteristic] = useState<number | null>(null)
   const [editValue, setEditValue] = useState<string>('')
 
@@ -492,7 +492,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
 
             // Для новых товаров (без productId) сохраняем только в локальное состояние
     // Сохранение в БД произойдет при создании товара
-  }, [productId, editingCharacteristic])
+  }, [editingCharacteristic])
 
   const removeCharacteristic = (valueId: number) => {
     setSelectedCharacteristics(prev => {

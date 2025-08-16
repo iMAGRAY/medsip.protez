@@ -50,7 +50,7 @@ export function ProductVariantDetails({
   variant,
   isOpen,
   onClose,
-  productName
+  productName: _productName
 }: ProductVariantDetailsProps) {
   if (!variant) return null
 

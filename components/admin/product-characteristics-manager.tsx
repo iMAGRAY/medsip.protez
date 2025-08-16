@@ -114,13 +114,13 @@ export function ProductCharacteristicsManager({
   })
 
   // Диалоги
-  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false)
+  const [_isGroupDialogOpen, _setIsGroupDialogOpen] = useState(false)
   const [isCharacteristicDialogOpen, setIsCharacteristicDialogOpen] = useState(false)
-  const [editingGroup, setEditingGroup] = useState<SpecGroup | null>(null)
+  const [_editingGroup, _setEditingGroup] = useState<SpecGroup | null>(null)
   const [editingCharacteristic, setEditingCharacteristic] = useState<ProductCharacteristic | null>(null)
 
   // Формы
-  const [groupFormData, setGroupFormData] = useState({
+  const [_groupFormData, _setGroupFormData] = useState({
     name: "",
     description: "",
     parent_id: undefined as number | undefined
@@ -138,78 +138,91 @@ export function ProductCharacteristicsManager({
     is_primary: false
   })
 
-  // Загрузка данных
-    const loadData = useCallback(async () => {
-              try {
-                setLoading(true)
-                setIsInitializing(true) // Блокируем синхронизацию во время загрузки
+  // Функция для построения иерархической структуры
+  const buildHierarchy = useCallback((flatGroups: SpecGroup[]): SpecGroup[] => {
 
-                // Сбрасываем состояние для новых товаров
-                if (isNewProduct) {
-                  setProductCharacteristics([])
-                }
-
-                await Promise.all([
-                  loadSpecGroups(),
-                  loadProductCharacteristics()
-                ])
-              } finally {
-                setLoading(false)
-                setIsInitializing(false) // Разблокируем синхронизацию после загрузки
-              }
-            }, [productId, isNewProduct])
-
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
-  // Синхронизация с родительским компонентом (только при ручных изменениях, не при загрузке)
-  const [isInitializing, setIsInitializing] = useState(false)
-
-  useEffect(() => {
-    // Не вызываем onCharacteristicsChange во время загрузки данных или для новых товаров
-    if (!isInitializing && !isNewProduct && productCharacteristics.length > 0) {
-
-      onCharacteristicsChange(productCharacteristics)
-    } else {
-
-    }
-  }, [productCharacteristics, isInitializing, isNewProduct])
-
-  // Сохранение состояния раскрытых групп в localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const expandedArray = Array.from(expandedGroups)
-
-        localStorage.setItem('admin-characteristics-expanded-groups', JSON.stringify(expandedArray))
-      } catch (error) {
-        console.error('Error saving expanded groups state:', error)
-      }
-    }
-  }, [expandedGroups])
-
-  // Дополнительный лог для отладки
-  useEffect(() => {
-    console.log('📊 ProductCharacteristicsManager Props:', {
-      productId,
-      productName,
-      characteristicsLength: characteristics.length,
-      isNewProduct,
-      productCharacteristicsLength: productCharacteristics.length,
-      expandedGroupsSize: expandedGroups.size,
-      expandedGroupsContent: Array.from(expandedGroups),
-      selectedGroupsSize: 0, // Удалено: selectedGroups
-      selectedGroupsContent: [] // Удалено: selectedGroups
+    // Создаем карту групп по ID для быстрого поиска
+    const groupMap = new Map<string | number, SpecGroup>()
+    flatGroups.forEach(group => {
+      groupMap.set(group.id, { ...group, children: [] })
     })
-  }, [productId, productName, characteristics, isNewProduct, productCharacteristics, expandedGroups])
 
-  // Отслеживание изменений expandedGroups
-  useEffect(() => {
-    // Здесь можно выполнить действия при изменении expandedGroups, если потребуется.
-  }, [expandedGroups])
+    const rootGroups: SpecGroup[] = []
 
-  const loadSpecGroups = async () => {
+    // Строим дерево, устанавливая связи parent-child
+    flatGroups.forEach(group => {
+      const currentGroup = groupMap.get(group.id)!
+
+      if (group.parent_id && groupMap.has(group.parent_id)) {
+        // Это дочерняя группа
+        const parentGroup = groupMap.get(group.parent_id)!
+        if (!parentGroup.children) {
+          parentGroup.children = []
+        }
+        parentGroup.children.push(currentGroup)
+      } else {
+        // Это корневая группа
+        rootGroups.push(currentGroup)
+      }
+    })
+
+    // Сортируем группы по ordering
+    const sortGroups = (groups: SpecGroup[]) => {
+      groups.sort((a, b) => (a.ordering || 0) - (b.ordering || 0))
+      groups.forEach(group => {
+        if (group.children && group.children.length > 0) {
+          sortGroups(group.children)
+        }
+      })
+    }
+
+    sortGroups(rootGroups)
+
+    // Устанавливаем уровни рекурсивно
+    const setLevels = (groups: SpecGroup[], level: number = 0) => {
+      groups.forEach(group => {
+        group.level = level
+
+        if (group.children && group.children.length > 0) {
+          setLevels(group.children, level + 1)
+        }
+      })
+    }
+
+    setLevels(rootGroups)
+    return rootGroups
+  }, [])
+
+  // Функция для обработки данных из API characteristics
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    const processGroup = (group: any): SpecGroup => {
+      const enumValues = group.enums || group.enum_values || []
+      const enumCount = group.enum_values_count || enumValues.length || 0
+
+      const processedGroup: SpecGroup = {
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        enum_count: enumCount,
+        enum_values: enumValues,
+        enums: enumValues,
+        parent_id: group.parent_id,
+        level: 0, // Будет вычислен в buildHierarchy
+        source_type: 'spec_group',
+        original_id: group.id,
+        ordering: group.ordering || 0,
+        children: [],
+        is_section: group.is_section || false
+      }
+
+      return processedGroup
+    }
+
+    const processedGroups = groups.map(processGroup)
+    return buildHierarchy(processedGroups)
+  }, [buildHierarchy])
+
+  const loadSpecGroups = useCallback(async () => {
     try {
       const res = await fetch('/api/characteristics')
       if (res.ok) {
@@ -227,9 +240,9 @@ export function ProductCharacteristicsManager({
         variant: "destructive"
       })
     }
-  }
+  }, [processHierarchicalGroups])
 
-  const loadProductCharacteristics = async () => {
+  const loadProductCharacteristics = useCallback(async () => {
     if (!productId || isNewProduct) {
 
       return
@@ -270,10 +283,146 @@ export function ProductCharacteristicsManager({
     } catch (error) {
       console.error('Error loading product characteristics:', error)
     }
+  }, [productId, isNewProduct])
+
+  // Загрузка данных
+    const loadData = useCallback(async () => {
+              try {
+                setLoading(true)
+                setIsInitializing(true) // Блокируем синхронизацию во время загрузки
+
+                // Сбрасываем состояние для новых товаров
+                if (isNewProduct) {
+                  setProductCharacteristics([])
+                }
+
+                await Promise.all([
+                  loadSpecGroups(),
+                  loadProductCharacteristics()
+                ])
+              } finally {
+                setLoading(false)
+                setIsInitializing(false) // Разблокируем синхронизацию после загрузки
+              }
+            }, [isNewProduct, loadProductCharacteristics, loadSpecGroups])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  // Синхронизация с родительским компонентом (только при ручных изменениях, не при загрузке)
+  const [isInitializing, setIsInitializing] = useState(false)
+
+  useEffect(() => {
+    // Не вызываем onCharacteristicsChange во время загрузки данных или для новых товаров
+    if (!isInitializing && !isNewProduct && productCharacteristics.length > 0) {
+
+      onCharacteristicsChange(productCharacteristics)
+    } else {
+
+    }
+  }, [productCharacteristics, isInitializing, isNewProduct, onCharacteristicsChange])
+
+  // Сохранение состояния раскрытых групп в localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const expandedArray = Array.from(expandedGroups)
+
+        localStorage.setItem('admin-characteristics-expanded-groups', JSON.stringify(expandedArray))
+      } catch (error) {
+        console.error('Error saving expanded groups state:', error)
+      }
+    }
+  }, [expandedGroups])
+
+  // Дополнительный лог для отладки
+  useEffect(() => {
+    console.log('📊 ProductCharacteristicsManager Props:', {
+      productId,
+      productName,
+      characteristicsLength: characteristics.length,
+      isNewProduct,
+      productCharacteristicsLength: productCharacteristics.length,
+      expandedGroupsSize: expandedGroups.size,
+      expandedGroupsContent: Array.from(expandedGroups),
+      selectedGroupsSize: 0, // Удалено: selectedGroups
+      selectedGroupsContent: [] // Удалено: selectedGroups
+    })
+  }, [productId, productName, characteristics, isNewProduct, productCharacteristics, expandedGroups])
+
+  // Отслеживание изменений expandedGroups
+  useEffect(() => {
+    // Здесь можно выполнить действия при изменении expandedGroups, если потребуется.
+  }, [expandedGroups])
+
+  const _processApiCharacteristics = (apiData: any): ProductCharacteristic[] => {
+    if (!apiData || !Array.isArray(apiData)) return []
+
+    return apiData.map((char: any, index: number) => ({
+      id: char.id?.toString() || `temp-${index}`,
+      group_id: char.group_id,
+      group_name: char.group_name || 'Без группы',
+      characteristic_type: char.characteristic_type || 'text',
+      label: char.label || char.name || '',
+      value_numeric: char.value_numeric,
+      value_text: char.value_text,
+      value_color: char.value_color,
+      selected_enum_id: char.selected_enum_id,
+      selected_enum_value: char.selected_enum_value,
+      unit_id: char.unit_id,
+      unit_code: char.unit_code,
+      is_primary: char.is_primary || false,
+      is_required: char.is_required || false,
+      sort_order: char.sort_order || 0
+    }))
   }
 
+  const _loadProductCharacteristicsDuplicate = useCallback(async () => {
+    if (!productId || isNewProduct) {
+
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/products/${productId}/characteristics`)
+      if (res.ok) {
+        const apiResponse = await res.json()
+
+        // Распаковываем данные из новой EAV системы
+        const characteristicsData = apiResponse.data?.characteristics || []
+
+        // Преобразуем группированные данные в плоский массив
+        const flatCharacteristics = characteristicsData.flatMap((group: any) => {
+          return group.characteristics?.map((char: any) => ({
+            id: `${char.template_id}-${char.variant_id}`,
+            group_id: group.group_id,
+            group_name: group.group_name,
+            characteristic_type: char.input_type === 'enum' ? 'select' : 'text',
+            label: char.enum_display_name || char.enum_value || char.raw_value || char.template_name,
+            value_text: char.raw_value,
+            value_numeric: char.numeric_value,
+            value_color: char.enum_color || char.raw_value,
+            selected_enum_id: char.enum_value_id,
+            selected_enum_value: char.enum_value,
+            template_id: char.template_id,
+            variant_id: char.variant_id,
+            is_primary: false,
+            is_required: false,
+            sort_order: char.template_sort_order || 0
+          })) || []
+        })
+
+        setProductCharacteristics(flatCharacteristics)
+
+      }
+    } catch (error) {
+      console.error('Error loading product characteristics:', error)
+    }
+  }, [productId, isNewProduct])
+
   // Функция для обработки данных из API characteristics
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
+  const _processHierarchicalGroupsDuplicate = useCallback((groups: any[]): SpecGroup[] => {
     const processGroup = (group: any): SpecGroup => {
       const enumValues = group.enums || group.enum_values || []
       const enumCount = group.enum_values_count || enumValues.length || 0
@@ -299,10 +448,10 @@ export function ProductCharacteristicsManager({
 
     const processedGroups = groups.map(processGroup)
     return buildHierarchy(processedGroups)
-  }
+  }, [buildHierarchy])
 
   // Функция для построения иерархической структуры
-  const buildHierarchy = (flatGroups: SpecGroup[]): SpecGroup[] => {
+  const _buildHierarchyDuplicate = useCallback((flatGroups: SpecGroup[]): SpecGroup[] => {
 
     // Создаем карту групп по ID для быстрого поиска
     const groupMap = new Map<string | number, SpecGroup>()
@@ -341,9 +490,9 @@ export function ProductCharacteristicsManager({
 
     setLevels(rootGroups)
     return rootGroups
-  }
+  }, [])
 
-  const _processApiCharacteristics = (apiData: any): ProductCharacteristic[] => {
+  const _processApiCharacteristicsDuplicate = (apiData: any): ProductCharacteristic[] => {
     if (!apiData || !Array.isArray(apiData)) return []
 
     return apiData.map((char: any, index: number) => ({

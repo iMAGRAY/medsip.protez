@@ -88,8 +88,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [page, _setPage] = useState(1)
+  const [_totalPages, _setTotalPages] = useState(1)
   const [updating, setUpdating] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState('active')
@@ -112,7 +112,7 @@ export default function OrdersPage() {
 
         if (data.success) {
           setOrders(data.data.orders)
-          setTotalPages(data.data.pagination.pages)
+          _setTotalPages(data.data.pagination.pages)
         } else {
           console.error('Ошибка загрузки заказов:', data.error)
         }
@@ -121,7 +121,7 @@ export default function OrdersPage() {
       } finally {
         setLoading(false)
       }
-    }, [page, activeTab])
+    }, [page])
 
   // Функция для фильтрации заказов по вкладкам
   const getOrdersByTab = (tabName: string) => {
@@ -585,7 +585,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  Конфигурация: ${configText}`;
   }
@@ -632,7 +632,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  _Конфигурация: ${configText}_`;
   }
@@ -675,7 +675,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\nКонфигурация: ${configText}`;
   }
@@ -724,7 +724,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  Конфигурация: ${configText}`;
   }
@@ -883,7 +883,7 @@ ${order.items?.map(item => {
         item.product_name,
         item.configuration && Object.keys(item.configuration).length > 0
           ? Object.entries(item.configuration)
-              .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+              .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
               .join(', ')
           : '',
         item.sku || '',

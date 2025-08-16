@@ -71,7 +71,7 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
       } finally {
         setLoading(false);
       }
-    }, []);
+    }, [apiClient, logger, toast]);
 
   useEffect(() => {
     loadManufacturers();

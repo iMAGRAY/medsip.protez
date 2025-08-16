@@ -72,7 +72,7 @@ export const WarehouseTreeManager: React.FC<WarehouseTreeManagerProps> = ({
   onNodeCreate,
   onNodeEdit,
   onNodeDelete,
-  onNodeMove,
+  onNodeMove: _onNodeMove,
   loading = false
 }) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())

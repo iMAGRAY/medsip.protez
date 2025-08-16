@@ -104,14 +104,7 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
       }
     }, [variantId])
 
-  useEffect(() => {
-    fetchAllTags()
-    if (variantId) {
-      fetchVariantTags()
-    }
-  }, [fetchAllTags])
-
-  const fetchVariantTags = async () => {
+  const fetchVariantTags = useCallback(async () => {
     try {
       const response = await fetch(`/api/variants/${variantId}/tags`, {
         credentials: 'include',
@@ -126,7 +119,14 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [variantId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (variantId) {
+      fetchVariantTags()
+    }
+  }, [fetchAllTags, fetchVariantTags, variantId])
 
   const handleTagToggle = async (tag: ProductTag, checked: boolean) => {
     if (isUpdating) return

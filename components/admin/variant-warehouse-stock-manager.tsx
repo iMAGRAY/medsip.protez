@@ -62,24 +62,7 @@ export function VariantWarehouseStockManager({
     fetchWarehouses()
   }, [fetchWarehouses])
 
-  // Загрузка остатков при изменении variantId
-  useEffect(() => {
-    if (variantId) {
-      fetchWarehouseStocks()
-    } else {
-      // Для нового варианта показываем склады с нулевыми остатками
-      setWarehouseStocks(warehouses.map(w => ({
-        warehouse_id: w.id,
-        warehouse_name: w.name,
-        warehouse_code: w.code,
-        city: w.city,
-        quantity: 0,
-        reserved_quantity: 0
-      })))
-    }
-  }, [variantId, warehouses])
-
-  const fetchWarehouseStocks = async () => {
+  const fetchWarehouseStocks = useCallback(async () => {
     if (!variantId) return
 
     setLoading(true)
@@ -96,7 +79,24 @@ export function VariantWarehouseStockManager({
     } finally {
       setLoading(false)
     }
-  }
+  }, [variantId])
+
+  // Загрузка остатков при изменении variantId
+  useEffect(() => {
+    if (variantId) {
+      fetchWarehouseStocks()
+    } else {
+      // Для нового варианта показываем склады с нулевыми остатками
+      setWarehouseStocks(warehouses.map(w => ({
+        warehouse_id: w.id,
+        warehouse_name: w.name,
+        warehouse_code: w.code,
+        city: w.city,
+        quantity: 0,
+        reserved_quantity: 0
+      })))
+    }
+  }, [variantId, warehouses, fetchWarehouseStocks])
 
   const handleQuantityChange = (warehouseId: number, quantity: string) => {
     const numQuantity = parseInt(quantity) || 0

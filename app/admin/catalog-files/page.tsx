@@ -44,7 +44,7 @@ interface CatalogFormData {
 }
 
 export default function CatalogFilesPage() {
-  const { authStatus, hasPermission } = useAuth()
+  const { authStatus: _authStatus, hasPermission } = useAuth()
   const [catalogs, setCatalogs] = useState<CatalogFile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

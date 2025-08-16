@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -95,7 +95,7 @@ export const WarehouseAdvancedSearch: React.FC<WarehouseAdvancedSearchProps> = (
   const [saveSearchName, setSaveSearchName] = useState('')
 
   // Доступные фильтры
-  const availableFilters: SearchFilter[] = [
+  const availableFilters: SearchFilter[] = useMemo(() => [
     {
       id: 'type',
       type: 'select',
@@ -169,7 +169,7 @@ export const WarehouseAdvancedSearch: React.FC<WarehouseAdvancedSearchProps> = (
         { value: 'kzn', label: 'Казань' }
       ]
     }
-  ]
+  ], [])
 
   // Быстрые фильтры
   const quickFilters: QuickFilter[] = [

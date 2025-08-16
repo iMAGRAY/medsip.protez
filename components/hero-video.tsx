@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import Image from "next/image"
 
 const HeroVideo = () => {
   const [videoError, setVideoError] = useState(false)
@@ -112,10 +113,11 @@ const HeroVideo = () => {
   if (videoError || isSlowConnection) {
     return (
       <div className="relative w-full h-full overflow-hidden">
-        <img
+        <Image
           src={staticImageUrl}
           alt="Семья с протезом идет вместе"
-          className="relative w-full h-full object-cover transition-transform duration-75 ease-out
+          fill
+          className="relative object-cover transition-transform duration-75 ease-out
             sm:object-center object-left-center"
           style={{
             transform: `translateY(${scrollY * 0.1}px)`,

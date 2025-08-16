@@ -1,0 +1,51 @@
+{
+  "tablesExist": {
+    "product_sizes": true,
+    "product_variants": true,
+    "both_exist": true
+  },
+  "schemaDifferences": {
+    "enhanced_columns": [
+      "dimensions",
+      "specifications",
+      "size_name",
+      "size_value"
+    ],
+    "has_all_enhanced": true,
+    "migration_indexes": [
+      "idx_product_variants_size_name",
+      "idx_product_variants_size_value",
+      "idx_product_variants_dimensions",
+      "idx_product_variants_specifications",
+      "product_specifications_pkey",
+      "product_specifications_product_id_idx",
+      "product_specifications_product_id_sort_idx",
+      "idx_product_sizes_dimensions_gin",
+      "idx_product_sizes_specifications_gin"
+    ]
+  },
+  "dataCounts": {
+    "product_sizes": 1,
+    "product_variants_total": 33,
+    "product_variants_migrated": 0,
+    "product_variants_original": 33
+  },
+  "migrationProgress": {
+    "unmigrated_sizes": 0,
+    "completion_percentage": 100,
+    "status": "COMPLETED",
+    "duplicate_skus": 0
+  },
+  "dataIntegrity": {
+    "orphaned_variants": 0,
+    "variants_without_characteristics": 0,
+    "inconsistent_data": 0,
+    "overall_status": "GOOD"
+  },
+  "recommendations": [
+    {
+      "priority": "LOW",
+      "message": "Migration completed. Consider dropping product_sizes table after testing."
+    }
+  ]
+}

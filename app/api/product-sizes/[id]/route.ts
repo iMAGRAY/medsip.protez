@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db-connection'
 
+/**
+ * @deprecated This API is deprecated. Use /api/admin/products/[id]/sizes instead
+ * which uses the unified product_variants table. This endpoint will be removed in v2.0
+ */
+
 // GET /api/product-sizes/[id] - получить размер по ID
 export async function GET(
   _request: NextRequest,
@@ -56,7 +61,10 @@ export async function GET(
       updatedAt: row.updated_at
     }
 
-    return NextResponse.json(size)
+    return NextResponse.json({
+      data: size,
+      warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
+    })
   } catch (error) {
     console.error('Error fetching product size:', error)
     return NextResponse.json(
@@ -204,7 +212,10 @@ export async function PUT(
       updatedAt: updatedSize.updated_at
     }
 
-    return NextResponse.json(response)
+    return NextResponse.json({
+      data: response,
+      warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
+    })
   } catch (error: any) {
     console.error('Error updating product size:', error)
 
@@ -260,7 +271,8 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Product size deleted successfully'
+      message: 'Product size deleted successfully',
+      warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     })
   } catch (error) {
     console.error('Error deleting product size:', error)

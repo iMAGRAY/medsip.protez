@@ -19,10 +19,10 @@ import { useAuth } from "@/components/admin/auth-guard"
 
 export default function ProductsAdmin() {
   const router = useRouter()
-  const { authStatus, hasPermission } = useAuth()
+  const { authStatus: _authStatus, hasPermission } = useAuth()
   const {
     products,
-    addProduct,
+    addProduct: _addProduct,
     updateProduct,
     deleteProduct,
     initializeData,

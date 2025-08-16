@@ -9,7 +9,8 @@ const ALLOWED_TABLES = [
   'categories',
   'model_series',
   'manufacturers',
-  'product_sizes',
+  'product_sizes',      // @deprecated: Use product_variants instead
+  'product_variants',   // Unified table for product variants
   'product_images',
   'site_settings',
   'product_characteristics',

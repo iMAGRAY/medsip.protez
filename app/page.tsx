@@ -18,7 +18,7 @@ import logger from "@/lib/logger"
 import { CatalogDownloadButtons } from "@/components/catalog-download-buttons"
 
 // Строгие интерфейсы для типизации
-interface Category {
+interface _Category {
   id: number
   name: string
   parent_id: number | null
@@ -43,7 +43,7 @@ interface Manufacturer {
   logo_url: string | null
 }
 
-interface MenuSection {
+interface _MenuSection {
   id: string
   name: string
   type: 'category' | 'manufacturer' | 'custom'
@@ -52,7 +52,7 @@ interface MenuSection {
   sort_order: number
 }
 
-interface Product {
+interface _Product {
   id: number
   name: string
   price: number
@@ -111,14 +111,14 @@ export default function HomePage() {
 
   // Функция для принудительного обновления данных
   const _handleForceRefresh = async () => {
-    setRefreshing(true)
+    _setRefreshing(true)
     try {
       await forceRefresh()
 
     } catch (error) {
       console.error('❌ Ошибка при обновлении данных:', error)
     } finally {
-      setRefreshing(false)
+      _setRefreshing(false)
     }
   }
 
@@ -134,10 +134,10 @@ export default function HomePage() {
   }
 
   // Загружаем категории товаров для каталога
-  const [specGroups, setSpecGroups] = useState<any[]>([])
+  const [_specGroups, _setSpecGroups] = useState<any[]>([])
   const [catalogMenuItems, setCatalogMenuItems] = useState<any[]>([])
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set()) // Для отображения/скрытия подкатегорий
-  const [refreshing, setRefreshing] = useState(false)
+  const [_refreshing, _setRefreshing] = useState(false)
 
   // Функция для переключения раскрытия категории
   const toggleCategoryExpansion = useCallback((categoryId: number) => {
@@ -155,6 +155,16 @@ export default function HomePage() {
   // Функция загрузки характеристик для фильтрации
   const loadFilterCharacteristics = useCallback(async (categoryId?: number | null) => {
     console.log('🎯 loadFilterCharacteristics вызвана с categoryId:', categoryId)
+    
+    // Отменяем предыдущий запрос если он есть
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Создаем новый AbortController
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    
     setIsLoadingCharacteristics(true)
     try {
       logger.log('🔄 Загрузка характеристик для фильтрации...', { categoryId })
@@ -164,7 +174,7 @@ export default function HomePage() {
         ? `/api/characteristics/by-category?category_id=${categoryId}&include_children=true`
         : '/api/characteristics'
         
-      const response = await fetch(url)
+      const response = await fetch(url, { signal: abortController.signal })
       
       if (!response.ok) {
         console.error('❌ HTTP ошибка при загрузке характеристик:', {
@@ -232,16 +242,30 @@ export default function HomePage() {
             }))
           )
         }
-        setAvailableCharacteristics(flatCharacteristics)
-        console.log('✅ Установлены характеристики:', flatCharacteristics.length, flatCharacteristics)
+        // Проверяем что запрос не был отменен перед обновлением состояния
+        if (!abortController.signal.aborted) {
+          setAvailableCharacteristics(flatCharacteristics)
+          console.log('✅ Установлены характеристики:', flatCharacteristics.length, flatCharacteristics)
+        }
       } else {
-        logger.error('❌ Ошибка загрузки характеристик:', result.error)
-        setAvailableCharacteristics([])
+        if (!abortController.signal.aborted) {
+          logger.error('❌ Ошибка загрузки характеристик:', result.error)
+          setAvailableCharacteristics([])
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Игнорируем AbortError - это нормальная отмена запроса
+      if (error.name === 'AbortError') {
+        console.log('🚫 Запрос характеристик отменен')
+        return
+      }
       logger.error('❌ Ошибка загрузки характеристик для фильтрации:', error)
     } finally {
-      setIsLoadingCharacteristics(false)
+      // Проверяем что это наш текущий запрос перед сбросом состояния
+      if (abortControllerRef.current === abortController) {
+        setIsLoadingCharacteristics(false)
+        abortControllerRef.current = null
+      }
     }
   }, [])
 
@@ -280,7 +304,7 @@ export default function HomePage() {
 
           const transformedCategories = transformCategories(result.data)
           setCatalogMenuItems(transformedCategories)
-          setSpecGroups(transformedCategories)
+          _setSpecGroups(transformedCategories)
 
           logger.log(`📋 Структура категорий:`)
           transformedCategories.forEach((item: any, index: number) => {
@@ -516,16 +540,21 @@ export default function HomePage() {
       onCategoryChange={handleCategoryChange}
       HierarchicalCategoryItem={HierarchicalCategoryItem}
     />
-  ), [hierarchicalCategories, activeCategory, handleCategoryChange, HierarchicalCategoryItem])
+  ), [hierarchicalCategories, activeCategory, handleCategoryChange, HierarchicalCategoryItem, activeCategoryId])
 
   const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null)
 
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
+  const filteredProductsRef = useRef<any[]>([])  // Ref для актуального filteredProducts
+  const hasMoreRef = useRef<boolean>(true)       // Ref для hasMore состояния
+  const isLoadingMoreRef = useRef<boolean>(false)  // Ref для isLoadingMore состояния
+  const abortControllerRef = useRef<AbortController | null>(null)  // AbortController для API запросов
 
   // Initialize filtered products
   useEffect(() => {
     setFilteredProducts(allProducts)
+    filteredProductsRef.current = allProducts  // Синхронизируем ref
   }, [allProducts])
 
   // Мемоизируем функцию поиска групп и их детей по ID
@@ -652,45 +681,60 @@ export default function HomePage() {
     }
 
     return tempProducts
-  }, [searchQuery, activeCategory, activeCategoryId, appliedFilters, sortBy, allProducts, hierarchicalCategories, findGroupAndChildrenById])
+  }, [searchQuery, activeCategory, activeCategoryId, appliedFilters, sortBy, allProducts, hierarchicalCategories])
 
   // Обновляем отфильтрованные товары и сбрасываем пагинацию при изменении фильтров
   useEffect(() => {
     const newProducts = [...processedProducts]
     setFilteredProducts(newProducts)
+    filteredProductsRef.current = newProducts  // Синхронизируем ref
     setCurrentPage(1)
     setHasMore(true)
+    hasMoreRef.current = true
 
     // Показываем первую порцию товаров
     const initialProducts = newProducts.slice(0, PRODUCTS_PER_PAGE)
     setDisplayedProducts(initialProducts)
-    setHasMore(newProducts.length > PRODUCTS_PER_PAGE)
+    const newHasMore = newProducts.length > PRODUCTS_PER_PAGE
+    setHasMore(newHasMore)
+    hasMoreRef.current = newHasMore
   }, [processedProducts])
 
   // Функция загрузки дополнительных товаров
   const loadMoreProducts = useCallback(() => {
-    if (isLoadingMore || !hasMore) return
-
+    // Проверяем актуальное состояние через refs
+    if (isLoadingMoreRef.current || !hasMoreRef.current) return
+    
     setIsLoadingMore(true)
+    isLoadingMoreRef.current = true
 
     // Имитируем небольшую задержку для плавности
     setTimeout(() => {
-      const nextPage = currentPage + 1
-      const startIndex = (nextPage - 1) * PRODUCTS_PER_PAGE
-      const endIndex = startIndex + PRODUCTS_PER_PAGE
-      const newProducts = filteredProducts.slice(startIndex, endIndex)
+      setCurrentPage(prevPage => {
+        const nextPage = prevPage + 1
+        const startIndex = (nextPage - 1) * PRODUCTS_PER_PAGE
+        const endIndex = startIndex + PRODUCTS_PER_PAGE
+        
+        // Используем ref для получения актуальных данных
+        const currentFiltered = filteredProductsRef.current || []
+        const newProducts = currentFiltered.slice(startIndex, endIndex)
 
-      if (newProducts.length > 0) {
-        setDisplayedProducts(prev => [...prev, ...newProducts])
-        setCurrentPage(nextPage)
-        setHasMore(endIndex < filteredProducts.length)
-      } else {
-        setHasMore(false)
-      }
-
+        if (newProducts.length > 0) {
+          setDisplayedProducts(prev => [...prev, ...newProducts])
+          const newHasMore = endIndex < currentFiltered.length
+          setHasMore(newHasMore)
+          hasMoreRef.current = newHasMore
+          return nextPage
+        } else {
+          setHasMore(false)
+          hasMoreRef.current = false
+          return prevPage
+        }
+      })
       setIsLoadingMore(false)
+      isLoadingMoreRef.current = false
     }, 300)
-  }, [currentPage, filteredProducts, isLoadingMore, hasMore])
+  }, [])
 
   // Intersection Observer для автоматической подгрузки
   useEffect(() => {
@@ -701,7 +745,7 @@ export default function HomePage() {
     observerRef.current = new IntersectionObserver(
       (entries) => {
         const [entry] = entries
-        if (entry.isIntersecting && hasMore && !isLoadingMore) {
+        if (entry.isIntersecting) {
           loadMoreProducts()
         }
       },
@@ -720,7 +764,7 @@ export default function HomePage() {
         observerRef.current.disconnect()
       }
     }
-  }, [loadMoreProducts, hasMore, isLoadingMore])
+  }, [loadMoreProducts])
 
   const _handleFilterChange = useCallback((filters: any) => {
     setAppliedFilters(filters)

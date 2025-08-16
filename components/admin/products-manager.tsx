@@ -129,19 +129,13 @@ export function ProductsManager({
       } finally {
         setLoading(false);
       }
-    }, []);
+    }, [apiClient, logger, toast]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  useEffect(() => {
-    if (modelLineId) {
-      loadProductsForModelLine();
-    }
-  }, [modelLineId]);
-
-  const loadProductsForModelLine = async () => {
+  const loadProductsForModelLine = useCallback(async () => {
     if (!modelLineId) return;
 
     try {
@@ -161,7 +155,13 @@ export function ProductsManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [modelLineId, apiClient, logger, toast]);
+
+  useEffect(() => {
+    if (modelLineId) {
+      loadProductsForModelLine();
+    }
+  }, [modelLineId, loadProductsForModelLine]);
 
   const resetProductForm = () => {
     setAttemptedSave(false)

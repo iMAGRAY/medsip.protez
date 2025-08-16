@@ -5,7 +5,7 @@ import { guardDbOr503Fast } from '@/lib/api-guards'
 
 export const dynamic = 'force-dynamic'
 
-function isDbConfigured() {
+function _isDbConfigured() {
   return !!process.env.DATABASE_URL || (
     !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
   )
@@ -103,7 +103,7 @@ export async function GET(_request: NextRequest) {
     })
 
     const categoriesForForm = categories.map(cat => {
-      const { children, ...categoryData } = cat
+      const { children: _children, ...categoryData } = cat
       return categoryData
     })
 

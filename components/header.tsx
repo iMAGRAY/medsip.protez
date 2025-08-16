@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, X, Phone, Mail, MapPin, ClipboardList } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
@@ -142,9 +143,11 @@ export default function Header() {
               <nav className="grid gap-4 py-4">
                   <InstantLink href="/" className="flex items-center gap-3 mb-4">
                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-                      <img
+                      <Image
                         src="/logo.webp"
                         alt="МедСИП Протезирование"
+                        width={32}
+                        height={32}
                         className="h-6 w-auto max-w-none dark:hidden"
                         style={{
                           filter: 'brightness(1) contrast(1.1)',

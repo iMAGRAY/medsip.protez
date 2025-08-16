@@ -33,7 +33,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 // Функция для создания уникального ключа товара с учетом конфигурации
-function getItemKey(item: Omit<CartItem, 'quantity'>): string {
+function _getItemKey(item: Omit<CartItem, 'quantity'>): string {
   const baseKey = `${item.id}_${item.variant_id || 'no-variant'}`
   
   if (item.configuration && Object.keys(item.configuration).length > 0) {

@@ -1,4 +1,4 @@
-interface ServiceContainer {
+interface _ServiceContainer {
   apiClient: any;
   adminStore: any;
   cacheManager: any;

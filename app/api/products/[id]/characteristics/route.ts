@@ -68,7 +68,7 @@ export async function GET(
 }
 
 // Функция для форматирования характеристик из новой EAV системы
-function formatEAVCharacteristics(rows: any[], _productId: number) {
+function _formatEAVCharacteristics(rows: any[], _productId: number) {
   const groupedCharacteristics: any = {};
 
   rows.forEach((row: any) => {
