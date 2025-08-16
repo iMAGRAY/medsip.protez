@@ -305,6 +305,15 @@ export default function HomePage() {
           const transformedCategories = transformCategories(result.data)
           setCatalogMenuItems(transformedCategories)
           _setSpecGroups(transformedCategories)
+          
+          // Автоматически раскрываем категории с детьми для видимости иерархии
+          const categoriesWithChildren = new Set<number>()
+          transformedCategories.forEach((cat: any) => {
+            if (cat.children && cat.children.length > 0) {
+              categoriesWithChildren.add(cat.id)
+            }
+          })
+          setExpandedCategories(categoriesWithChildren)
 
           logger.log(`📋 Структура категорий:`)
           transformedCategories.forEach((item: any, index: number) => {

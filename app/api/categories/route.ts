@@ -116,6 +116,10 @@ export const GET = withCache(async function GET(request: NextRequest) {
           const parent = categoriesMap.get(cat.parent_id);
           if (parent) {
             parent.children.push(categoriesMap.get(cat.id));
+          } else {
+            // Если родитель не найден (возможно неактивен или удален),
+            // показываем категорию как корневую
+            rootCategories.push(categoriesMap.get(cat.id));
           }
         } else {
           rootCategories.push(categoriesMap.get(cat.id));
