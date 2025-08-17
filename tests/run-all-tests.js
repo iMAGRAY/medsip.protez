@@ -14,31 +14,32 @@ if (!process.env.DATABASE_URL && !process.env.POSTGRESQL_HOST) {
 }
 
 const tests = [
-  // API Tests
-  'tests/api/about-page.test.js',
-  'tests/api/contacts-page.test.js',
-  'tests/api/db-status.test.js',
-  'tests/api/manufacturers.test.js',
-  'tests/api/product-specifications.test.js',
-  'tests/api/site-settings.test.js',
-
-  // Database Tests
-  'tests/database/connection.test.js',
-
-  // Integration Tests
-  'tests/integration/hierarchy.test.js',
-  'tests/integration/static-assets.test.js',
-
-  // Performance Tests
-  'tests/performance/media-gallery-performance.test.js'
+  // Дымовые тесты
+  { name: 'Дымовые тесты', file: 'tests/smoke-tests.js' },
+  
+  // Интеграционные тесты
+  { name: 'Интеграционные API тесты', file: 'tests/integration/api-integration-tests.js' },
+  { name: 'Тесты аутентификации', file: 'tests/integration/auth-session-tests.js' },
+  
+  // E2E тесты
+  { name: 'E2E критические сценарии', file: 'tests/e2e/critical-user-flows.js' },
+  
+  // Тесты безопасности
+  { name: 'Тесты безопасности', file: 'tests/security/security-tests.js' },
+  
+  // Тесты производительности
+  { name: 'Тесты производительности', file: 'tests/performance/load-tests.js' }
 ]
 
 let passed = 0
 let failed = 0
 
-async function runTest(testFile) {
+async function runTest(testInfo) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [testFile], {
+    console.log(`\n🚀 Запуск: ${testInfo.name}`)
+    console.log('─'.repeat(50))
+    
+    const child = spawn(process.execPath, [testInfo.file], {
       stdio: ['inherit', 'pipe', 'pipe'],
       env: { ...process.env }
     })
@@ -60,15 +61,17 @@ async function runTest(testFile) {
 
     child.on('close', (code) => {
       if (code === 0) {
+        console.log(`✅ ${testInfo.name} - ПРОЙДЕНО`)
         passed++
       } else {
+        console.log(`❌ ${testInfo.name} - ПРОВАЛЕНО`)
         failed++
       }
       resolve(code)
     })
 
     child.on('error', (error) => {
-      console.error(`❌ ${path.basename(testFile)} - ERROR: ${error.message}`)
+      console.error(`❌ ${testInfo.name} - ОШИБКА: ${error.message}`)
       failed++
       resolve(1)
     })
@@ -77,6 +80,10 @@ async function runTest(testFile) {
 
 async function runAllTests() {
   const startTime = Date.now()
+  
+  console.log('='.repeat(60))
+  console.log('🧪 ЗАПУСК ВСЕХ ТЕСТОВ MEDSIP.PROTEZ')
+  console.log('='.repeat(60))
 
   for (const test of tests) {
     await runTest(test)
@@ -85,10 +92,20 @@ async function runAllTests() {
   const duration = Date.now() - startTime
   const total = passed + failed
 
-  console.log('\n' + '='.repeat(50))
-  console.log('='.repeat(50))
+  console.log('\n' + '='.repeat(60))
+  console.log('📊 ИТОГОВЫЕ РЕЗУЛЬТАТЫ')
+  console.log('='.repeat(60))
+  console.log(`\n📈 Статистика:`)
+  console.log(`  Всего тестов: ${total}`)
+  console.log(`  ✅ Пройдено: ${passed}`)
+  console.log(`  ❌ Провалено: ${failed}`)
+  console.log(`  ⏱️  Время: ${(duration / 1000).toFixed(2)}s`)
+  console.log(`  📊 Успешность: ${total > 0 ? ((passed / total) * 100).toFixed(1) : 0}%`)
+  
   if (failed === 0) {
+    console.log('\n🎉 ВСЕ ТЕСТЫ ПРОЙДЕНЫ УСПЕШНО!')
   } else {
+    console.log('\n⚠️  Некоторые тесты провалены. Проверьте логи выше.')
   }
 
   process.exit(failed > 0 ? 1 : 0)

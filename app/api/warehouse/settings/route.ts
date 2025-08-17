@@ -52,7 +52,6 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка получения настроек склада:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения настроек складской системы'
@@ -95,7 +94,6 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка сохранения настроек склада:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка сохранения настроек складской системы'

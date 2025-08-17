@@ -193,7 +193,6 @@ export async function POST(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка создания иерархии складов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания иерархии складов: ' + (error instanceof Error ? error.message : 'Unknown error')

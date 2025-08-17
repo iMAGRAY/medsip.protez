@@ -68,7 +68,6 @@ export async function GET(_request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Redis status error:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения статуса Redis',
@@ -164,7 +163,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Redis operation error:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка выполнения операции Redis',
@@ -242,7 +240,6 @@ export async function DELETE(request: NextRequest) {
     }, { status: 400 })
 
   } catch (error) {
-    console.error('Redis flush error:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка очистки кеша Redis',

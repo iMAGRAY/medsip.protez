@@ -233,8 +233,6 @@ export async function GET(request: Request) {
     })
 
   } catch (error) {
-    console.error("Database error in available-entities GET:", error)
-    console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace')
     return NextResponse.json(
       {
         success: false,

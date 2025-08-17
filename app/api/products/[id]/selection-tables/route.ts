@@ -80,7 +80,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
@@ -104,7 +104,8 @@ export async function PUT(
       )
     }
 
-    const productId = parseInt(params.id)
+    const { id } = await params
+    const productId = parseInt(id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(

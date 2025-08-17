@@ -5,13 +5,14 @@ import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 // GET /api/admin/characteristic-templates/[id] - получить шаблон с предустановленными значениями
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const guard = guardDbOr503Fast()
     if (guard) return guard
 
-    const templateId = parseInt(params.id);
+    const resolvedParams = await params
+    const templateId = parseInt(resolvedParams.id);
 
     if (isNaN(templateId)) {
       return NextResponse.json(
@@ -84,13 +85,14 @@ export async function GET(
 // PUT /api/admin/characteristic-templates/[id] - обновить шаблон
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const guard = guardDbOr503Fast()
     if (guard) return guard
 
-    const templateId = parseInt(params.id);
+    const resolvedParams = await params
+    const templateId = parseInt(resolvedParams.id);
 
     if (isNaN(templateId)) {
       return NextResponse.json(
@@ -208,13 +210,14 @@ export async function PUT(
 // DELETE /api/admin/characteristic-templates/[id] - удалить шаблон
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const guard = guardDbOr503Fast()
     if (guard) return guard
 
-    const templateId = parseInt(params.id);
+    const resolvedParams = await params
+    const templateId = parseInt(resolvedParams.id);
 
     if (isNaN(templateId)) {
       return NextResponse.json(

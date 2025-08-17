@@ -81,7 +81,6 @@ export async function POST(_request: NextRequest) {
         try {
           fileHash = await calculateFileHashFromUrl(s3Url)
         } catch (_hashError) {
-          console.warn(`⚠️ Не удалось вычислить хеш для ${obj.Key}, используем ключ как хеш`)
           fileHash = obj.Key.replace(/[^a-zA-Z0-9]/g, '')
         }
 
@@ -131,7 +130,6 @@ skipped++
         synced++
 
       } catch (error) {
-        console.error(`❌ Ошибка при синхронизации ${obj.Key}:`, error)
         errors++
       }
     }
@@ -146,7 +144,6 @@ skipped++
     })
 
   } catch (error) {
-    console.error('❌ Ошибка при синхронизации:', error)
     return NextResponse.json(
       {
         success: false,

@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Error fetching size charts:", error)
     return NextResponse.json(
       {
         success: false,
@@ -184,8 +183,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('Error creating size chart:', error)
-
     if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // Unique constraint violation
       return NextResponse.json(
         { error: 'Size chart with this name already exists' },

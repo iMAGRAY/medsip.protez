@@ -94,7 +94,6 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Database error in filter-characteristics GET (new EAV system):', error);
     return NextResponse.json(
       {
         success: false,

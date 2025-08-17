@@ -57,7 +57,6 @@ export async function POST(_request: NextRequest) {
             cacheManager.clear();
 
         } catch (cacheError) {
-            console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
         }
 
         return NextResponse.json({
@@ -70,7 +69,6 @@ export async function POST(_request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('❌ Ошибка синхронизации:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка синхронизации данных о товарах'

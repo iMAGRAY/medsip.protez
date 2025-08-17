@@ -128,7 +128,6 @@ try {
       }
     })
   } catch (error) {
-    console.error('Ошибка получения значений характеристик (новая EAV система):', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка получения данных из новой EAV системы', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -271,7 +270,6 @@ export async function POST(request: NextRequest) {
       system: 'eav_unified'
     })
   } catch (error) {
-    console.error('Ошибка создания значения характеристики (новая EAV система):', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка создания значения характеристики в новой EAV системе', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -337,7 +335,6 @@ export async function PUT(request: NextRequest) {
       system: 'eav_unified'
     })
   } catch (error) {
-    console.error('Ошибка обновления значения характеристики (новая EAV система):', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления значения характеристики в новой EAV системе', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -381,7 +378,6 @@ export async function DELETE(request: NextRequest) {
       system: 'eav_unified'
     })
   } catch (error) {
-    console.error('Ошибка удаления значения характеристики (новая EAV система):', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления значения характеристики из новой EAV системы', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

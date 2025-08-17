@@ -76,7 +76,6 @@ const client = getDbConnection()
         roles: _roles
       })
     } catch (error) {
-      console.error('Database error getting roles:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка получения ролей из базы данных' },
@@ -84,7 +83,6 @@ const client = getDbConnection()
       )
     }
   } catch (error) {
-    console.error('Error getting roles:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -189,7 +187,6 @@ export async function POST(request: NextRequest) {
         }
       })
     } catch (error) {
-      console.error('Database error creating role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка создания роли в базе данных' },
@@ -197,7 +194,6 @@ export async function POST(request: NextRequest) {
       )
     }
   } catch (error) {
-    console.error('Error creating role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -304,7 +300,6 @@ export async function PUT(request: NextRequest) {
         }
       })
     } catch (error) {
-      console.error('Database error updating role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка обновления роли в базе данных' },
@@ -312,7 +307,6 @@ export async function PUT(request: NextRequest) {
       )
     }
   } catch (error) {
-    console.error('Error updating role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -420,7 +414,6 @@ export async function DELETE(request: NextRequest) {
         message: 'Роль успешно удалена'
       })
     } catch (error) {
-      console.error('Database error deleting role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка удаления роли в базе данных' },
@@ -428,7 +421,6 @@ export async function DELETE(request: NextRequest) {
       )
     }
   } catch (error) {
-    console.error('Error deleting role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -30,7 +30,6 @@ export async function GET() {
       warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     })
   } catch (error) {
-    console.error("Database error in product-sizes GET:", error)
     return NextResponse.json({ error: "Failed to fetch product sizes" }, { status: 500 })
   }
 }
@@ -146,8 +145,6 @@ export async function POST(request: NextRequest) {
       warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     }, { status: 201 })
   } catch (error: any) {
-    console.error('Error creating product size:', error)
-
     if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // Unique constraint violation
       if (error.constraint === 'unique_product_size') {
         return NextResponse.json(

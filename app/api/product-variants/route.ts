@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка получения вариантов товаров:', error);
     return NextResponse.json(
       { error: 'Ошибка получения вариантов товаров' },
       { status: 500 }
@@ -111,7 +110,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result.rows[0], { status: 201 });
 
   } catch (error) {
-    console.error('Ошибка создания варианта товара:', error);
     return NextResponse.json(
       { error: 'Ошибка создания варианта товара' },
       { status: 500 }

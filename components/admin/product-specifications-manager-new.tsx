@@ -220,7 +220,7 @@ export function ProductSpecificationsManagerNew({
 
       // Если ID не является корректным числом, пропускаем эту группу
       if (isNaN(groupId) || groupId <= 0) {
-        console.warn(`⚠️ Skipping group with invalid ID: ${group.name} (id: ${group.id})`)
+        // Skipping group with invalid ID
         return null
       }
 
@@ -245,13 +245,13 @@ export function ProductSpecificationsManagerNew({
         const processedGroups = processHierarchicalGroups(data)
 
         if (process.env.NODE_ENV === 'development') {
-          console.log('📊 Loaded spec groups:', processedGroups.map(g => ({ id: g.id, name: g.name, type: typeof g.id })))
+          // Spec groups loaded
         }
 
         setSpecGroups(processedGroups)
       }
     } catch (error) {
-      console.error('Error loading spec groups:', error)
+      // Error loading spec groups
       toast.error('Не удалось загрузить группы характеристик')
     }
   }, [processHierarchicalGroups])
@@ -278,7 +278,7 @@ export function ProductSpecificationsManagerNew({
 
         if (process.env.NODE_ENV === 'development') {
 
-          console.log('Group IDs from characteristics:', Array.from(existingGroupIds))
+          // Group IDs from characteristics
         }
 
         setSelectedGroups(existingGroupIds)
@@ -289,7 +289,7 @@ export function ProductSpecificationsManagerNew({
         }
       }
     } catch (error) {
-      console.error('Error loading product characteristics:', error)
+      // Error loading product characteristics
     }
   }, [productId, isNewProduct, processApiCharacteristics])
 
@@ -301,10 +301,10 @@ export function ProductSpecificationsManagerNew({
 
         setTemplates(data)
       } else {
-        console.error('Failed to load templates:', res.status, res.statusText)
+        // Failed to load templates
       }
     } catch (error) {
-      console.error('Error loading templates:', error)
+      // Error loading templates
     }
   }
 
@@ -318,14 +318,14 @@ export function ProductSpecificationsManagerNew({
 
     // Проверяем, что groupId является корректным числом
     if (isNaN(groupId) || groupId === 0) {
-      console.error('Invalid groupId:', groupId)
+      // Invalid groupId
       toast.error('Ошибка: некорректный ID группы')
       return
     }
 
     // Для отладки - потом можно убрать
     if (process.env.NODE_ENV === 'development') {
-      console.log('Toggling group:', groupId, 'Type:', typeof groupId, 'Current selected:', Array.from(selectedGroups))
+      // Toggling group
     }
 
     setSelectedGroups(prev => {
@@ -343,7 +343,7 @@ export function ProductSpecificationsManagerNew({
       }
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('New selected groups:', Array.from(newSelected))
+        // New selected groups
       }
 
       return newSelected
@@ -461,11 +461,11 @@ export function ProductSpecificationsManagerNew({
         await loadTemplates()
       } else {
         const errorData = await res.json().catch(() => ({}))
-        console.error('❌ Failed to save template:', errorData)
+        // Failed to save template
         toast.error('Не удалось сохранить шаблон')
       }
     } catch (error) {
-      console.error('❌ Error saving template:', error)
+      // Error saving template
       toast.error('Не удалось сохранить шаблон')
     } finally {
       setSaving(false)
@@ -484,11 +484,11 @@ export function ProductSpecificationsManagerNew({
         await loadTemplates()
       } else {
         const errorData = await res.json().catch(() => ({}))
-        console.error('❌ Failed to delete template:', errorData)
+        // Failed to delete template
         toast.error('Не удалось удалить шаблон')
       }
     } catch (error) {
-      console.error('❌ Error deleting template:', error)
+      // Error deleting template
       toast.error('Не удалось удалить шаблон')
     }
   }
@@ -502,12 +502,12 @@ export function ProductSpecificationsManagerNew({
         const groupExists = specGroups.find(g => g.id === Number(char.group_id))
 
         if (!hasValidGroupId) {
-          console.warn('⚠️ Characteristic has invalid group_id:', char)
+          // Characteristic has invalid group_id
           return false
         }
 
         if (!groupExists) {
-          console.warn('⚠️ Group not found for characteristic:', char)
+          // Group not found for characteristic
           return false
         }
 
@@ -553,7 +553,7 @@ export function ProductSpecificationsManagerNew({
         toast.success(`Шаблон "${template.name}" применён (${templateCharacteristics.length} характеристик)`)
       }
 
-      console.log('📊 Final selected groups:', Array.from(finalGroupIds))
+      // Final selected groups
 
       setProductCharacteristics(finalCharacteristics)
       setSelectedGroups(finalGroupIds)
@@ -565,7 +565,7 @@ export function ProductSpecificationsManagerNew({
       setIsTemplateDialogOpen(false) // Закрываем диалог
 
     } catch (error) {
-      console.error('Error applying template:', error)
+      // Error applying template
       toast.error('Не удалось применить шаблон')
     }
   }
@@ -661,8 +661,7 @@ export function ProductSpecificationsManagerNew({
               variant="outline"
               size="sm"
               onClick={() => {
-                console.log('Current selectedGroups:', Array.from(selectedGroups))
-                console.log('Current specGroups:', specGroups.map(g => ({ id: g.id, name: g.name })))
+                // State logged to console
 
                 toast.success('Состояние выведено в консоль')
               }}
@@ -803,7 +802,7 @@ export function ProductSpecificationsManagerNew({
         {Array.from(selectedGroups).map(groupId => {
           const group = specGroups.find(g => g.id === groupId)
           if (!group) {
-            console.warn('Group not found for ID:', groupId)
+            // Group not found for ID
             return null
           }
 
@@ -1292,7 +1291,7 @@ export function ProductSpecificationsManagerNew({
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            console.log('🔥 Apply template (replace) button clicked:', template);
+                            // Apply template (replace) button clicked
                             handleApplyTemplate(template, 'replace');
                           }}
                         >
@@ -1302,7 +1301,7 @@ export function ProductSpecificationsManagerNew({
                           size="sm"
                           type="button"
                           onClick={() => {
-                            console.log('🔥 Apply template (merge) button clicked:', template);
+                            // Apply template (merge) button clicked
                             handleApplyTemplate(template, 'merge');
                           }}
                         >
@@ -1383,7 +1382,7 @@ export function ProductSpecificationsManagerNew({
                               loadTemplates();
                             } else {
                               toast.error('Ошибка создания тестового шаблона');
-                              console.error('❌ Test template creation failed:', result);
+                              // Test template creation failed
                             }
                           } catch (error) {
                             console.error('❌ Error creating test template:', error);
@@ -1772,12 +1771,7 @@ export function ProductSpecificationsManagerNew({
 
   // Отладочная информация
   if (process.env.NODE_ENV === 'development') {
-    console.log('Current component state:', {
-      specGroups: specGroups.length,
-      selectedGroups: Array.from(selectedGroups),
-      productCharacteristics: productCharacteristics.length,
-      activeStep
-    })
+    // Current component state logged
   }
 
   return (

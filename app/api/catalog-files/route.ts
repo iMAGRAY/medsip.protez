@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData)
   } catch (error) {
-    console.error('Error fetching catalog files:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка загрузки файлов каталогов' },
       { status: 500 }
@@ -155,7 +154,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка создания каталога' },
       { status: 500 }

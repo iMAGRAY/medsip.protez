@@ -21,9 +21,10 @@ const ALLOWED_TABLES = [
 
 export async function GET(
   _req: Request,
-  { params }: { params: { table: string } }
+  { params }: { params: Promise<{ table: string }> }
 ) {
-  const { table } = params
+  const resolvedParams = await params
+  const { table } = resolvedParams
   if (!ALLOWED_TABLES.includes(table)) {
     return NextResponse.json({ error: 'Table not allowed' }, { status: 400 })
   }
@@ -32,7 +33,6 @@ export async function GET(
     const result = await executeQuery(`SELECT * FROM ${table} ORDER BY 1 LIMIT $1`, [limit])
     return NextResponse.json({ rows: result.rows })
   } catch (error) {
-    console.error('Fetch table error:', error)
     return NextResponse.json({ error: 'Failed to fetch table' }, { status: 500 })
   }
 }

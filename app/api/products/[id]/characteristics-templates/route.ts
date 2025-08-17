@@ -4,9 +4,10 @@ import { getPool } from '@/lib/db-connection';
 // GET /api/products/[id]/characteristics-templates - получить характеристики товара на основе шаблонов (simple)
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id);
 
   try {
     if (isNaN(productId)) {
@@ -125,7 +126,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Ошибка получения характеристик товара (шаблоны):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения характеристик товара' },
       { status: 500 }
@@ -136,9 +136,10 @@ export async function GET(
 // POST /api/products/[id]/characteristics-templates - сохранить характеристики товара на основе шаблонов
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id);
 
   try {
     if (isNaN(productId)) {
@@ -187,7 +188,6 @@ export async function POST(
 
         // Проверяем обязательные поля
         if (!template_id && !group_id) {
-          console.warn('Пропускаем характеристику без template_id и group_id:', char);
           continue;
         }
 
@@ -249,7 +249,6 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка сохранения характеристик товара (шаблоны):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка сохранения характеристик товара' },
       { status: 500 }

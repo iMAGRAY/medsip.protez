@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
     const result = await pool.query(query, params)
     return NextResponse.json({ success: true, data: result.rows })
   } catch (error) {
-    console.error('Error fetching spec enums:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch spec enums' },
       { status: 500 }
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     })
   } catch (error) {
-    console.error("Ошибка создания enum значения:", error)
     return NextResponse.json(
       { success: false, error: "Ошибка создания enum значения" },
       { status: 500 }
@@ -129,7 +127,6 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Ошибка обновления enum:", error)
     return NextResponse.json(
       { error: "Ошибка обновления enum" },
       { status: 500 }
@@ -169,7 +166,6 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Ошибка удаления enum:", error)
     return NextResponse.json(
       { error: "Ошибка удаления enum" },
       { status: 500 }

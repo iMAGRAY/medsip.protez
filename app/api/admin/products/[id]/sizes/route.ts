@@ -17,10 +17,11 @@ export const dynamic = 'force-dynamic'
 // POST /api/admin/products/[id]/sizes - создать новый вариант
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const masterProductId = parseInt(params.id)
+    const resolvedParams = await params
+    const masterProductId = parseInt(resolvedParams.id)
     const body: LegacySizeInput = await request.json()
 
     if (!body.sizeName) {
@@ -99,10 +100,11 @@ export async function POST(
 // PUT /api/admin/products/[id]/sizes - обновить вариант
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const masterProductId = parseInt(params.id)
+    const resolvedParams = await params
+    const masterProductId = parseInt(resolvedParams.id)
     const body: LegacySizeInput & { variantId: number } = await request.json()
     const { variantId } = body
 
@@ -208,10 +210,11 @@ export async function PUT(
 // DELETE /api/admin/products/[id]/sizes - удалить вариант
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const masterProductId = parseInt(params.id)
+    const resolvedParams = await params
+    const masterProductId = parseInt(resolvedParams.id)
     const { searchParams } = new URL(request.url)
     const variantId = searchParams.get('variantId')
 

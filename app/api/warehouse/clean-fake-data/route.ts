@@ -67,7 +67,6 @@ export async function POST(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка очистки фейковых данных:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({
       success: false,

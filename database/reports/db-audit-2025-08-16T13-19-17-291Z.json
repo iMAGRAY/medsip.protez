@@ -1,0 +1,3408 @@
+{
+  "startedAt": "2025-08-16T13:19:16.474Z",
+  "info": {
+    "version": "PostgreSQL 17.4 (Ubuntu 17.4-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit",
+    "db": "default_db",
+    "usr": "gen_user",
+    "host": "212.113.118.141/32",
+    "port": 5432,
+    "now": "2025-08-16T13:19:16.940Z",
+    "settings": [
+      {
+        "name": "autovacuum",
+        "setting": "on"
+      },
+      {
+        "name": "autovacuum_analyze_scale_factor",
+        "setting": "0.1"
+      },
+      {
+        "name": "autovacuum_analyze_threshold",
+        "setting": "50"
+      },
+      {
+        "name": "autovacuum_vacuum_scale_factor",
+        "setting": "0.2"
+      },
+      {
+        "name": "autovacuum_vacuum_threshold",
+        "setting": "50"
+      },
+      {
+        "name": "effective_cache_size",
+        "setting": "524288"
+      },
+      {
+        "name": "maintenance_work_mem",
+        "setting": "33554432"
+      },
+      {
+        "name": "max_connections",
+        "setting": "200"
+      },
+      {
+        "name": "random_page_cost",
+        "setting": "4"
+      },
+      {
+        "name": "seq_page_cost",
+        "setting": "1"
+      },
+      {
+        "name": "shared_buffers",
+        "setting": "31232"
+      },
+      {
+        "name": "work_mem",
+        "setting": "436"
+      }
+    ],
+    "extensions": [
+      "plpgsql"
+    ]
+  },
+  "tables": [
+    {
+      "table": "product_variants",
+      "est_rows": 33,
+      "total_bytes": 540672,
+      "table_bytes": 65536,
+      "index_bytes": 475136
+    },
+    {
+      "table": "products",
+      "est_rows": 35,
+      "total_bytes": 532480,
+      "table_bytes": 131072,
+      "index_bytes": 401408
+    },
+    {
+      "table": "product_tags",
+      "est_rows": 954,
+      "total_bytes": 434176,
+      "table_bytes": 122880,
+      "index_bytes": 311296
+    },
+    {
+      "table": "product_sizes",
+      "est_rows": 1,
+      "total_bytes": 286720,
+      "table_bytes": 8192,
+      "index_bytes": 278528
+    },
+    {
+      "table": "variant_characteristics_simple",
+      "est_rows": 358,
+      "total_bytes": 237568,
+      "table_bytes": 32768,
+      "index_bytes": 204800
+    },
+    {
+      "table": "product_characteristics_simple",
+      "est_rows": 400,
+      "total_bytes": 204800,
+      "table_bytes": 32768,
+      "index_bytes": 172032
+    },
+    {
+      "table": "characteristic_values_legacy",
+      "est_rows": 125,
+      "total_bytes": 196608,
+      "table_bytes": 57344,
+      "index_bytes": 139264
+    },
+    {
+      "table": "characteristic_groups_legacy",
+      "est_rows": 23,
+      "total_bytes": 180224,
+      "table_bytes": 24576,
+      "index_bytes": 155648
+    },
+    {
+      "table": "product_categories",
+      "est_rows": 72,
+      "total_bytes": 180224,
+      "table_bytes": 16384,
+      "index_bytes": 163840
+    },
+    {
+      "table": "media_files",
+      "est_rows": 49,
+      "total_bytes": 172032,
+      "table_bytes": 32768,
+      "index_bytes": 139264
+    },
+    {
+      "table": "users",
+      "est_rows": 4,
+      "total_bytes": 163840,
+      "table_bytes": 8192,
+      "index_bytes": 155648
+    },
+    {
+      "table": "product_selection_tables",
+      "est_rows": -1,
+      "total_bytes": 147456,
+      "table_bytes": 8192,
+      "index_bytes": 139264
+    },
+    {
+      "table": "user_audit_log",
+      "est_rows": 64,
+      "total_bytes": 139264,
+      "table_bytes": 32768,
+      "index_bytes": 106496
+    },
+    {
+      "table": "warehouse_inventory",
+      "est_rows": 3,
+      "total_bytes": 131072,
+      "table_bytes": 8192,
+      "index_bytes": 122880
+    },
+    {
+      "table": "order_items",
+      "est_rows": 28,
+      "total_bytes": 122880,
+      "table_bytes": 16384,
+      "index_bytes": 106496
+    },
+    {
+      "table": "characteristics_groups_simple",
+      "est_rows": 79,
+      "total_bytes": 122880,
+      "table_bytes": 16384,
+      "index_bytes": 106496
+    },
+    {
+      "table": "user_sessions",
+      "est_rows": 12,
+      "total_bytes": 114688,
+      "table_bytes": 8192,
+      "index_bytes": 106496
+    },
+    {
+      "table": "variant_attributes_new",
+      "est_rows": -1,
+      "total_bytes": 98304,
+      "table_bytes": 8192,
+      "index_bytes": 90112
+    },
+    {
+      "table": "model_series",
+      "est_rows": 14,
+      "total_bytes": 98304,
+      "table_bytes": 8192,
+      "index_bytes": 90112
+    },
+    {
+      "table": "warehouse_zones",
+      "est_rows": 5,
+      "total_bytes": 98304,
+      "table_bytes": 8192,
+      "index_bytes": 90112
+    },
+    {
+      "table": "characteristics_values_simple",
+      "est_rows": 94,
+      "total_bytes": 90112,
+      "table_bytes": 16384,
+      "index_bytes": 73728
+    },
+    {
+      "table": "warehouse_cities",
+      "est_rows": 6,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "site_menu",
+      "est_rows": 4,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "warehouse_sections",
+      "est_rows": 7,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "warehouse_warehouses",
+      "est_rows": 5,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "size_chart_values",
+      "est_rows": -1,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "catalog_menu_settings",
+      "est_rows": 8,
+      "total_bytes": 81920,
+      "table_bytes": 8192,
+      "index_bytes": 73728
+    },
+    {
+      "table": "product_warehouse_stock",
+      "est_rows": 3,
+      "total_bytes": 73728,
+      "table_bytes": 8192,
+      "index_bytes": 65536
+    },
+    {
+      "table": "product_configurable_characteristics",
+      "est_rows": 1,
+      "total_bytes": 73728,
+      "table_bytes": 8192,
+      "index_bytes": 65536
+    },
+    {
+      "table": "product_tag_relations",
+      "est_rows": 66,
+      "total_bytes": 73728,
+      "table_bytes": 8192,
+      "index_bytes": 65536
+    },
+    {
+      "table": "category_attribute_types",
+      "est_rows": -1,
+      "total_bytes": 73728,
+      "table_bytes": 8192,
+      "index_bytes": 65536
+    },
+    {
+      "table": "variant_attribute_types",
+      "est_rows": 4,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "warehouse_articles",
+      "est_rows": 10,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "site_settings",
+      "est_rows": 1,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "size_charts",
+      "est_rows": 4,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "variant_attribute_values",
+      "est_rows": 23,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "warehouse_regions",
+      "est_rows": 6,
+      "total_bytes": 65536,
+      "table_bytes": 8192,
+      "index_bytes": 57344
+    },
+    {
+      "table": "variant_characteristics",
+      "est_rows": -1,
+      "total_bytes": 65536,
+      "table_bytes": 0,
+      "index_bytes": 65536
+    },
+    {
+      "table": "variant_images",
+      "est_rows": -1,
+      "total_bytes": 57344,
+      "table_bytes": 0,
+      "index_bytes": 57344
+    },
+    {
+      "table": "characteristic_preset_values",
+      "est_rows": 20,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "roles",
+      "est_rows": 5,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "catalog_files",
+      "est_rows": -1,
+      "total_bytes": 49152,
+      "table_bytes": 0,
+      "index_bytes": 49152
+    },
+    {
+      "table": "warehouse_settings",
+      "est_rows": 17,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "manufacturers",
+      "est_rows": 6,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "warehouses",
+      "est_rows": 3,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "suppliers",
+      "est_rows": -1,
+      "total_bytes": 49152,
+      "table_bytes": 0,
+      "index_bytes": 49152
+    },
+    {
+      "table": "form_templates",
+      "est_rows": 3,
+      "total_bytes": 49152,
+      "table_bytes": 8192,
+      "index_bytes": 40960
+    },
+    {
+      "table": "warehouse_movements",
+      "est_rows": -1,
+      "total_bytes": 40960,
+      "table_bytes": 0,
+      "index_bytes": 40960
+    },
+    {
+      "table": "product_images",
+      "est_rows": -1,
+      "total_bytes": 40960,
+      "table_bytes": 0,
+      "index_bytes": 40960
+    },
+    {
+      "table": "product_media_links",
+      "est_rows": -1,
+      "total_bytes": 40960,
+      "table_bytes": 0,
+      "index_bytes": 40960
+    },
+    {
+      "table": "characteristic_templates",
+      "est_rows": 10,
+      "total_bytes": 32768,
+      "table_bytes": 8192,
+      "index_bytes": 24576
+    },
+    {
+      "table": "variant_tag_relations",
+      "est_rows": -1,
+      "total_bytes": 32768,
+      "table_bytes": 0,
+      "index_bytes": 32768
+    },
+    {
+      "table": "orders",
+      "est_rows": 14,
+      "total_bytes": 32768,
+      "table_bytes": 8192,
+      "index_bytes": 24576
+    },
+    {
+      "table": "product_specifications",
+      "est_rows": -1,
+      "total_bytes": 32768,
+      "table_bytes": 0,
+      "index_bytes": 32768
+    },
+    {
+      "table": "variant_warehouse_stock",
+      "est_rows": -1,
+      "total_bytes": 32768,
+      "table_bytes": 0,
+      "index_bytes": 32768
+    },
+    {
+      "table": "product_suppliers",
+      "est_rows": -1,
+      "total_bytes": 24576,
+      "table_bytes": 0,
+      "index_bytes": 24576
+    },
+    {
+      "table": "price_logs",
+      "est_rows": -1,
+      "total_bytes": 24576,
+      "table_bytes": 0,
+      "index_bytes": 24576
+    },
+    {
+      "table": "product_certificates",
+      "est_rows": -1,
+      "total_bytes": 24576,
+      "table_bytes": 0,
+      "index_bytes": 24576
+    },
+    {
+      "table": "variant_price_tiers",
+      "est_rows": -1,
+      "total_bytes": 16384,
+      "table_bytes": 0,
+      "index_bytes": 16384
+    },
+    {
+      "table": "product_view_stats",
+      "est_rows": -1,
+      "total_bytes": 16384,
+      "table_bytes": 0,
+      "index_bytes": 16384
+    }
+  ],
+  "indexes": [
+    {
+      "table_name": "catalog_files",
+      "index_name": "catalog_files_pkey",
+      "idx_scan": "41",
+      "indexdef": "CREATE UNIQUE INDEX catalog_files_pkey ON public.catalog_files USING btree (id)"
+    },
+    {
+      "table_name": "catalog_files",
+      "index_name": "idx_catalog_files_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_catalog_files_active ON public.catalog_files USING btree (is_active)"
+    },
+    {
+      "table_name": "catalog_files",
+      "index_name": "idx_catalog_files_created_by_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_catalog_files_created_by_fk ON public.catalog_files USING btree (created_by)"
+    },
+    {
+      "table_name": "catalog_files",
+      "index_name": "idx_catalog_files_created_at",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_catalog_files_created_at ON public.catalog_files USING btree (created_at)"
+    },
+    {
+      "table_name": "catalog_files",
+      "index_name": "idx_catalog_files_year",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_catalog_files_year ON public.catalog_files USING btree (year)"
+    },
+    {
+      "table_name": "catalog_menu_settings",
+      "index_name": "catalog_menu_settings_parent_id_idx",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX catalog_menu_settings_parent_id_idx ON public.catalog_menu_settings USING btree (parent_id)"
+    },
+    {
+      "table_name": "catalog_menu_settings",
+      "index_name": "catalog_menu_settings_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX catalog_menu_settings_pkey ON public.catalog_menu_settings USING btree (id)"
+    },
+    {
+      "table_name": "catalog_menu_settings",
+      "index_name": "idx_catalog_menu_settings_hierarchy",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_catalog_menu_settings_hierarchy ON public.catalog_menu_settings USING btree (parent_id, sort_order)"
+    },
+    {
+      "table_name": "catalog_menu_settings",
+      "index_name": "catalog_menu_settings_entity_type_entity_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX catalog_menu_settings_entity_type_entity_id_key ON public.catalog_menu_settings USING btree (entity_type, entity_id)"
+    },
+    {
+      "table_name": "category_attribute_types",
+      "index_name": "idx_category_attribute_types_category",
+      "idx_scan": "5",
+      "indexdef": "CREATE INDEX idx_category_attribute_types_category ON public.category_attribute_types USING btree (category_id)"
+    },
+    {
+      "table_name": "category_attribute_types",
+      "index_name": "category_attribute_types_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX category_attribute_types_pkey ON public.category_attribute_types USING btree (id)"
+    },
+    {
+      "table_name": "category_attribute_types",
+      "index_name": "category_attribute_types_category_id_attribute_type_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX category_attribute_types_category_id_attribute_type_id_key ON public.category_attribute_types USING btree (category_id, attribute_type_id)"
+    },
+    {
+      "table_name": "category_attribute_types",
+      "index_name": "idx_category_attribute_types_type",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_category_attribute_types_type ON public.category_attribute_types USING btree (attribute_type_id)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "spec_groups_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX spec_groups_pkey ON public.characteristic_groups_legacy USING btree (id)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "idx_characteristic_groups_legacy_group_settings_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_groups_legacy_group_settings_gin ON public.characteristic_groups_legacy USING gin (group_settings jsonb_path_ops)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "idx_characteristic_groups_name",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_groups_name ON public.characteristic_groups_legacy USING btree (name)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "idx_characteristic_groups_is_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_groups_is_active ON public.characteristic_groups_legacy USING btree (is_active)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "idx_characteristic_groups_legacy_parent_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_groups_legacy_parent_id_fk ON public.characteristic_groups_legacy USING btree (parent_id)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "idx_characteristic_groups_is_section",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_groups_is_section ON public.characteristic_groups_legacy USING btree (is_section)"
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "index_name": "spec_groups_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX spec_groups_name_key ON public.characteristic_groups_legacy USING btree (name)"
+    },
+    {
+      "table_name": "characteristic_preset_values",
+      "index_name": "characteristic_preset_values_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX characteristic_preset_values_pkey ON public.characteristic_preset_values USING btree (id)"
+    },
+    {
+      "table_name": "characteristic_preset_values",
+      "index_name": "idx_characteristic_preset_values_template_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_preset_values_template_id ON public.characteristic_preset_values USING btree (template_id)"
+    },
+    {
+      "table_name": "characteristic_templates",
+      "index_name": "characteristic_templates_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX characteristic_templates_pkey ON public.characteristic_templates USING btree (id)"
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "index_name": "spec_enums_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX spec_enums_pkey ON public.characteristic_values_legacy USING btree (id)"
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "index_name": "idx_characteristic_values_legacy_group_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_values_legacy_group_id_fk ON public.characteristic_values_legacy USING btree (group_id)"
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "index_name": "idx_characteristic_values_value",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_values_value ON public.characteristic_values_legacy USING btree (value)"
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "index_name": "idx_characteristic_values_legacy_parent_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_values_legacy_parent_id_fk ON public.characteristic_values_legacy USING btree (parent_id)"
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "index_name": "idx_characteristic_values_is_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristic_values_is_active ON public.characteristic_values_legacy USING btree (is_active)"
+    },
+    {
+      "table_name": "characteristics_groups_simple",
+      "index_name": "characteristics_groups_simple_pkey",
+      "idx_scan": "645",
+      "indexdef": "CREATE UNIQUE INDEX characteristics_groups_simple_pkey ON public.characteristics_groups_simple USING btree (id)"
+    },
+    {
+      "table_name": "characteristics_groups_simple",
+      "index_name": "idx_characteristics_groups_simple_hierarchy",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristics_groups_simple_hierarchy ON public.characteristics_groups_simple USING btree (parent_id, sort_order) WHERE (parent_id IS NOT NULL)"
+    },
+    {
+      "table_name": "characteristics_groups_simple",
+      "index_name": "idx_characteristics_groups_simple_sort_order",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristics_groups_simple_sort_order ON public.characteristics_groups_simple USING btree (sort_order)"
+    },
+    {
+      "table_name": "characteristics_groups_simple",
+      "index_name": "idx_characteristics_groups_simple_performance",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_characteristics_groups_simple_performance ON public.characteristics_groups_simple USING btree (is_active, sort_order, show_in_main_params) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "characteristics_values_simple",
+      "index_name": "idx_characteristics_values_group_id",
+      "idx_scan": "2444",
+      "indexdef": "CREATE INDEX idx_characteristics_values_group_id ON public.characteristics_values_simple USING btree (group_id)"
+    },
+    {
+      "table_name": "characteristics_values_simple",
+      "index_name": "characteristics_values_simple_pkey",
+      "idx_scan": "1299",
+      "indexdef": "CREATE UNIQUE INDEX characteristics_values_simple_pkey ON public.characteristics_values_simple USING btree (id)"
+    },
+    {
+      "table_name": "characteristics_values_simple",
+      "index_name": "idx_characteristics_values_simple_performance",
+      "idx_scan": "568",
+      "indexdef": "CREATE INDEX idx_characteristics_values_simple_performance ON public.characteristics_values_simple USING btree (group_id, is_active, sort_order) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "characteristics_values_simple",
+      "index_name": "idx_characteristics_values_simple_group_id",
+      "idx_scan": "282",
+      "indexdef": "CREATE INDEX idx_characteristics_values_simple_group_id ON public.characteristics_values_simple USING btree (group_id)"
+    },
+    {
+      "table_name": "form_templates",
+      "index_name": "form_templates_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX form_templates_pkey ON public.form_templates USING btree (id)"
+    },
+    {
+      "table_name": "form_templates",
+      "index_name": "idx_form_templates_characteristics_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_form_templates_characteristics_gin ON public.form_templates USING gin (characteristics jsonb_path_ops)"
+    },
+    {
+      "table_name": "manufacturers",
+      "index_name": "manufacturers_pkey",
+      "idx_scan": "137",
+      "indexdef": "CREATE UNIQUE INDEX manufacturers_pkey ON public.manufacturers USING btree (id)"
+    },
+    {
+      "table_name": "manufacturers",
+      "index_name": "idx_manufacturers_name",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_manufacturers_name ON public.manufacturers USING btree (name)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_upload_count",
+      "idx_scan": "49",
+      "indexdef": "CREATE INDEX idx_media_files_upload_count ON public.media_files USING btree (upload_count)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "media_files_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX media_files_pkey ON public.media_files USING btree (id)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_active_recent",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_media_files_active_recent ON public.media_files USING btree (created_at DESC) WHERE (upload_count > 0)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "media_files_file_hash_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX media_files_file_hash_key ON public.media_files USING btree (file_hash)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_hash",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_media_files_hash ON public.media_files USING btree (file_hash)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_size",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_media_files_size ON public.media_files USING btree (file_size)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_extension",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_media_files_extension ON public.media_files USING btree (file_extension)"
+    },
+    {
+      "table_name": "media_files",
+      "index_name": "idx_media_files_metadata_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_media_files_metadata_gin ON public.media_files USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "table_name": "model_series",
+      "index_name": "model_lines_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX model_lines_pkey ON public.model_series USING btree (id)"
+    },
+    {
+      "table_name": "model_series",
+      "index_name": "idx_model_lines_manufacturer_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_model_lines_manufacturer_active ON public.model_series USING btree (manufacturer_id, is_active) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "model_series",
+      "index_name": "idx_model_lines_category",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_model_lines_category ON public.model_series USING btree (category_id)"
+    },
+    {
+      "table_name": "model_series",
+      "index_name": "model_lines_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX model_lines_name_key ON public.model_series USING btree (name)"
+    },
+    {
+      "table_name": "model_series",
+      "index_name": "model_series_manufacturer_id_idx",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX model_series_manufacturer_id_idx ON public.model_series USING btree (manufacturer_id)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "idx_order_items_order_id_fk",
+      "idx_scan": "32",
+      "indexdef": "CREATE INDEX idx_order_items_order_id_fk ON public.order_items USING btree (order_id)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "order_items_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (id)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "idx_order_items_article_number",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_order_items_article_number ON public.order_items USING btree (article_number)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "idx_order_items_variant_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_order_items_variant_id ON public.order_items USING btree (variant_id)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "idx_order_items_sku",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_order_items_sku ON public.order_items USING btree (sku)"
+    },
+    {
+      "table_name": "order_items",
+      "index_name": "idx_order_items_configuration_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_order_items_configuration_gin ON public.order_items USING gin (configuration jsonb_path_ops)"
+    },
+    {
+      "table_name": "orders",
+      "index_name": "orders_pkey",
+      "idx_scan": "64",
+      "indexdef": "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)"
+    },
+    {
+      "table_name": "price_logs",
+      "index_name": "idx_price_logs_variant",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_price_logs_variant ON public.price_logs USING btree (variant_id)"
+    },
+    {
+      "table_name": "price_logs",
+      "index_name": "price_logs_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX price_logs_pkey ON public.price_logs USING btree (id)"
+    },
+    {
+      "table_name": "price_logs",
+      "index_name": "idx_price_logs_date",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_price_logs_date ON public.price_logs USING btree (start_date, end_date)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "categories_pkey",
+      "idx_scan": "1333",
+      "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.product_categories USING btree (id)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_parent",
+      "idx_scan": "12",
+      "indexdef": "CREATE INDEX idx_categories_parent ON public.product_categories USING btree (parent_id)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_parent_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_parent_active ON public.product_categories USING btree (parent_id, is_active) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "unique_category_name_parent",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_category_name_parent ON public.product_categories USING btree (name, parent_id)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_name_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_name_gin ON public.product_categories USING gin (to_tsvector('russian'::regconfig, (name)::text))"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_parent_hierarchy",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_parent_hierarchy ON public.product_categories USING btree (parent_id, sort_order, name) WHERE (parent_id IS NOT NULL)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_active ON public.product_categories USING btree (is_active)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_type",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_type ON public.product_categories USING btree (type)"
+    },
+    {
+      "table_name": "product_categories",
+      "index_name": "idx_categories_type_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_categories_type_active ON public.product_categories USING btree (type, is_active) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "product_certificates",
+      "index_name": "product_certificates_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_certificates_pkey ON public.product_certificates USING btree (id)"
+    },
+    {
+      "table_name": "product_certificates",
+      "index_name": "idx_product_certificates_variant_id_fk",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_product_certificates_variant_id_fk ON public.product_certificates USING btree (variant_id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "idx_product_characteristics_value_id",
+      "idx_scan": "2566",
+      "indexdef": "CREATE INDEX idx_product_characteristics_value_id ON public.product_characteristics_simple USING btree (value_id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "idx_product_characteristics_product_id",
+      "idx_scan": "414",
+      "indexdef": "CREATE INDEX idx_product_characteristics_product_id ON public.product_characteristics_simple USING btree (product_id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "idx_product_characteristics_simple_value_id",
+      "idx_scan": "282",
+      "indexdef": "CREATE INDEX idx_product_characteristics_simple_value_id ON public.product_characteristics_simple USING btree (value_id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "idx_product_characteristics_simple_product_id",
+      "idx_scan": "55",
+      "indexdef": "CREATE INDEX idx_product_characteristics_simple_product_id ON public.product_characteristics_simple USING btree (product_id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "product_characteristics_simple_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_characteristics_simple_pkey ON public.product_characteristics_simple USING btree (id)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "idx_product_characteristics_simple_performance",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_characteristics_simple_performance ON public.product_characteristics_simple USING btree (product_id, value_id, is_primary, display_order)"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "index_name": "product_characteristics_simple_product_id_value_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_characteristics_simple_product_id_value_id_key ON public.product_characteristics_simple USING btree (product_id, value_id)"
+    },
+    {
+      "table_name": "product_configurable_characteristics",
+      "index_name": "idx_product_configurable_characteristics_product_id",
+      "idx_scan": "24",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_configurable_characteristics_product_id ON public.product_configurable_characteristics USING btree (product_id)"
+    },
+    {
+      "table_name": "product_configurable_characteristics",
+      "index_name": "product_configurable_characteristics_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_configurable_characteristics_pkey ON public.product_configurable_characteristics USING btree (id)"
+    },
+    {
+      "table_name": "product_configurable_characteristics",
+      "index_name": "idx_product_configurable_characteristics_characteristic_data_gi",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_configurable_characteristics_characteristic_data_gi ON public.product_configurable_characteristics USING gin (characteristic_data jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_images",
+      "index_name": "idx_product_images_order",
+      "idx_scan": "2",
+      "indexdef": "CREATE INDEX idx_product_images_order ON public.product_images USING btree (product_id, image_order)"
+    },
+    {
+      "table_name": "product_images",
+      "index_name": "idx_product_images_main",
+      "idx_scan": "2",
+      "indexdef": "CREATE INDEX idx_product_images_main ON public.product_images USING btree (product_id, is_main)"
+    },
+    {
+      "table_name": "product_images",
+      "index_name": "product_images_variant_id_idx",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX product_images_variant_id_idx ON public.product_images USING btree (variant_id)"
+    },
+    {
+      "table_name": "product_images",
+      "index_name": "product_images_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_images_pkey ON public.product_images USING btree (id)"
+    },
+    {
+      "table_name": "product_media_links",
+      "index_name": "idx_product_media_links_product",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_product_media_links_product ON public.product_media_links USING btree (product_id)"
+    },
+    {
+      "table_name": "product_media_links",
+      "index_name": "product_media_links_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_media_links_pkey ON public.product_media_links USING btree (id)"
+    },
+    {
+      "table_name": "product_media_links",
+      "index_name": "idx_product_media_links_main",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_media_links_main ON public.product_media_links USING btree (is_main) WHERE (is_main = true)"
+    },
+    {
+      "table_name": "product_media_links",
+      "index_name": "product_media_links_product_id_media_file_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_media_links_product_id_media_file_id_key ON public.product_media_links USING btree (product_id, media_file_id)"
+    },
+    {
+      "table_name": "product_media_links",
+      "index_name": "idx_product_media_links_media",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_media_links_media ON public.product_media_links USING btree (media_file_id)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "unique_product_table_type",
+      "idx_scan": "77",
+      "indexdef": "CREATE UNIQUE INDEX unique_product_table_type ON public.product_selection_tables USING btree (product_id, table_type)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "product_selection_tables_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_selection_tables_pkey ON public.product_selection_tables USING btree (id)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "idx_product_selection_tables_product_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_selection_tables_product_id ON public.product_selection_tables USING btree (product_id)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "idx_product_selection_tables_rows_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_selection_tables_rows_gin ON public.product_selection_tables USING gin (rows jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "idx_product_selection_tables_type",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_selection_tables_type ON public.product_selection_tables USING btree (table_type)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "idx_product_selection_tables_sku",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_selection_tables_sku ON public.product_selection_tables USING btree (sku)"
+    },
+    {
+      "table_name": "product_selection_tables",
+      "index_name": "idx_product_selection_tables_headers_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_selection_tables_headers_gin ON public.product_selection_tables USING gin (headers jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_product",
+      "idx_scan": "205",
+      "indexdef": "CREATE INDEX idx_product_sizes_product ON public.product_sizes USING btree (product_id)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_custom_fields_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_custom_fields_gin ON public.product_sizes USING gin (custom_fields jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_is_new",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_is_new ON public.product_sizes USING btree (is_new) WHERE (is_new = true)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_sku",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_sku ON public.product_sizes USING btree (sku)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "product_sizes_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_sizes_pkey ON public.product_sizes USING btree (id)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "unique_product_size",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_product_size ON public.product_sizes USING btree (product_id, size_name)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "unique_sku",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_sku ON public.product_sizes USING btree (sku)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_is_bestseller",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_is_bestseller ON public.product_sizes USING btree (is_bestseller) WHERE (is_bestseller = true)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_available",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_available ON public.product_sizes USING btree (is_available)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_name",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_name ON public.product_sizes USING btree (name)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_discount_price",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_discount_price ON public.product_sizes USING btree (discount_price) WHERE (discount_price IS NOT NULL)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_characteristics_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_characteristics_gin ON public.product_sizes USING gin (characteristics jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_specifications_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_specifications_gin ON public.product_sizes USING gin (specifications jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_selection_tables_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_selection_tables_gin ON public.product_sizes USING gin (selection_tables jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_images_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_images_gin ON public.product_sizes USING gin (images jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_dimensions_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_dimensions_gin ON public.product_sizes USING gin (dimensions jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_sizes",
+      "index_name": "idx_product_sizes_is_featured",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_sizes_is_featured ON public.product_sizes USING btree (is_featured) WHERE (is_featured = true)"
+    },
+    {
+      "table_name": "product_specifications",
+      "index_name": "product_specifications_product_id_sort_idx",
+      "idx_scan": "29",
+      "indexdef": "CREATE INDEX product_specifications_product_id_sort_idx ON public.product_specifications USING btree (product_id, sort_order)"
+    },
+    {
+      "table_name": "product_specifications",
+      "index_name": "product_specifications_product_id_idx",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX product_specifications_product_id_idx ON public.product_specifications USING btree (product_id)"
+    },
+    {
+      "table_name": "product_specifications",
+      "index_name": "product_specifications_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_specifications_pkey ON public.product_specifications USING btree (id)"
+    },
+    {
+      "table_name": "product_suppliers",
+      "index_name": "idx_product_suppliers_variant",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_product_suppliers_variant ON public.product_suppliers USING btree (variant_id)"
+    },
+    {
+      "table_name": "product_suppliers",
+      "index_name": "idx_product_suppliers_supplier",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_suppliers_supplier ON public.product_suppliers USING btree (supplier_id)"
+    },
+    {
+      "table_name": "product_suppliers",
+      "index_name": "product_suppliers_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_suppliers_pkey ON public.product_suppliers USING btree (variant_id, supplier_id)"
+    },
+    {
+      "table_name": "product_tag_relations",
+      "index_name": "idx_product_tag_relations_product_id",
+      "idx_scan": "4",
+      "indexdef": "CREATE INDEX idx_product_tag_relations_product_id ON public.product_tag_relations USING btree (product_id)"
+    },
+    {
+      "table_name": "product_tag_relations",
+      "index_name": "product_tag_relations_pkey",
+      "idx_scan": "4",
+      "indexdef": "CREATE UNIQUE INDEX product_tag_relations_pkey ON public.product_tag_relations USING btree (id)"
+    },
+    {
+      "table_name": "product_tag_relations",
+      "index_name": "product_tag_relations_product_id_tag_id_key",
+      "idx_scan": "3",
+      "indexdef": "CREATE UNIQUE INDEX product_tag_relations_product_id_tag_id_key ON public.product_tag_relations USING btree (product_id, tag_id)"
+    },
+    {
+      "table_name": "product_tag_relations",
+      "index_name": "idx_product_tag_relations_tag_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_tag_relations_tag_id ON public.product_tag_relations USING btree (tag_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "product_tags_pkey",
+      "idx_scan": "7",
+      "indexdef": "CREATE UNIQUE INDEX product_tags_pkey ON public.product_tags USING btree (id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_product_id",
+      "idx_scan": "3",
+      "indexdef": "CREATE INDEX idx_product_tags_product_id ON public.product_tags USING btree (product_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_variant_id",
+      "idx_scan": "3",
+      "indexdef": "CREATE INDEX idx_product_tags_variant_id ON public.product_tags USING btree (variant_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_name_variant_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_tags_name_variant_id ON public.product_tags USING btree (name, variant_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_slug",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_tags_slug ON public.product_tags USING btree (slug)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_slug_variant_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_tags_slug_variant_id ON public.product_tags USING btree (slug, variant_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_slug_product_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_tags_slug_product_id ON public.product_tags USING btree (slug, product_id)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_is_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_tags_is_active ON public.product_tags USING btree (is_active)"
+    },
+    {
+      "table_name": "product_tags",
+      "index_name": "idx_product_tags_name_product_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_tags_name_product_id ON public.product_tags USING btree (name, product_id)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_variants_active_master",
+      "idx_scan": "1890",
+      "indexdef": "CREATE INDEX idx_variants_active_master ON public.product_variants USING btree (master_id) WHERE ((is_deleted = false) AND (is_active = true))"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_master_sku",
+      "idx_scan": "1133",
+      "indexdef": "CREATE INDEX idx_product_variants_master_sku ON public.product_variants USING btree (master_id, sku)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "product_variants_pkey",
+      "idx_scan": "190",
+      "indexdef": "CREATE UNIQUE INDEX product_variants_pkey ON public.product_variants USING btree (id)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_category_id",
+      "idx_scan": "5",
+      "indexdef": "CREATE INDEX idx_product_variants_category_id ON public.product_variants USING btree (category_id)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_slug",
+      "idx_scan": "2",
+      "indexdef": "CREATE INDEX idx_product_variants_slug ON public.product_variants USING btree (slug) WHERE (slug IS NOT NULL)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_master_id",
+      "idx_scan": "2",
+      "indexdef": "CREATE INDEX idx_product_variants_master_id ON public.product_variants USING btree (master_id)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_deleted",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_product_variants_deleted ON public.product_variants USING btree (is_deleted)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_sku",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_sku ON public.product_variants USING btree (sku)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_featured",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_featured ON public.product_variants USING btree (is_featured) WHERE ((is_featured = true) AND (is_active = true))"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_stock",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_stock ON public.product_variants USING btree (stock_quantity) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_attributes",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_attributes ON public.product_variants USING gin (attributes)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_is_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_is_active ON public.product_variants USING btree (is_active) WHERE (is_active = true)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_videos_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_videos_gin ON public.product_variants USING gin (videos jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_images_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_images_gin ON public.product_variants USING gin (images jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_documents_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_documents_gin ON public.product_variants USING gin (documents jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_custom_fields_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_custom_fields_gin ON public.product_variants USING gin (custom_fields jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_attributes_json_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_attributes_json_gin ON public.product_variants USING gin (attributes_json jsonb_path_ops)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_specifications",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_specifications ON public.product_variants USING gin (specifications)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_dimensions",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_dimensions ON public.product_variants USING gin (dimensions)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_size_value",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_size_value ON public.product_variants USING btree (size_value)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_size_name",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_size_name ON public.product_variants USING btree (size_name)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_original_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_original_id ON public.product_variants USING btree (((attributes ->> 'original_id'::text))) WHERE ((attributes ->> 'original_id'::text) IS NOT NULL)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "product_variants_sku_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_variants_sku_key ON public.product_variants USING btree (sku)"
+    },
+    {
+      "table_name": "product_variants",
+      "index_name": "idx_product_variants_migration",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_variants_migration ON public.product_variants USING btree (((attributes ->> 'migrated_from'::text))) WHERE ((attributes ->> 'migrated_from'::text) IS NOT NULL)"
+    },
+    {
+      "table_name": "product_view_stats",
+      "index_name": "product_view_stats_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_view_stats_pkey ON public.product_view_stats USING btree (id)"
+    },
+    {
+      "table_name": "product_view_stats",
+      "index_name": "product_view_stats_product_id_key",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_view_stats_product_id_key ON public.product_view_stats USING btree (product_id)"
+    },
+    {
+      "table_name": "product_warehouse_stock",
+      "index_name": "product_warehouse_stock_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX product_warehouse_stock_pkey ON public.product_warehouse_stock USING btree (id)"
+    },
+    {
+      "table_name": "product_warehouse_stock",
+      "index_name": "idx_product_warehouse_stock_warehouse_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_warehouse_stock_warehouse_id ON public.product_warehouse_stock USING btree (warehouse_id)"
+    },
+    {
+      "table_name": "product_warehouse_stock",
+      "index_name": "idx_product_warehouse_stock_product_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_product_warehouse_stock_product_id ON public.product_warehouse_stock USING btree (product_id)"
+    },
+    {
+      "table_name": "product_warehouse_stock",
+      "index_name": "product_warehouse_stock_product_id_warehouse_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX product_warehouse_stock_product_id_warehouse_id_key ON public.product_warehouse_stock USING btree (product_id, warehouse_id)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "products_pkey",
+      "idx_scan": "2310",
+      "indexdef": "CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_category_stock_performance",
+      "idx_scan": "2196",
+      "indexdef": "CREATE INDEX idx_products_category_stock_performance ON public.products USING btree (category_id, in_stock, created_at DESC)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_series",
+      "idx_scan": "52",
+      "indexdef": "CREATE INDEX idx_products_series ON public.products USING btree (series_id)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_active",
+      "idx_scan": "42",
+      "indexdef": "CREATE INDEX idx_products_active ON public.products USING btree (id) WHERE (is_deleted = false)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_created_at",
+      "idx_scan": "3",
+      "indexdef": "CREATE INDEX idx_products_created_at ON public.products USING btree (created_at DESC)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_show_price",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_show_price ON public.products USING btree (show_price)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "unique_product_name_manufacturer",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_product_name_manufacturer ON public.products USING btree (name, manufacturer_id)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_category_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_category_active ON public.products USING btree (category_id) WHERE (is_deleted = false)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_manufacturer_performance",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_manufacturer_performance ON public.products USING btree (manufacturer_id) WHERE (manufacturer_id IS NOT NULL)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_manufacturer_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_manufacturer_active ON public.products USING btree (manufacturer_id) WHERE (is_deleted = false)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_created_at_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_created_at_active ON public.products USING btree (created_at DESC) WHERE (is_deleted = false)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_images_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_images_gin ON public.products USING gin (images jsonb_path_ops)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_active_status",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_active_status ON public.products USING btree (in_stock, stock_status, price) WHERE ((in_stock = true) AND (price IS NOT NULL))"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_in_stock",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_in_stock ON public.products USING btree (in_stock)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_category",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_category ON public.products USING btree (category_id)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_fulltext_search",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_fulltext_search ON public.products USING gin (to_tsvector('russian'::regconfig, (((name)::text || ' '::text) || COALESCE(description, ''::text))))"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_manufacturer_stock",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_manufacturer_stock ON public.products USING btree (manufacturer_id, in_stock, stock_status) WHERE (manufacturer_id IS NOT NULL)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_category_price",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_category_price ON public.products USING btree (category_id, price DESC) WHERE (price IS NOT NULL)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_stock_status",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_stock_status ON public.products USING btree (stock_status)"
+    },
+    {
+      "table_name": "products",
+      "index_name": "idx_products_specs_cache_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_products_specs_cache_gin ON public.products USING gin (specs_cache jsonb_path_ops)"
+    },
+    {
+      "table_name": "roles",
+      "index_name": "roles_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX roles_name_key ON public.roles USING btree (name)"
+    },
+    {
+      "table_name": "roles",
+      "index_name": "roles_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX roles_pkey ON public.roles USING btree (id)"
+    },
+    {
+      "table_name": "site_menu",
+      "index_name": "site_menu_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX site_menu_pkey ON public.site_menu USING btree (id)"
+    },
+    {
+      "table_name": "site_menu",
+      "index_name": "idx_site_menu_sort_order",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_site_menu_sort_order ON public.site_menu USING btree (sort_order)"
+    },
+    {
+      "table_name": "site_menu",
+      "index_name": "idx_site_menu_spec_group_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_site_menu_spec_group_id ON public.site_menu USING btree (spec_group_id)"
+    },
+    {
+      "table_name": "site_menu",
+      "index_name": "idx_site_menu_is_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_site_menu_is_active ON public.site_menu USING btree (is_active)"
+    },
+    {
+      "table_name": "site_settings",
+      "index_name": "site_settings_pkey",
+      "idx_scan": "96",
+      "indexdef": "CREATE UNIQUE INDEX site_settings_pkey ON public.site_settings USING btree (id)"
+    },
+    {
+      "table_name": "site_settings",
+      "index_name": "idx_site_settings_additional_contacts_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_site_settings_additional_contacts_gin ON public.site_settings USING gin (additional_contacts jsonb_path_ops)"
+    },
+    {
+      "table_name": "site_settings",
+      "index_name": "idx_site_settings_social_media_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_site_settings_social_media_gin ON public.site_settings USING gin (social_media jsonb_path_ops)"
+    },
+    {
+      "table_name": "size_chart_values",
+      "index_name": "size_chart_values_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX size_chart_values_pkey ON public.size_chart_values USING btree (id)"
+    },
+    {
+      "table_name": "size_chart_values",
+      "index_name": "idx_size_chart_values_chart",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_size_chart_values_chart ON public.size_chart_values USING btree (size_chart_id)"
+    },
+    {
+      "table_name": "size_chart_values",
+      "index_name": "unique_chart_size",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_chart_size ON public.size_chart_values USING btree (size_chart_id, size_name)"
+    },
+    {
+      "table_name": "size_chart_values",
+      "index_name": "idx_size_chart_values_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_size_chart_values_active ON public.size_chart_values USING btree (is_active)"
+    },
+    {
+      "table_name": "size_charts",
+      "index_name": "size_charts_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX size_charts_pkey ON public.size_charts USING btree (id)"
+    },
+    {
+      "table_name": "size_charts",
+      "index_name": "size_charts_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX size_charts_name_key ON public.size_charts USING btree (name)"
+    },
+    {
+      "table_name": "size_charts",
+      "index_name": "idx_size_charts_category",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_size_charts_category ON public.size_charts USING btree (category_id)"
+    },
+    {
+      "table_name": "suppliers",
+      "index_name": "suppliers_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX suppliers_pkey ON public.suppliers USING btree (id)"
+    },
+    {
+      "table_name": "suppliers",
+      "index_name": "idx_suppliers_contact_info_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_suppliers_contact_info_gin ON public.suppliers USING gin (contact_info jsonb_path_ops)"
+    },
+    {
+      "table_name": "suppliers",
+      "index_name": "idx_suppliers_deleted",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_suppliers_deleted ON public.suppliers USING btree (is_deleted)"
+    },
+    {
+      "table_name": "suppliers",
+      "index_name": "idx_suppliers_name",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_suppliers_name ON public.suppliers USING btree (name)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "user_audit_log_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX user_audit_log_pkey ON public.user_audit_log USING btree (id)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "idx_user_audit_log_user_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_audit_log_user_id ON public.user_audit_log USING btree (user_id)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "idx_user_audit_log_action",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_audit_log_action ON public.user_audit_log USING btree (action)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "idx_user_audit_log_details_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_audit_log_details_gin ON public.user_audit_log USING gin (details jsonb_path_ops)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "idx_user_audit_log_resource",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_audit_log_resource ON public.user_audit_log USING btree (resource_type, resource_id)"
+    },
+    {
+      "table_name": "user_audit_log",
+      "index_name": "idx_user_audit_log_created_at",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_audit_log_created_at ON public.user_audit_log USING btree (created_at)"
+    },
+    {
+      "table_name": "user_sessions",
+      "index_name": "idx_user_sessions_expires_at",
+      "idx_scan": "92",
+      "indexdef": "CREATE INDEX idx_user_sessions_expires_at ON public.user_sessions USING btree (expires_at)"
+    },
+    {
+      "table_name": "user_sessions",
+      "index_name": "idx_user_sessions_last_activity",
+      "idx_scan": "76",
+      "indexdef": "CREATE INDEX idx_user_sessions_last_activity ON public.user_sessions USING btree (last_activity)"
+    },
+    {
+      "table_name": "user_sessions",
+      "index_name": "idx_user_sessions_user_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_user_sessions_user_id ON public.user_sessions USING btree (user_id)"
+    },
+    {
+      "table_name": "user_sessions",
+      "index_name": "user_sessions_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX user_sessions_pkey ON public.user_sessions USING btree (id)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "users_pkey",
+      "idx_scan": "124",
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "users_username_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX users_username_key ON public.users USING btree (username)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_last_login",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_last_login ON public.users USING btree (last_login)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_status",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_status ON public.users USING btree (status)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_created_by_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_created_by_fk ON public.users USING btree (created_by)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_email",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_email ON public.users USING btree (email)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_role_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_role_id ON public.users USING btree (role_id)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "users_email_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)"
+    },
+    {
+      "table_name": "users",
+      "index_name": "idx_users_username",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_users_username ON public.users USING btree (username)"
+    },
+    {
+      "table_name": "variant_attribute_types",
+      "index_name": "idx_variant_attribute_types_validation_rules_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_attribute_types_validation_rules_gin ON public.variant_attribute_types USING gin (validation_rules jsonb_path_ops)"
+    },
+    {
+      "table_name": "variant_attribute_types",
+      "index_name": "variant_attribute_types_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_attribute_types_pkey ON public.variant_attribute_types USING btree (id)"
+    },
+    {
+      "table_name": "variant_attribute_types",
+      "index_name": "variant_attribute_types_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_attribute_types_code_key ON public.variant_attribute_types USING btree (code)"
+    },
+    {
+      "table_name": "variant_attribute_values",
+      "index_name": "variant_attribute_values_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_attribute_values_pkey ON public.variant_attribute_values USING btree (id)"
+    },
+    {
+      "table_name": "variant_attribute_values",
+      "index_name": "variant_attribute_values_attribute_type_id_value_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_attribute_values_attribute_type_id_value_key ON public.variant_attribute_values USING btree (attribute_type_id, value)"
+    },
+    {
+      "table_name": "variant_attribute_values",
+      "index_name": "idx_variant_attribute_values_metadata_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_attribute_values_metadata_gin ON public.variant_attribute_values USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "index_name": "variant_attributes_new_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_attributes_new_pkey ON public.variant_attributes_new USING btree (id)"
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "index_name": "idx_variant_attributes_new_variant",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_variant_attributes_new_variant ON public.variant_attributes_new USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "index_name": "idx_variant_attributes_new_type",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_attributes_new_type ON public.variant_attributes_new USING btree (attribute_type_id)"
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "index_name": "variant_attributes_new_variant_id_attribute_type_id_attribu_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_attributes_new_variant_id_attribute_type_id_attribu_key ON public.variant_attributes_new USING btree (variant_id, attribute_type_id, attribute_value_id)"
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "index_name": "idx_variant_attributes_new_value",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_attributes_new_value ON public.variant_attributes_new USING btree (attribute_value_id)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "idx_variant_characteristics_variant",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_variant ON public.variant_characteristics USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "variant_characteristics_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_characteristics_pkey ON public.variant_characteristics USING btree (id)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "idx_variant_characteristics_highlighted",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_highlighted ON public.variant_characteristics USING btree (is_highlighted) WHERE (is_highlighted = true)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "idx_variant_characteristics_json_value_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_json_value_gin ON public.variant_characteristics USING gin (\"json_value\" jsonb_path_ops)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "variant_characteristics_variant_id_template_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_characteristics_variant_id_template_id_key ON public.variant_characteristics USING btree (variant_id, template_id)"
+    },
+    {
+      "table_name": "variant_characteristics",
+      "index_name": "idx_variant_characteristics_template",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_template ON public.variant_characteristics USING btree (template_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "idx_variant_characteristics_simple_value",
+      "idx_scan": "347",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_simple_value ON public.variant_characteristics_simple USING btree (value_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "idx_variant_characteristics_simple_variant",
+      "idx_scan": "98",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_simple_variant ON public.variant_characteristics_simple USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "idx_variant_characteristics_simple_value_id",
+      "idx_scan": "48",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_simple_value_id ON public.variant_characteristics_simple USING btree (value_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "idx_variant_characteristics_simple_variant_id",
+      "idx_scan": "7",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_simple_variant_id ON public.variant_characteristics_simple USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "variant_characteristics_simple_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_characteristics_simple_pkey ON public.variant_characteristics_simple USING btree (id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "variant_characteristics_simple_variant_id_value_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_characteristics_simple_variant_id_value_id_key ON public.variant_characteristics_simple USING btree (variant_id, value_id)"
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "index_name": "idx_variant_characteristics_composite",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_characteristics_composite ON public.variant_characteristics_simple USING btree (variant_id, value_id)"
+    },
+    {
+      "table_name": "variant_images",
+      "index_name": "variant_images_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_images_pkey ON public.variant_images USING btree (id)"
+    },
+    {
+      "table_name": "variant_images",
+      "index_name": "idx_variant_images_variant",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_variant_images_variant ON public.variant_images USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_images",
+      "index_name": "idx_variant_images_metadata_gin",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_images_metadata_gin ON public.variant_images USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "table_name": "variant_images",
+      "index_name": "idx_variant_images_primary",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_images_primary ON public.variant_images USING btree (variant_id, is_primary) WHERE (is_primary = true)"
+    },
+    {
+      "table_name": "variant_images",
+      "index_name": "unique_primary_image_per_variant",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX unique_primary_image_per_variant ON public.variant_images USING btree (variant_id) WHERE (is_primary = true)"
+    },
+    {
+      "table_name": "variant_price_tiers",
+      "index_name": "variant_price_tiers_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_price_tiers_pkey ON public.variant_price_tiers USING btree (id)"
+    },
+    {
+      "table_name": "variant_price_tiers",
+      "index_name": "variant_price_tiers_variant_id_user_group_min_quantity_key",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_price_tiers_variant_id_user_group_min_quantity_key ON public.variant_price_tiers USING btree (variant_id, user_group, min_quantity)"
+    },
+    {
+      "table_name": "variant_tag_relations",
+      "index_name": "idx_variant_tag_relations_variant_id",
+      "idx_scan": "34",
+      "indexdef": "CREATE INDEX idx_variant_tag_relations_variant_id ON public.variant_tag_relations USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_tag_relations",
+      "index_name": "variant_tag_relations_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_tag_relations_pkey ON public.variant_tag_relations USING btree (id)"
+    },
+    {
+      "table_name": "variant_tag_relations",
+      "index_name": "variant_tag_relations_variant_id_tag_id_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX variant_tag_relations_variant_id_tag_id_key ON public.variant_tag_relations USING btree (variant_id, tag_id)"
+    },
+    {
+      "table_name": "variant_tag_relations",
+      "index_name": "idx_variant_tag_relations_tag_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_tag_relations_tag_id ON public.variant_tag_relations USING btree (tag_id)"
+    },
+    {
+      "table_name": "variant_warehouse_stock",
+      "index_name": "variant_warehouse_stock_variant_id_warehouse_id_key",
+      "idx_scan": "60",
+      "indexdef": "CREATE UNIQUE INDEX variant_warehouse_stock_variant_id_warehouse_id_key ON public.variant_warehouse_stock USING btree (variant_id, warehouse_id)"
+    },
+    {
+      "table_name": "variant_warehouse_stock",
+      "index_name": "idx_variant_warehouse_stock_variant_id",
+      "idx_scan": "1",
+      "indexdef": "CREATE INDEX idx_variant_warehouse_stock_variant_id ON public.variant_warehouse_stock USING btree (variant_id)"
+    },
+    {
+      "table_name": "variant_warehouse_stock",
+      "index_name": "variant_warehouse_stock_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX variant_warehouse_stock_pkey ON public.variant_warehouse_stock USING btree (id)"
+    },
+    {
+      "table_name": "variant_warehouse_stock",
+      "index_name": "idx_variant_warehouse_stock_warehouse_id",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_variant_warehouse_stock_warehouse_id ON public.variant_warehouse_stock USING btree (warehouse_id)"
+    },
+    {
+      "table_name": "warehouse_articles",
+      "index_name": "warehouse_articles_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_articles_pkey ON public.warehouse_articles USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_articles",
+      "index_name": "idx_warehouse_articles_code",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_articles_code ON public.warehouse_articles USING btree (article_code)"
+    },
+    {
+      "table_name": "warehouse_articles",
+      "index_name": "warehouse_articles_article_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_articles_article_code_key ON public.warehouse_articles USING btree (article_code)"
+    },
+    {
+      "table_name": "warehouse_cities",
+      "index_name": "warehouse_cities_pkey",
+      "idx_scan": "192",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_cities_pkey ON public.warehouse_cities USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_cities",
+      "index_name": "idx_warehouse_cities_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_cities_active ON public.warehouse_cities USING btree (is_active)"
+    },
+    {
+      "table_name": "warehouse_cities",
+      "index_name": "idx_warehouse_cities_region",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_cities_region ON public.warehouse_cities USING btree (region_id)"
+    },
+    {
+      "table_name": "warehouse_cities",
+      "index_name": "warehouse_cities_region_id_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_cities_region_id_code_key ON public.warehouse_cities USING btree (region_id, code)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "warehouse_inventory_sku_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_inventory_sku_key ON public.warehouse_inventory USING btree (sku)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "warehouse_inventory_warehouse_id_idx",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX warehouse_inventory_warehouse_id_idx ON public.warehouse_inventory USING btree (warehouse_id)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "idx_warehouse_inventory_product_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_inventory_product_id_fk ON public.warehouse_inventory USING btree (product_id)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "idx_warehouse_inventory_article_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_inventory_article_id_fk ON public.warehouse_inventory USING btree (article_id)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "idx_warehouse_inventory_status",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_inventory_status ON public.warehouse_inventory USING btree (status)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "idx_warehouse_inventory_section",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_inventory_section ON public.warehouse_inventory USING btree (section_id)"
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "index_name": "warehouse_inventory_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_inventory_pkey ON public.warehouse_inventory USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_movements",
+      "index_name": "warehouse_movements_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_movements_pkey ON public.warehouse_movements USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_movements",
+      "index_name": "idx_warehouse_movements_to_section_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_movements_to_section_id_fk ON public.warehouse_movements USING btree (to_section_id)"
+    },
+    {
+      "table_name": "warehouse_movements",
+      "index_name": "idx_warehouse_movements_inventory",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_movements_inventory ON public.warehouse_movements USING btree (inventory_id)"
+    },
+    {
+      "table_name": "warehouse_movements",
+      "index_name": "idx_warehouse_movements_from_section_id_fk",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_movements_from_section_id_fk ON public.warehouse_movements USING btree (from_section_id)"
+    },
+    {
+      "table_name": "warehouse_regions",
+      "index_name": "warehouse_regions_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_regions_pkey ON public.warehouse_regions USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_regions",
+      "index_name": "warehouse_regions_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_regions_code_key ON public.warehouse_regions USING btree (code)"
+    },
+    {
+      "table_name": "warehouse_regions",
+      "index_name": "idx_warehouse_regions_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_regions_active ON public.warehouse_regions USING btree (is_active)"
+    },
+    {
+      "table_name": "warehouse_sections",
+      "index_name": "idx_warehouse_sections_zone",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_sections_zone ON public.warehouse_sections USING btree (zone_id)"
+    },
+    {
+      "table_name": "warehouse_sections",
+      "index_name": "warehouse_sections_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_sections_pkey ON public.warehouse_sections USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_sections",
+      "index_name": "idx_warehouse_sections_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_sections_active ON public.warehouse_sections USING btree (is_active)"
+    },
+    {
+      "table_name": "warehouse_sections",
+      "index_name": "warehouse_sections_zone_id_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_sections_zone_id_name_key ON public.warehouse_sections USING btree (zone_id, name)"
+    },
+    {
+      "table_name": "warehouse_settings",
+      "index_name": "warehouse_settings_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_settings_pkey ON public.warehouse_settings USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_settings",
+      "index_name": "warehouse_settings_setting_key_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_settings_setting_key_key ON public.warehouse_settings USING btree (setting_key)"
+    },
+    {
+      "table_name": "warehouse_warehouses",
+      "index_name": "idx_warehouse_warehouses_city",
+      "idx_scan": "750",
+      "indexdef": "CREATE INDEX idx_warehouse_warehouses_city ON public.warehouse_warehouses USING btree (city_id)"
+    },
+    {
+      "table_name": "warehouse_warehouses",
+      "index_name": "warehouse_warehouses_pkey",
+      "idx_scan": "87",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_warehouses_pkey ON public.warehouse_warehouses USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_warehouses",
+      "index_name": "warehouse_warehouses_city_id_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_warehouses_city_id_code_key ON public.warehouse_warehouses USING btree (city_id, code)"
+    },
+    {
+      "table_name": "warehouse_warehouses",
+      "index_name": "idx_warehouse_warehouses_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_warehouses_active ON public.warehouse_warehouses USING btree (is_active)"
+    },
+    {
+      "table_name": "warehouse_zones",
+      "index_name": "idx_warehouse_zones_warehouse",
+      "idx_scan": "215",
+      "indexdef": "CREATE INDEX idx_warehouse_zones_warehouse ON public.warehouse_zones USING btree (warehouse_id)"
+    },
+    {
+      "table_name": "warehouse_zones",
+      "index_name": "warehouse_zones_pkey",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_zones_pkey ON public.warehouse_zones USING btree (id)"
+    },
+    {
+      "table_name": "warehouse_zones",
+      "index_name": "warehouse_zones_name_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouse_zones_name_key ON public.warehouse_zones USING btree (name)"
+    },
+    {
+      "table_name": "warehouse_zones",
+      "index_name": "idx_warehouse_zones_location",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_zones_location ON public.warehouse_zones USING btree (location)"
+    },
+    {
+      "table_name": "warehouse_zones",
+      "index_name": "idx_warehouse_zones_active",
+      "idx_scan": "0",
+      "indexdef": "CREATE INDEX idx_warehouse_zones_active ON public.warehouse_zones USING btree (is_active)"
+    },
+    {
+      "table_name": "warehouses",
+      "index_name": "warehouses_pkey",
+      "idx_scan": "1",
+      "indexdef": "CREATE UNIQUE INDEX warehouses_pkey ON public.warehouses USING btree (id)"
+    },
+    {
+      "table_name": "warehouses",
+      "index_name": "warehouses_code_key",
+      "idx_scan": "0",
+      "indexdef": "CREATE UNIQUE INDEX warehouses_code_key ON public.warehouses USING btree (code)"
+    }
+  ],
+  "foreignKeys": [
+    {
+      "fk_name": "catalog_files_created_by_fkey",
+      "ref_table": "users",
+      "table_name": "catalog_files",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL",
+      "columns": "{created_by}"
+    },
+    {
+      "fk_name": "catalog_menu_settings_parent_id_fkey",
+      "ref_table": "catalog_menu_settings",
+      "table_name": "catalog_menu_settings",
+      "definition": "FOREIGN KEY (parent_id) REFERENCES catalog_menu_settings(id) ON DELETE CASCADE",
+      "columns": "{parent_id}"
+    },
+    {
+      "fk_name": "category_attribute_types_category_id_fkey",
+      "ref_table": "product_categories",
+      "table_name": "category_attribute_types",
+      "definition": "FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE CASCADE",
+      "columns": "{category_id}"
+    },
+    {
+      "fk_name": "category_attribute_types_attribute_type_id_fkey",
+      "ref_table": "variant_attribute_types",
+      "table_name": "category_attribute_types",
+      "definition": "FOREIGN KEY (attribute_type_id) REFERENCES variant_attribute_types(id) ON DELETE CASCADE",
+      "columns": "{attribute_type_id}"
+    },
+    {
+      "fk_name": "spec_groups_parent_id_fkey",
+      "ref_table": "characteristic_groups_legacy",
+      "table_name": "characteristic_groups_legacy",
+      "definition": "FOREIGN KEY (parent_id) REFERENCES characteristic_groups_legacy(id) ON DELETE CASCADE",
+      "columns": "{parent_id}"
+    },
+    {
+      "fk_name": "characteristics_values_simple_group_id_fkey",
+      "ref_table": "characteristics_groups_simple",
+      "table_name": "characteristics_values_simple",
+      "definition": "FOREIGN KEY (group_id) REFERENCES characteristics_groups_simple(id) ON DELETE CASCADE",
+      "columns": "{group_id}"
+    },
+    {
+      "fk_name": "characteristic_values_group_id_fkey",
+      "ref_table": "characteristic_groups_legacy",
+      "table_name": "characteristic_values_legacy",
+      "definition": "FOREIGN KEY (group_id) REFERENCES characteristic_groups_legacy(id)",
+      "columns": "{group_id}"
+    },
+    {
+      "fk_name": "spec_enums_parent_id_fkey",
+      "ref_table": "characteristic_values_legacy",
+      "table_name": "characteristic_values_legacy",
+      "definition": "FOREIGN KEY (parent_id) REFERENCES characteristic_values_legacy(id)",
+      "columns": "{parent_id}"
+    },
+    {
+      "fk_name": "fk_model_lines_manufacturer",
+      "ref_table": "manufacturers",
+      "table_name": "model_series",
+      "definition": "FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id)",
+      "columns": "{manufacturer_id}"
+    },
+    {
+      "fk_name": "fk_model_series_manufacturer",
+      "ref_table": "manufacturers",
+      "table_name": "model_series",
+      "definition": "FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id)",
+      "columns": "{manufacturer_id}"
+    },
+    {
+      "fk_name": "order_items_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "order_items",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id)",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "order_items_order_id_fkey",
+      "ref_table": "orders",
+      "table_name": "order_items",
+      "definition": "FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE",
+      "columns": "{order_id}"
+    },
+    {
+      "fk_name": "price_logs_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "price_logs",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "categories_parent_id_fkey",
+      "ref_table": "product_categories",
+      "table_name": "product_categories",
+      "definition": "FOREIGN KEY (parent_id) REFERENCES product_categories(id) ON DELETE SET NULL",
+      "columns": "{parent_id}"
+    },
+    {
+      "fk_name": "product_certificates_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "product_certificates",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "product_characteristics_simple_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_characteristics_simple",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_characteristics_simple_value_id_fkey",
+      "ref_table": "characteristics_values_simple",
+      "table_name": "product_characteristics_simple",
+      "definition": "FOREIGN KEY (value_id) REFERENCES characteristics_values_simple(id) ON DELETE CASCADE",
+      "columns": "{value_id}"
+    },
+    {
+      "fk_name": "product_configurable_characteristics_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_configurable_characteristics",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_images_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_images",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "fk_product_images_variant_id_product_variants",
+      "ref_table": "product_variants",
+      "table_name": "product_images",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "product_media_links_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_media_links",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_media_links_media_file_id_fkey",
+      "ref_table": "media_files",
+      "table_name": "product_media_links",
+      "definition": "FOREIGN KEY (media_file_id) REFERENCES media_files(id) ON DELETE CASCADE",
+      "columns": "{media_file_id}"
+    },
+    {
+      "fk_name": "fk_products_series",
+      "ref_table": "model_series",
+      "table_name": "products",
+      "definition": "FOREIGN KEY (series_id) REFERENCES model_series(id)",
+      "columns": "{series_id}"
+    },
+    {
+      "fk_name": "fk_products_manufacturer",
+      "ref_table": "manufacturers",
+      "table_name": "products",
+      "definition": "FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(id)",
+      "columns": "{manufacturer_id}"
+    },
+    {
+      "fk_name": "fk_products_category",
+      "ref_table": "product_categories",
+      "table_name": "products",
+      "definition": "FOREIGN KEY (category_id) REFERENCES product_categories(id)",
+      "columns": "{category_id}"
+    },
+    {
+      "fk_name": "product_selection_tables_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_selection_tables",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_sizes_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_sizes",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_specifications_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_specifications",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_suppliers_supplier_id_fkey",
+      "ref_table": "suppliers",
+      "table_name": "product_suppliers",
+      "definition": "FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE CASCADE",
+      "columns": "{supplier_id}"
+    },
+    {
+      "fk_name": "product_suppliers_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "product_suppliers",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "product_tag_relations_tag_id_fkey",
+      "ref_table": "product_tags",
+      "table_name": "product_tag_relations",
+      "definition": "FOREIGN KEY (tag_id) REFERENCES product_tags(id) ON DELETE CASCADE",
+      "columns": "{tag_id}"
+    },
+    {
+      "fk_name": "fk_product_tag_relations_product_id_products",
+      "ref_table": "products",
+      "table_name": "product_tag_relations",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "fk_product_tags_product_id_products",
+      "ref_table": "products",
+      "table_name": "product_tags",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "fk_product_tags_variant_id_product_variants",
+      "ref_table": "product_variants",
+      "table_name": "product_tags",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "fk_product_variants_category",
+      "ref_table": "product_categories",
+      "table_name": "product_variants",
+      "definition": "FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE SET NULL",
+      "columns": "{category_id}"
+    },
+    {
+      "fk_name": "product_variants_master_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_variants",
+      "definition": "FOREIGN KEY (master_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{master_id}"
+    },
+    {
+      "fk_name": "product_view_stats_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_view_stats",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_warehouse_stock_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "product_warehouse_stock",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "product_warehouse_stock_warehouse_id_fkey",
+      "ref_table": "warehouses",
+      "table_name": "product_warehouse_stock",
+      "definition": "FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE CASCADE",
+      "columns": "{warehouse_id}"
+    },
+    {
+      "fk_name": "site_menu_spec_group_id_fkey",
+      "ref_table": "characteristic_groups_legacy",
+      "table_name": "site_menu",
+      "definition": "FOREIGN KEY (spec_group_id) REFERENCES characteristic_groups_legacy(id) ON DELETE SET NULL",
+      "columns": "{spec_group_id}"
+    },
+    {
+      "fk_name": "fk_size_charts_category_id_product_categories",
+      "ref_table": "product_categories",
+      "table_name": "size_charts",
+      "definition": "FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE SET NULL",
+      "columns": "{category_id}"
+    },
+    {
+      "fk_name": "size_chart_values_size_chart_id_fkey",
+      "ref_table": "size_charts",
+      "table_name": "size_chart_values",
+      "definition": "FOREIGN KEY (size_chart_id) REFERENCES size_charts(id) ON DELETE CASCADE",
+      "columns": "{size_chart_id}"
+    },
+    {
+      "fk_name": "user_audit_log_user_id_fkey",
+      "ref_table": "users",
+      "table_name": "user_audit_log",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL",
+      "columns": "{user_id}"
+    },
+    {
+      "fk_name": "users_role_id_fkey",
+      "ref_table": "roles",
+      "table_name": "users",
+      "definition": "FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL",
+      "columns": "{role_id}"
+    },
+    {
+      "fk_name": "users_created_by_fkey",
+      "ref_table": "users",
+      "table_name": "users",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL",
+      "columns": "{created_by}"
+    },
+    {
+      "fk_name": "user_sessions_user_id_fkey",
+      "ref_table": "users",
+      "table_name": "user_sessions",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+      "columns": "{user_id}"
+    },
+    {
+      "fk_name": "variant_attributes_new_attribute_value_id_fkey",
+      "ref_table": "variant_attribute_values",
+      "table_name": "variant_attributes_new",
+      "definition": "FOREIGN KEY (attribute_value_id) REFERENCES variant_attribute_values(id)",
+      "columns": "{attribute_value_id}"
+    },
+    {
+      "fk_name": "variant_attributes_new_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_attributes_new",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_attributes_new_attribute_type_id_fkey",
+      "ref_table": "variant_attribute_types",
+      "table_name": "variant_attributes_new",
+      "definition": "FOREIGN KEY (attribute_type_id) REFERENCES variant_attribute_types(id)",
+      "columns": "{attribute_type_id}"
+    },
+    {
+      "fk_name": "variant_attribute_values_attribute_type_id_fkey",
+      "ref_table": "variant_attribute_types",
+      "table_name": "variant_attribute_values",
+      "definition": "FOREIGN KEY (attribute_type_id) REFERENCES variant_attribute_types(id) ON DELETE CASCADE",
+      "columns": "{attribute_type_id}"
+    },
+    {
+      "fk_name": "variant_characteristics_template_id_fkey",
+      "ref_table": "characteristic_templates",
+      "table_name": "variant_characteristics",
+      "definition": "FOREIGN KEY (template_id) REFERENCES characteristic_templates(id)",
+      "columns": "{template_id}"
+    },
+    {
+      "fk_name": "variant_characteristics_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_characteristics",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_characteristics_simple_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_characteristics_simple",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_characteristics_simple_value_id_fkey",
+      "ref_table": "characteristics_values_simple",
+      "table_name": "variant_characteristics_simple",
+      "definition": "FOREIGN KEY (value_id) REFERENCES characteristics_values_simple(id) ON DELETE CASCADE",
+      "columns": "{value_id}"
+    },
+    {
+      "fk_name": "variant_images_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_images",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_price_tiers_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_price_tiers",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_tag_relations_tag_id_fkey",
+      "ref_table": "product_tags",
+      "table_name": "variant_tag_relations",
+      "definition": "FOREIGN KEY (tag_id) REFERENCES product_tags(id) ON DELETE CASCADE",
+      "columns": "{tag_id}"
+    },
+    {
+      "fk_name": "fk_variant_tag_relations_variant_id_product_variants",
+      "ref_table": "product_variants",
+      "table_name": "variant_tag_relations",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "variant_warehouse_stock_warehouse_id_fkey",
+      "ref_table": "warehouses",
+      "table_name": "variant_warehouse_stock",
+      "definition": "FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE CASCADE",
+      "columns": "{warehouse_id}"
+    },
+    {
+      "fk_name": "variant_warehouse_stock_variant_id_fkey",
+      "ref_table": "product_variants",
+      "table_name": "variant_warehouse_stock",
+      "definition": "FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE CASCADE",
+      "columns": "{variant_id}"
+    },
+    {
+      "fk_name": "warehouse_cities_region_id_fkey",
+      "ref_table": "warehouse_regions",
+      "table_name": "warehouse_cities",
+      "definition": "FOREIGN KEY (region_id) REFERENCES warehouse_regions(id) ON DELETE CASCADE",
+      "columns": "{region_id}"
+    },
+    {
+      "fk_name": "fk_warehouse_inventory_warehouse_id_warehouse_warehouses",
+      "ref_table": "warehouse_warehouses",
+      "table_name": "warehouse_inventory",
+      "definition": "FOREIGN KEY (warehouse_id) REFERENCES warehouse_warehouses(id) ON DELETE CASCADE",
+      "columns": "{warehouse_id}"
+    },
+    {
+      "fk_name": "warehouse_inventory_article_id_fkey",
+      "ref_table": "warehouse_articles",
+      "table_name": "warehouse_inventory",
+      "definition": "FOREIGN KEY (article_id) REFERENCES warehouse_articles(id) ON DELETE SET NULL",
+      "columns": "{article_id}"
+    },
+    {
+      "fk_name": "warehouse_inventory_section_id_fkey",
+      "ref_table": "warehouse_sections",
+      "table_name": "warehouse_inventory",
+      "definition": "FOREIGN KEY (section_id) REFERENCES warehouse_sections(id) ON DELETE SET NULL",
+      "columns": "{section_id}"
+    },
+    {
+      "fk_name": "warehouse_inventory_product_id_fkey",
+      "ref_table": "products",
+      "table_name": "warehouse_inventory",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL",
+      "columns": "{product_id}"
+    },
+    {
+      "fk_name": "warehouse_movements_from_section_id_fkey",
+      "ref_table": "warehouse_sections",
+      "table_name": "warehouse_movements",
+      "definition": "FOREIGN KEY (from_section_id) REFERENCES warehouse_sections(id) ON DELETE SET NULL",
+      "columns": "{from_section_id}"
+    },
+    {
+      "fk_name": "warehouse_movements_inventory_id_fkey",
+      "ref_table": "warehouse_inventory",
+      "table_name": "warehouse_movements",
+      "definition": "FOREIGN KEY (inventory_id) REFERENCES warehouse_inventory(id) ON DELETE CASCADE",
+      "columns": "{inventory_id}"
+    },
+    {
+      "fk_name": "warehouse_movements_to_section_id_fkey",
+      "ref_table": "warehouse_sections",
+      "table_name": "warehouse_movements",
+      "definition": "FOREIGN KEY (to_section_id) REFERENCES warehouse_sections(id) ON DELETE SET NULL",
+      "columns": "{to_section_id}"
+    },
+    {
+      "fk_name": "warehouse_sections_zone_id_fkey",
+      "ref_table": "warehouse_zones",
+      "table_name": "warehouse_sections",
+      "definition": "FOREIGN KEY (zone_id) REFERENCES warehouse_zones(id) ON DELETE CASCADE",
+      "columns": "{zone_id}"
+    },
+    {
+      "fk_name": "warehouse_warehouses_city_id_fkey",
+      "ref_table": "warehouse_cities",
+      "table_name": "warehouse_warehouses",
+      "definition": "FOREIGN KEY (city_id) REFERENCES warehouse_cities(id) ON DELETE CASCADE",
+      "columns": "{city_id}"
+    },
+    {
+      "fk_name": "warehouse_zones_warehouse_id_fkey",
+      "ref_table": "warehouse_warehouses",
+      "table_name": "warehouse_zones",
+      "definition": "FOREIGN KEY (warehouse_id) REFERENCES warehouse_warehouses(id) ON DELETE CASCADE",
+      "columns": "{warehouse_id}"
+    }
+  ],
+  "vacuum": [
+    {
+      "table_name": "product_categories",
+      "n_live_tup": "0",
+      "n_dead_tup": "32",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristics_values_simple",
+      "n_live_tup": "94",
+      "n_dead_tup": "30",
+      "last_vacuum": null,
+      "last_autovacuum": "2025-08-08T21:50:11.579Z",
+      "last_analyze": null,
+      "last_autoanalyze": "2025-08-08T22:24:12.224Z"
+    },
+    {
+      "table_name": "products",
+      "n_live_tup": "0",
+      "n_dead_tup": "28",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "user_sessions",
+      "n_live_tup": "12",
+      "n_dead_tup": "8",
+      "last_vacuum": null,
+      "last_autovacuum": "2025-08-16T10:33:42.419Z",
+      "last_analyze": null,
+      "last_autoanalyze": "2025-08-16T07:18:38.733Z"
+    },
+    {
+      "table_name": "product_characteristics_simple",
+      "n_live_tup": "0",
+      "n_dead_tup": "8",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_characteristics_simple",
+      "n_live_tup": "0",
+      "n_dead_tup": "4",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "orders",
+      "n_live_tup": "0",
+      "n_dead_tup": "4",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "category_attribute_types",
+      "n_live_tup": "0",
+      "n_dead_tup": "4",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_tag_relations",
+      "n_live_tup": "0",
+      "n_dead_tup": "3",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_warehouse_stock",
+      "n_live_tup": "0",
+      "n_dead_tup": "3",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_configurable_characteristics",
+      "n_live_tup": "0",
+      "n_dead_tup": "2",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "users",
+      "n_live_tup": "0",
+      "n_dead_tup": "2",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_selection_tables",
+      "n_live_tup": "0",
+      "n_dead_tup": "2",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_variants",
+      "n_live_tup": "0",
+      "n_dead_tup": "1",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "site_menu",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_characteristics",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_certificates",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "size_chart_values",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "model_series",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_movements",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristic_groups_legacy",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_regions",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristics_groups_simple",
+      "n_live_tup": "79",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": "2025-08-09T02:05:56.538Z",
+      "last_analyze": null,
+      "last_autoanalyze": "2025-08-08T21:50:11.581Z"
+    },
+    {
+      "table_name": "warehouse_articles",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "catalog_menu_settings",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_attribute_values",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "order_items",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "manufacturers",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_price_tiers",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_images",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouses",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "media_files",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "user_audit_log",
+      "n_live_tup": "2",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_zones",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_warehouse_stock",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_images",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "site_settings",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "catalog_files",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristic_preset_values",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "suppliers",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "form_templates",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristic_templates",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_attribute_types",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "size_charts",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_tags",
+      "n_live_tup": "1004",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": "2025-08-10T09:08:30.391Z"
+    },
+    {
+      "table_name": "price_logs",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_suppliers",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_sizes",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_cities",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_attributes_new",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_specifications",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_settings",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_media_links",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "product_view_stats",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "variant_tag_relations",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_inventory",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "characteristic_values_legacy",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "roles",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_warehouses",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    },
+    {
+      "table_name": "warehouse_sections",
+      "n_live_tup": "0",
+      "n_dead_tup": "0",
+      "last_vacuum": null,
+      "last_autovacuum": null,
+      "last_analyze": null,
+      "last_autoanalyze": null
+    }
+  ],
+  "missingFkIndexes": [],
+  "recommendedIndexes": [],
+  "schemaGaps": {
+    "missing": [],
+    "have": [
+      "characteristics_values_simple",
+      "warehouse_articles",
+      "characteristic_preset_values",
+      "form_templates",
+      "media_files",
+      "site_settings",
+      "warehouses",
+      "model_series",
+      "users",
+      "variant_price_tiers",
+      "product_specifications",
+      "product_images",
+      "product_view_stats",
+      "variant_attribute_types",
+      "warehouse_sections",
+      "user_audit_log",
+      "product_variants",
+      "order_items",
+      "characteristics_groups_simple",
+      "size_charts",
+      "catalog_files",
+      "characteristic_templates",
+      "manufacturers",
+      "variant_images",
+      "variant_attribute_values",
+      "variant_characteristics",
+      "product_configurable_characteristics",
+      "product_certificates",
+      "product_characteristics_simple",
+      "product_sizes",
+      "warehouse_inventory",
+      "warehouse_regions",
+      "warehouse_warehouses",
+      "warehouse_zones",
+      "user_sessions",
+      "variant_tag_relations",
+      "orders",
+      "product_categories",
+      "warehouse_cities",
+      "characteristic_values_legacy",
+      "product_selection_tables",
+      "product_tag_relations",
+      "price_logs",
+      "products",
+      "product_media_links",
+      "suppliers",
+      "variant_characteristics_simple",
+      "characteristic_groups_legacy",
+      "product_suppliers",
+      "variant_attributes_new",
+      "site_menu",
+      "warehouse_movements",
+      "product_warehouse_stock",
+      "variant_warehouse_stock",
+      "size_chart_values",
+      "catalog_menu_settings",
+      "category_attribute_types",
+      "product_tags",
+      "warehouse_settings",
+      "roles"
+    ]
+  }
+}

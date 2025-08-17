@@ -48,7 +48,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     })
   } catch (error) {
-    console.error('Error fetching characteristic values:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch characteristic values' },
       { status: 500 }
@@ -103,7 +102,6 @@ export async function POST(request: NextRequest) {
       message: 'Значение характеристики создано'
     })
   } catch (error) {
-    console.error("❌ Ошибка создания значения характеристики:", error)
     return NextResponse.json(
       { success: false, error: "Ошибка создания значения характеристики" },
       { status: 500 }
@@ -160,7 +158,6 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("❌ Ошибка обновления значения характеристики:", error)
     return NextResponse.json(
       { success: false, error: "Ошибка обновления значения характеристики" },
       { status: 500 }
@@ -233,7 +230,6 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("❌ Ошибка удаления значения характеристики:", error)
     return NextResponse.json(
       { success: false, error: "Ошибка удаления значения характеристики" },
       { status: 500 }

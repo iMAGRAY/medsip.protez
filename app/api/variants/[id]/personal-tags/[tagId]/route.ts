@@ -5,9 +5,11 @@ import { pool } from '@/lib/db'
 // DELETE - удаление личного тега варианта
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string, tagId: string } }
+  { params }: { params: Promise<{ id: string, tagId: string }> }
 ) {
   try {
+    const { id, tagId } = await params
+    
     // EMERGENCY PATCH: Skip auth check temporarily
     // const cookieStore = cookies()
     // const sessionId = cookieStore.get('admin_session')?.value
@@ -21,10 +23,10 @@ export async function DELETE(
       }, { status: 403 })
     }
     
-    const variantId = parseInt(params.id)
-    const tagId = parseInt(params.tagId)
+    const variantId = parseInt(id)
+    const tagIdInt = parseInt(tagId)
     
-    if (isNaN(variantId) || isNaN(tagId)) {
+    if (isNaN(variantId) || isNaN(tagIdInt)) {
       return NextResponse.json({
         success: false,
         error: 'Неверные параметры'
@@ -34,7 +36,7 @@ export async function DELETE(
     // Проверяем, что это действительно личный тег этого варианта
     const checkResult = await pool.query(
       'SELECT variant_id FROM product_tags WHERE id = $1',
-      [tagId]
+      [tagIdInt]
     )
     
     if (checkResult.rows.length === 0) {
@@ -56,7 +58,7 @@ export async function DELETE(
     // Удаляем личный тег полностью
     await pool.query(
       'DELETE FROM product_tags WHERE id = $1 AND variant_id = $2',
-      [tagId, variantId]
+      [tagIdInt, variantId]
     )
     
     return NextResponse.json({
@@ -64,7 +66,6 @@ export async function DELETE(
       message: 'Личный тег варианта удален'
     })
   } catch (error) {
-    console.error('Error deleting variant personal tag:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления личного тега варианта'

@@ -136,7 +136,6 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Database error in characteristics GET:', error);
     return NextResponse.json(
       {
         success: false,
@@ -236,7 +235,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Error creating characteristic group:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка создания группы характеристик' },
       { status: 500 }
@@ -363,7 +361,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     })
   } catch (error) {
-    console.error('❌ Error updating characteristic:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления характеристики', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -538,8 +535,6 @@ return NextResponse.json({
       data: result.rows[0]
     })
   } catch (error) {
-    console.error('❌ Error deleting characteristic:', error)
-
     return NextResponse.json(
       {
         success: false,

@@ -55,7 +55,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     });
   } catch (error) {
-    console.error('Ошибка получения зон:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения зон'
@@ -125,7 +124,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка создания зоны:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания зоны'
@@ -172,7 +170,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка обновления зоны:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления зоны'
@@ -233,7 +230,6 @@ export async function DELETE(request: NextRequest) {
       message: 'Зона удалена'
     });
   } catch (error) {
-    console.error('Ошибка удаления зоны:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления зоны'

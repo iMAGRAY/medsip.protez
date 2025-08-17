@@ -113,7 +113,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Ошибка получения товаров для артикулов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения товаров для артикулов'
@@ -187,7 +186,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка создания складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания складского артикула'
@@ -268,7 +266,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка обновления складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления складского артикула'
@@ -320,7 +317,6 @@ export async function DELETE(request: NextRequest) {
       message: 'Складской артикул удален'
     });
   } catch (error) {
-    console.error('Ошибка удаления складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления складского артикула'

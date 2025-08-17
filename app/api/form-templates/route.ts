@@ -39,7 +39,6 @@ export async function GET() {
 
     return NextResponse.json(result.rows)
   } catch (error) {
-    console.error('❌ Error loading templates:', error)
     return NextResponse.json({
       error: 'Failed to load templates',
       details: error instanceof Error ? error.message : String(error)
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result.rows[0])
   } catch (error) {
-    console.error('❌ Error saving template:', error)
     return NextResponse.json({ error: 'Failed to save template' }, { status: 500 })
   }
 }
@@ -125,7 +123,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedTemplate)
   } catch (error) {
-    console.error('Error updating form template:', error)
     return NextResponse.json(
       { error: 'Failed to update template' },
       { status: 500 }
@@ -157,7 +154,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error deleting form template:', error)
     return NextResponse.json(
       { error: 'Failed to delete template' },
       { status: 500 }

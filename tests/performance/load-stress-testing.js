@@ -15,7 +15,7 @@ const fs = require('fs').promises;
 
 // Конфигурация нагрузочного тестирования
 const LOAD_CONFIG = {
-  BASE_URL: 'http://localhost:3004',
+  BASE_URL: 'http://localhost:3009',
   TESTS: {
     LIGHT_LOAD: { concurrent: 10, duration: 30 },    // Легкая нагрузка
     MODERATE_LOAD: { concurrent: 50, duration: 60 },  // Умеренная нагрузка

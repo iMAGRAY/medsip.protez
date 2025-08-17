@@ -78,7 +78,6 @@ class Semaphore {
       clearTimeout(waiter.timeout)
     }
     this.waiting = []
-    console.log('Semaphore cleanup: cleared waiting promises')
   }
 
   // Метод для мониторинга состояния
@@ -94,13 +93,11 @@ const dbSemaphore = new Semaphore(MAX_DB_CONNECTIONS)
 
 // Cleanup semaphore при shutdown процесса
 process.on('SIGINT', () => {
-  console.log('Shutting down media API...')
   dbSemaphore.cleanup()
   process.exit(0)
 })
 
 process.on('SIGTERM', () => {
-  console.log('Terminating media API...')
   dbSemaphore.cleanup()
   process.exit(0)
 })

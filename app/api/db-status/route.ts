@@ -21,8 +21,6 @@ export async function GET() {
       }, { status: 503 })
     }
   } catch (error) {
-    console.error('Database status check failed:', error)
-
     return NextResponse.json({
       status: 'degraded',
       database: 'disconnected',

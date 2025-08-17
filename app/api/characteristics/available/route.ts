@@ -122,7 +122,6 @@ export async function GET(_request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Error loading available characteristics:', error)
     return NextResponse.json(
       {
         success: false,

@@ -34,8 +34,6 @@ export async function GET(_request: NextRequest) {
 
   } catch (error) {
     logger.error('Ошибка получения количества заказов:', error)
-    console.error('Ошибка получения количества заказов:', error)
-
     // Возвращаем fallback данные если БД недоступна
     const fallbackData = {
       success: true,

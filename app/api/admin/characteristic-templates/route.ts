@@ -88,11 +88,10 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    try { console.error('Admin characteristic-templates GET failed:', error) } catch {}
-    return NextResponse.json(
-      { success: false, error: 'Ошибка получения шаблонов характеристик', details: (error as any)?.message ?? String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      error: 'Ошибка получения шаблонов характеристик'
+    }, { status: 500 })
   }
 }
 

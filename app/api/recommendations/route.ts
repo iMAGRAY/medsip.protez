@@ -68,7 +68,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Ошибка при получении рекомендаций:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }
@@ -103,7 +102,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Ошибка при обработке GET запроса рекомендаций:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }

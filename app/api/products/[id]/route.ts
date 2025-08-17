@@ -92,9 +92,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id)
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
   const _cacheManager = getCacheManager()
 
   try {
@@ -253,7 +254,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cacheManager = getCacheManager()
 
@@ -277,7 +278,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json({ success: false, error: 'Invalid product ID' }, { status: 400 })
     }

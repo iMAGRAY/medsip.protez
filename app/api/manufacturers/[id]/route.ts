@@ -3,21 +3,21 @@ import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer GET")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
 
     // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
@@ -108,12 +108,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: (error as any).message,
-      stack: (error as any).stack,
-      name: (error as any).name
-    });
     return NextResponse.json(
       { error: 'Failed to fetch manufacturer', success: false, details: (error as any).message },
       { status: 500 }
@@ -123,21 +117,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer PUT")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
     const data = await request.json();
 
     // Валидация обязательных полей
@@ -206,12 +200,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
 
     // Обработка дубликатов
     if ((error as any).code === '23505') {
@@ -230,21 +218,21 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer DELETE")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
 
     // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
@@ -335,12 +323,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
       { error: 'Failed to delete manufacturer', success: false, details: error.message },
       { status: 500 }

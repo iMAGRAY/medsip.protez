@@ -5,12 +5,13 @@ import { logger } from '@/lib/logger'
 
 export async function POST(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -134,12 +135,13 @@ export async function POST(
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(

@@ -80,7 +80,6 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Debug error:', error)
     return NextResponse.json(
       { 
         success: false,

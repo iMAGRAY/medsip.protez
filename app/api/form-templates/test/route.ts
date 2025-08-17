@@ -78,7 +78,6 @@ export async function POST() {
     })
 
   } catch (error) {
-    console.error('❌ Error creating test template:', error)
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -121,7 +120,6 @@ export async function GET() {
     })
 
   } catch (error) {
-    console.error('❌ Error checking templates:', error)
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'

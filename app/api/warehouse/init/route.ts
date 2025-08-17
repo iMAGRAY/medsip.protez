@@ -84,7 +84,6 @@ export async function POST(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка инициализации складской системы:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка инициализации складской системы',

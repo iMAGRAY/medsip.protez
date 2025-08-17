@@ -234,7 +234,6 @@ export async function GET() {
     })
   } catch (error) {
     const responseTime = Date.now() - startTime
-    console.error("❌ Catalog Menu API error:", error)
     return NextResponse.json({ success: false, error: "Failed to load catalog menu", performance: { response_time_ms: responseTime, error: true } }, { status: 500 })
   }
 }
@@ -294,7 +293,6 @@ export async function POST(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error creating menu item:", error)
     if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') { // unique violation
       return NextResponse.json(
         { success: false, error: 'Элемент меню для этой сущности уже существует' },
@@ -359,7 +357,6 @@ export async function PUT(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error updating menu item:", error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления элемента меню' },
       { status: 500 }
@@ -397,7 +394,6 @@ export async function DELETE(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error deleting menu item:", error)
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления элемента меню' },
       { status: 500 }

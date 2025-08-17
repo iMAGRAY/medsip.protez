@@ -76,7 +76,6 @@ export async function POST(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при создании таблицы:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка при создании таблицы',
@@ -132,7 +131,6 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при проверке таблицы:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка при проверке таблицы',

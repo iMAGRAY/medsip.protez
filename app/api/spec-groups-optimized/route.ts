@@ -85,7 +85,6 @@ return NextResponse.json({
     })
 
   } catch (error) {
-    console.error("Database error in spec-groups-optimized GET:", error)
     return NextResponse.json(
       {
         success: false,

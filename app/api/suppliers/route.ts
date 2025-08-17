@@ -62,7 +62,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка получения поставщиков:', error);
     return NextResponse.json(
       { error: 'Ошибка получения поставщиков' },
       { status: 500 }
@@ -106,7 +105,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result.rows[0], { status: 201 });
 
   } catch (error) {
-    console.error('Ошибка создания поставщика:', error);
     return NextResponse.json(
       { error: 'Ошибка создания поставщика' },
       { status: 500 }

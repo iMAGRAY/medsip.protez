@@ -16,10 +16,14 @@ export const GET = withCache(async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const fast = searchParams.get('fast') === 'true';
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
-    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : (page - 1) * limit;
     const _detailed = searchParams.get('detailed') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
+    const categoryId = searchParams.get('category_id') ? parseInt(searchParams.get('category_id')!) : undefined;
+    const manufacturerId = searchParams.get('manufacturer_id') ? parseInt(searchParams.get('manufacturer_id')!) : undefined;
+    const sort = searchParams.get('sort') || 'created_desc';
 
     // Если нет нужных таблиц — возвращаем пустой успешный ответ, не 500
     const needed = await tablesExist(['products'])
@@ -27,8 +31,17 @@ export const GET = withCache(async function GET(request: NextRequest) {
       return okEmpty('data', { success: true, count: 0 })
     }
 
-    // Генерируем ключ кеша
-    const cacheParams = { fast, limit, detailed: _detailed };
+    // Генерируем ключ кеша с учетом всех параметров пагинации
+    const cacheParams = { 
+      fast, 
+      limit, 
+      page, 
+      offset, 
+      detailed: _detailed, 
+      categoryId, 
+      manufacturerId, 
+      sort 
+    };
     const cacheKey = cacheKeys.productList(cacheParams);
 
     // Определяем TTL в зависимости от типа запроса
@@ -38,49 +51,49 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const fetchProducts = async () => {
       let query;
       let queryParams: any[] = [];
+      let whereConditions = ['(p.is_deleted = false OR p.is_deleted IS NULL)'];
+      let paramCounter = 1;
+
+      // Добавляем фильтры
+      if (categoryId) {
+        whereConditions.push(`p.category_id = $${paramCounter}`);
+        queryParams.push(categoryId);
+        paramCounter++;
+      }
+      
+      if (manufacturerId) {
+        whereConditions.push(`p.manufacturer_id = $${paramCounter}`);
+        queryParams.push(manufacturerId);
+        paramCounter++;
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+      // Определяем сортировку
+      let orderBy = 'ORDER BY p.created_at DESC';
+      switch(sort) {
+        case 'name_asc': orderBy = 'ORDER BY p.name ASC'; break;
+        case 'name_desc': orderBy = 'ORDER BY p.name DESC'; break;
+        case 'price_asc': orderBy = 'ORDER BY p.price ASC NULLS LAST'; break;
+        case 'price_desc': orderBy = 'ORDER BY p.price DESC NULLS LAST'; break;
+        case 'created_asc': orderBy = 'ORDER BY p.created_at ASC'; break;
+        case 'created_desc': orderBy = 'ORDER BY p.created_at DESC'; break;
+      }
 
     if (fast) {
-      // Быстрый запрос без JOIN'ов
+      // Оптимизированный быстрый запрос без сложных подзапросов
       query = `
         SELECT
           p.id, p.name, p.short_name, p.description, p.sku, p.article_number, p.price, p.discount_price,
           p.image_url, p.in_stock, p.stock_quantity, p.stock_status, p.show_price,
           p.category_id, p.manufacturer_id, p.series_id,
           p.created_at, p.updated_at,
-          CASE 
-            WHEN EXISTS (
-              SELECT 1 FROM product_variants pv 
-              WHERE pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
-              AND (pv.name IS NULL OR pv.name NOT ILIKE '%standard%')
-            ) THEN true
-            ELSE false
-          END as has_variants,
-          (
-            SELECT COUNT(*) 
-            FROM product_variants pv 
-            WHERE pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
-            AND (pv.name IS NULL OR pv.name NOT ILIKE '%standard%')
-          )::int as variants_count,
-          COALESCE(
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
-                'id', pv.id,
-                'price', pv.price,
-                'discountPrice', pv.discount_price,
-                'isAvailable', pv.is_active,
-                'sizeName', pv.size_name,
-                'sizeValue', pv.size_value,
-                'stockQuantity', pv.stock_quantity,
-                'sku', pv.sku
-              ) ORDER BY pv.sort_order, pv.size_name
-            ) FILTER (WHERE pv.id IS NOT NULL),
-            '[]'::json
-          ) as variants
+          false as has_variants,
+          0 as variants_count,
+          '[]'::json as variants
         FROM products p
-        LEFT JOIN product_variants pv ON pv.master_id = p.id AND pv.is_active = true AND pv.is_deleted = false
-        WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
-        GROUP BY p.id
-        ORDER BY p.created_at DESC
+        ${whereClause}
+        ${orderBy}
       `;
     } else {
       // Полный запрос с JOIN'ами включая характеристики из простой системы
@@ -132,28 +145,28 @@ export const GET = withCache(async function GET(request: NextRequest) {
         ${joinSimple ? `LEFT JOIN product_characteristics_simple prch ON p.id = prch.product_id
         LEFT JOIN characteristics_values_simple cv ON prch.value_id = cv.id AND cv.is_active = true
         LEFT JOIN characteristics_groups_simple cg ON cv.group_id = cg.id AND cg.is_active = true` : ''}
-        WHERE (p.is_deleted = false OR p.is_deleted IS NULL)
+        ${whereClause}
         GROUP BY p.id, ms.name, m.name, pc.name
-        ORDER BY p.created_at DESC
+        ${orderBy}
       `;
     }
 
     if (limit) {
       if (offset) {
-        query += ` LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+        query += ` LIMIT $${paramCounter} OFFSET $${paramCounter + 1}`;
         queryParams.push(limit, offset);
       } else {
-        query += ` LIMIT $${queryParams.length + 1}`;
+        query += ` LIMIT $${paramCounter}`;
         queryParams.push(limit);
       }
     } else if (offset) {
-      query += ` OFFSET $${queryParams.length + 1}`;
+      query += ` OFFSET $${paramCounter}`;
       queryParams.push(offset);
     }
 
-      // Добавляем timeout 30s для предотвращения hang
+      // Добавляем timeout 15s для предотвращения hang (уменьшено для нагрузки)
       const queryTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout after 30 seconds')), 30000)
+        setTimeout(() => reject(new Error('Query timeout after 15 seconds')), 15000)
       );
       
       const result = await Promise.race([

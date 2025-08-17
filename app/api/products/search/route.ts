@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     let searchQuery = `
-      SELECT DISTINCT
+      SELECT ${includeVariants ? '' : 'DISTINCT'}
         p.id,
         p.name,
         p.description,
@@ -37,36 +37,33 @@ export async function GET(request: NextRequest) {
         p.manufacturer_id,
         p.series_id,
         c.name as category_name,
-        m.name as manufacturer_name,
+        m.name as manufacturer_name${includeVariants ? `,
         COALESCE(
-          CASE 
-            WHEN ${includeVariants} THEN (
-              SELECT json_agg(
-                json_build_object(
-                  'id', pv.id,
-                  'sizeName', pv.size_name,
-                  'sizeValue', pv.size_value,
-                  'sku', pv.sku,
-                  'price', pv.price,
-                  'discountPrice', pv.discount_price,
-                  'stockQuantity', pv.stock_quantity,
-                  'isAvailable', pv.is_active
-                ) ORDER BY pv.sort_order, pv.size_name
-              )
-              FROM product_variants pv
-              WHERE pv.master_id = p.id
-                AND pv.is_active = true
-                AND pv.is_deleted = false
-                AND (
-                  LOWER(pv.size_name) LIKE LOWER($1)
-                  OR LOWER(pv.size_value) LIKE LOWER($1)
-                  OR LOWER(pv.sku) LIKE LOWER($1)
-                )
+          (
+            SELECT json_agg(
+              json_build_object(
+                'id', pv.id,
+                'sizeName', pv.size_name,
+                'sizeValue', pv.size_value,
+                'sku', pv.sku,
+                'price', pv.price,
+                'discountPrice', pv.discount_price,
+                'stockQuantity', pv.stock_quantity,
+                'isAvailable', pv.is_active
+              ) ORDER BY pv.sort_order, pv.size_name
             )
-            ELSE NULL
-          END,
+            FROM product_variants pv
+            WHERE pv.master_id = p.id
+              AND pv.is_active = true
+              AND pv.is_deleted = false
+              AND (
+                LOWER(pv.size_name) LIKE LOWER($1)
+                OR LOWER(pv.size_value) LIKE LOWER($1)
+                OR LOWER(pv.sku) LIKE LOWER($1)
+              )
+          ),
           '[]'::json
-        ) as matching_variants
+        ) as matching_variants` : ''}
       FROM products p
       LEFT JOIN product_categories c ON p.category_id = c.id
       LEFT JOIN manufacturers m ON p.manufacturer_id = m.id
@@ -123,7 +120,7 @@ export async function GET(request: NextRequest) {
       categoryId: row.category_id,
       categoryName: row.category_name,
       manufacturerName: row.manufacturer_name,
-      matchingVariants: row.matching_variants || []
+      matchingVariants: includeVariants ? (row.matching_variants || []) : undefined
     }))
 
     return NextResponse.json({

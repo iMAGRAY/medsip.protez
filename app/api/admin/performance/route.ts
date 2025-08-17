@@ -54,7 +54,6 @@ export async function GET(request: Request) {
       }
     })
   } catch (error) {
-    console.error('Performance monitoring error:', error)
     return NextResponse.json(
       {
         success: false,

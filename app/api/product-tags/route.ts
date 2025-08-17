@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     })
   } catch (error) {
-    console.error('Error fetching product tags:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка загрузки тегов'
@@ -112,8 +111,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     })
   } catch (error: any) {
-    console.error('Error creating product tag:', error)
-    
     if (error.code === '23505') { // Unique violation
       let context = ''
       if (body.variant_id) {
@@ -187,8 +184,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     })
   } catch (error: any) {
-    console.error('Error updating product tag:', error)
-    
     if (error.code === '23505') {
       return NextResponse.json({
         success: false,
@@ -246,7 +241,6 @@ export async function DELETE(request: NextRequest) {
       data: result.rows[0]
     })
   } catch (error) {
-    console.error('Error deleting product tag:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления тега'

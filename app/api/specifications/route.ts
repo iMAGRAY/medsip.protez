@@ -224,7 +224,6 @@ export async function GET(_request: NextRequest) {
       manufacturers_count: rootManufacturers.length
     });
   } catch (error) {
-    console.error('Ошибка получения групп характеристик:', error);
     return NextResponse.json({ success: false, error: 'Ошибка получения данных' }, { status: 500 });
   }
 }
@@ -274,7 +273,6 @@ export async function POST(request: NextRequest) {
       data: characteristic
     });
   } catch (error) {
-    console.error('Ошибка создания характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка создания характеристики' },
       { status: 500 }

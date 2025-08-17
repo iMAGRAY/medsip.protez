@@ -199,8 +199,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(category, { status: 201 });
 
   } catch (error) {
-    console.error('❌ Categories API POST Error:', error);
-
     // Обработка дубликатов
     if (error.code === '23505') {
       return NextResponse.json(
@@ -258,7 +256,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ Categories API PUT Error:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления категории' },
       { status: 500 }
@@ -408,7 +405,6 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Categories API DELETE Error:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления категории' },
       { status: 500 }

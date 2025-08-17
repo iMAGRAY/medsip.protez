@@ -8,10 +8,11 @@ export const dynamic = 'force-dynamic'
 // GET /api/products/[id]/sizes - получить все размеры для конкретного продукта
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id
+    const resolvedParams = await params
+    const productId = resolvedParams.id
 
     const query = `
       SELECT

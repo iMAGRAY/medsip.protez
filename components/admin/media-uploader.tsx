@@ -63,7 +63,6 @@ export function MediaUploader({
         })
         results.push(result)
       } catch (error) {
-        console.error(`Error uploading ${file.name}:`, error)
         results.push({ success: false, error: `Failed to upload ${file.name}` })
       }
     }

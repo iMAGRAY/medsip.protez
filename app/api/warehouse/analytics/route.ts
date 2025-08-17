@@ -229,7 +229,6 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Ошибка получения аналитики складов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения аналитики складов'

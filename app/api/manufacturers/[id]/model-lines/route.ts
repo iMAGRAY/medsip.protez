@@ -7,15 +7,16 @@ const pool = new Pool({
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const client = await pool.connect();
 
     // Сначала получаем информацию о производителе
     const manufacturerResult = await client.query(
       'SELECT * FROM manufacturers WHERE id = $1',
-      [params.id]
+      [resolvedParams.id]
     );
 
     if (manufacturerResult.rows.length === 0) {
@@ -38,7 +39,7 @@ export async function GET(
       WHERE ml.manufacturer_id = $1
       GROUP BY ml.id, m.name
       ORDER BY ml.name
-    `, [params.id]);
+    `, [resolvedParams.id]);
 
     client.release();
 
@@ -50,7 +51,6 @@ export async function GET(
       }
     });
   } catch (error) {
-    console.error('Ошибка получения модельных рядов производителя:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения данных' },
       { status: 500 }

@@ -9,10 +9,11 @@ import { getPool } from '@/lib/db-connection'
 // GET /api/product-sizes/[id] - получить размер по ID
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -66,7 +67,6 @@ export async function GET(
       warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     })
   } catch (error) {
-    console.error('Error fetching product size:', error)
     return NextResponse.json(
       { error: 'Failed to fetch product size' },
       { status: 500 }
@@ -77,10 +77,11 @@ export async function GET(
 // PUT /api/product-sizes/[id] - обновить размер
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -217,8 +218,6 @@ export async function PUT(
       warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     })
   } catch (error: any) {
-    console.error('Error updating product size:', error)
-
     if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // Unique constraint violation
       if (error.constraint === 'unique_product_size') {
         return NextResponse.json(
@@ -244,10 +243,11 @@ export async function PUT(
 // DELETE /api/product-sizes/[id] - удалить размер
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -275,7 +275,6 @@ export async function DELETE(
       warning: 'DEPRECATED: This API endpoint is deprecated. Use /api/admin/products/[id]/sizes instead. This endpoint will be removed in v2.0'
     })
   } catch (error) {
-    console.error('Error deleting product size:', error)
     return NextResponse.json(
       { error: 'Failed to delete product size' },
       { status: 500 }

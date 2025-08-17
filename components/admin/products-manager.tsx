@@ -248,7 +248,7 @@ export function ProductsManager({
             await loadData();
           }
         } catch (reloadError) {
-          console.error('❌ Error reloading data after save:', reloadError)
+          // Error reloading data after save
           // Fallback к обычной загрузке
           if (modelLineId) {
             await loadProductsForModelLine();
@@ -325,7 +325,7 @@ export function ProductsManager({
               await loadData();
             }
           } catch (reloadError) {
-            console.error('❌ Error reloading data after deletion:', reloadError)
+            // Error reloading data after deletion
             // Fallback к обычной загрузке
             if (modelLineId) {
               await loadProductsForModelLine();

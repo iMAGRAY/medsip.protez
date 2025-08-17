@@ -81,7 +81,6 @@ export async function GET() {
     })
 
   } catch (error) {
-    console.error("Database error in specifications/available GET:", error)
     return NextResponse.json(
       {
         success: false,

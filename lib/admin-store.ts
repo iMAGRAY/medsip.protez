@@ -180,7 +180,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       }
     } catch (cacheError) {
-      console.warn('⚠️ Failed to clear cache via API in forceRefresh:', cacheError)
+      // Failed to clear cache via API in forceRefresh
     }
 
     // Перезагружаем данные с принудительным обновлением
@@ -218,7 +218,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         throw new Error(result.error || 'Ошибка синхронизации')
       }
     } catch (error) {
-      console.error('❌ Ошибка синхронизации:', error)
+      // Ошибка синхронизации
       throw error
     }
   },
@@ -268,10 +268,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       const _loadTime = Math.round(endTime - startTime)
 
       if (failed.length > 0) {
-        console.warn(`Failed to load ${failed.length} data sources:`, failed.map(f => f.name))
-        failed.forEach((f) => {
-          console.error(`Failed to load ${f.name}:`, f.result.reason)
-        })
+        // Failed to load data sources
+        // Individual load failures logged
       }
 
       if (failed.length === results.length) {
@@ -307,7 +305,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       const updated = await apiClient.updateSiteSettings(data)
       set({ siteSettings: updated })
     } catch (error) {
-      console.error('❌ Admin Store - updateSiteSettings failed:', error)
+      // Admin Store - updateSiteSettings failed
       throw error
     }
   },
@@ -527,7 +525,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   // Products
   loadProducts: async (forceRefresh = false) => {
     try {
-      console.log('🔄 Загружаем товары...', forceRefresh ? '(принудительное обновление)' : '')
+      // Загружаем товары
       const _startTime = performance.now()
 
       // Принудительно очищаем кэш если требуется
@@ -557,7 +555,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
           }
         } catch (cacheError) {
-          console.warn('⚠️ Failed to clear cache via API:', cacheError)
+          // Failed to clear cache via API
         }
       }
 
@@ -569,7 +567,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       // Проверяем что это массив
       if (!Array.isArray(apiProducts)) {
-        console.warn('❌ API вернул не массив:', apiProducts)
+        // API вернул не массив
         set({ products: [] })
         return
       }
@@ -580,7 +578,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       set({ products: _products })
     } catch (error) {
-      console.error('❌ Ошибка при загрузке товаров:', error)
+      // Ошибка при загрузке товаров
       set({ products: [] })
     }
   },
@@ -610,7 +608,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
           await get().forceRefresh()
 
         } catch (reloadError) {
-          console.error('❌ Error refreshing products after creation:', reloadError)
+          // Error refreshing products after creation
           // Fallback к обычной загрузке с принудительным обновлением
           get().loadProducts(true)
         }

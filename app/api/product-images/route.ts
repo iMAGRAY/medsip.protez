@@ -58,7 +58,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData)
   } catch (error) {
-    console.error('Error fetching product images:', error)
     return NextResponse.json(
       { error: 'Failed to fetch product images' },
       { status: 500 }
@@ -169,7 +168,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error adding product images:', error)
     return NextResponse.json(
       { error: 'Failed to add product images' },
       { status: 500 }
@@ -254,7 +252,6 @@ export async function PUT(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error updating product images:', error)
     return NextResponse.json(
       { error: 'Failed to update product images' },
       { status: 500 }
@@ -381,7 +378,6 @@ export async function DELETE(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error deleting product images:', error)
     return NextResponse.json(
       { error: 'Failed to delete product images' },
       { status: 500 }

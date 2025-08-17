@@ -7,10 +7,11 @@ export const dynamic = 'force-dynamic'
 // GET /api/product-specifications/[id] - Get specifications for a specific product
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -51,7 +52,6 @@ export async function GET(
         { status: 404 }
       )
     }
-    console.error("Error fetching product specifications:", error)
     return NextResponse.json(
       {
         success: false,
@@ -66,11 +66,12 @@ export async function GET(
 // PUT - Обновить характеристику
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const pool = getPool()
 
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const {
       label,
@@ -82,7 +83,7 @@ export async function PUT(
     } = body
 
     const updateFields = []
-    const values = [params.id]
+    const values = [resolvedParams.id]
     let paramCount = 2
 
     if (label !== undefined) {
@@ -146,7 +147,6 @@ export async function PUT(
 
     return NextResponse.json(result.rows[0])
   } catch (error) {
-    console.error('Ошибка обновления характеристики:', error)
     return NextResponse.json(
       { error: 'Ошибка обновления характеристики' },
       { status: 500 }
@@ -157,14 +157,15 @@ export async function PUT(
 // DELETE - Удалить характеристику
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const pool = getPool()
 
   try {
+    const resolvedParams = await params
     const result = await pool.query(
       'DELETE FROM product_characteristics_simple WHERE id = $1 RETURNING *',
-      [params.id]
+      [resolvedParams.id]
     )
 
     if (result.rows.length === 0) {
@@ -179,7 +180,6 @@ export async function DELETE(
       message: 'Характеристика удалена'
     })
   } catch (error) {
-    console.error('Ошибка удаления характеристики:', error)
     return NextResponse.json(
       { error: 'Ошибка удаления характеристики' },
       { status: 500 }

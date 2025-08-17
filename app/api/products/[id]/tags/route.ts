@@ -49,12 +49,7 @@ export async function GET(
       data: result.rows
     })
   } catch (error) {
-    console.error('Error fetching product tags:', {
-      productId: params.id,
-      error: error instanceof Error ? error.message : error,
-      stack: error instanceof Error ? error.stack : undefined
-    })
-    
+    const { id } = await params
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Ошибка загрузки тегов товара'
@@ -65,7 +60,7 @@ export async function GET(
 // POST - добавление тега к товару
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // EMERGENCY PATCH: Skip auth check temporarily
@@ -81,7 +76,8 @@ export async function POST(
       }, { status: 403 })
     }
     
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
     const body = await request.json()
     const { tag_id } = body
     
@@ -158,7 +154,6 @@ export async function POST(
       data: result.rows
     })
   } catch (error) {
-    console.error('Error adding tag to product:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка добавления тега'
@@ -169,7 +164,7 @@ export async function POST(
 // PUT - обновление тегов товара (замена всех тегов)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // EMERGENCY PATCH: Skip auth check temporarily
@@ -185,7 +180,8 @@ export async function PUT(
       }, { status: 403 })
     }
     
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
     const body = await request.json()
     const { tag_ids } = body
     
@@ -242,7 +238,6 @@ export async function PUT(
       client.release()
     }
   } catch (error) {
-    console.error('Error updating product tags:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления тегов'
@@ -253,7 +248,7 @@ export async function PUT(
 // DELETE - удаление тега у товара
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // EMERGENCY PATCH: Skip auth check temporarily
@@ -269,7 +264,8 @@ export async function DELETE(
       }, { status: 403 })
     }
     
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
     const searchParams = request.nextUrl.searchParams
     const tagId = searchParams.get('tag_id')
     
@@ -290,7 +286,6 @@ export async function DELETE(
       message: 'Тег удален'
     })
   } catch (error) {
-    console.error('Error removing tag from product:', error)
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления тега'

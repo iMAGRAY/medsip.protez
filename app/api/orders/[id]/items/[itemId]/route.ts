@@ -5,14 +5,15 @@ import { getCacheManager, getLogger } from '@/lib/dependency-injection'
 // PUT - обновление цены товара в заказе
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; itemId: string } }
+  { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
   const logger = getLogger()
   const cacheManager = getCacheManager()
 
   try {
-    const orderId = parseInt(params.id)
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await params
+    const orderId = parseInt(resolvedParams.id)
+    const itemId = parseInt(resolvedParams.itemId)
     const body = await request.json()
     const { custom_price, status, notes } = body
 

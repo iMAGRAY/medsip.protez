@@ -115,8 +115,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Ошибка создания заказа:', error)
-
     // Возвращаем более информативное сообщение об ошибке в dev режиме
     const isDev = process.env.NODE_ENV === 'development'
     const errorMessage = isDev
@@ -202,7 +200,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Ошибка получения заказов:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { sanitizeTitle } from "@/lib/utils/sanitize"
 import { SafeImage } from "@/components/safe-image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -493,7 +494,7 @@ export default function ProductPage() {
       const title = selectedVariant 
         ? `${displayProduct.name} - ${selectedVariant.name}`
         : displayProduct.name
-      document.title = `${title} | МЕДСИП`
+      document.title = sanitizeTitle(`${title} | МЕДСИП`)
     }
   }, [displayProduct, selectedVariant])
 

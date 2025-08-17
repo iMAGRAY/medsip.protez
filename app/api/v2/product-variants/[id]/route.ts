@@ -91,10 +91,11 @@ function cleanObjectForJson(obj: any, fieldName: string): any {
 // GET /api/v2/product-variants/[id] - получить конкретный вариант
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
-  const variantId = params.id
+  const resolvedParams = await params
+    const variantId = resolvedParams.id
   
   try {
     const { searchParams } = new URL(request.url)
@@ -153,10 +154,11 @@ export async function GET(
 // PUT /api/v2/product-variants/[id] - обновить вариант
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
-  const variantId = params.id
+  const resolvedParams = await params
+    const variantId = resolvedParams.id
   
   try {
     const body = await request.json()
@@ -321,10 +323,11 @@ export async function PUT(
 // DELETE /api/v2/product-variants/[id] - удалить вариант
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
-  const variantId = params.id
+  const resolvedParams = await params
+    const variantId = resolvedParams.id
   
   try {
     // Hard delete: сначала удаляем зависимые записи, затем сам вариант

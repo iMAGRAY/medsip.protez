@@ -83,7 +83,6 @@ export async function GET(_request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Test error:', error)
     return NextResponse.json(
       { 
         success: false,

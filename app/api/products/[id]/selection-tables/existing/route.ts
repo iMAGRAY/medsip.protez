@@ -5,7 +5,7 @@ import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
@@ -13,7 +13,8 @@ export async function GET(
     const guard = await guardDbOr503()
     if (guard) return guard
 
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -90,7 +91,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
@@ -98,7 +99,8 @@ export async function PUT(
     const guard = await guardDbOr503()
     if (guard) return guard
 
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(

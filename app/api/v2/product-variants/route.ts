@@ -248,9 +248,7 @@ export async function POST(request: NextRequest) {
     if (!finalSku && article_number) {
       finalSku = `VAR-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     }
-    
 
-    
     // Проверяем существование мастер-товара
     const masterCheck = await pool.query(
       'SELECT id FROM products WHERE id = $1 AND is_deleted = FALSE',
@@ -270,7 +268,6 @@ export async function POST(request: NextRequest) {
     // Генерируем slug
     const slug = await generateUniqueSlug(name)
 
-    
     // Создаем вариант
 
     const result = await pool.query(`
@@ -333,7 +330,6 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     const _duration = Date.now() - startTime
-    console.error('Error creating product variant:', error)
     logger.error('Error creating product variant', error, 'API')
     
     return NextResponse.json(

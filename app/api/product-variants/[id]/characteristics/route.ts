@@ -4,10 +4,11 @@ import { pool } from '@/lib/db';
 // GET /api/product-variants/[id]/characteristics - получить характеристики варианта товара
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
     const { searchParams } = new URL(request.url);
     const locale = searchParams.get('locale') || 'ru';
 
@@ -126,7 +127,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Ошибка получения характеристик варианта:', error);
     return NextResponse.json(
       { error: 'Ошибка получения характеристик варианта' },
       { status: 500 }
@@ -137,10 +137,11 @@ export async function GET(
 // POST /api/product-variants/[id]/characteristics - добавить/обновить характеристику варианта
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
     const body = await request.json();
     const { template_id, raw_value, numeric_value, bool_value, date_value, file_url, enum_value_id } = body;
 
@@ -192,7 +193,6 @@ export async function POST(
     return NextResponse.json(result.rows[0], { status: 201 });
 
   } catch (error) {
-    console.error('Ошибка сохранения характеристики:', error);
     return NextResponse.json(
       { error: 'Ошибка сохранения характеристики' },
       { status: 500 }
@@ -203,10 +203,11 @@ export async function POST(
 // DELETE /api/product-variants/[id]/characteristics?template_id=X - удалить характеристику варианта
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
     const { searchParams } = new URL(request.url);
     const templateId = searchParams.get('template_id');
 
@@ -237,7 +238,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Ошибка удаления характеристики:', error);
     return NextResponse.json(
       { error: 'Ошибка удаления характеристики' },
       { status: 500 }

@@ -94,7 +94,6 @@ export async function DELETE(request: NextRequest) {
           }
         }
       } catch (error) {
-        console.error('❌ Error extracting key from URL:', error)
         return NextResponse.json(
           { error: "Failed to extract key from URL" },
           { status: 400 }
@@ -201,7 +200,6 @@ export async function DELETE(request: NextRequest) {
         apiCache.clear()
 
       } catch (cacheError) {
-        console.warn('⚠️ Failed to clear media cache:', cacheError)
       }
 
       // Очищаем кеш продуктов, чтобы интерфейс сразу обновился
@@ -210,7 +208,6 @@ export async function DELETE(request: NextRequest) {
         await redisClient.flushPattern('products-*')
 
       } catch (prodCacheErr) {
-        console.warn('⚠️ Failed to clear products cache:', prodCacheErr)
       }
 
       return NextResponse.json({
@@ -229,7 +226,6 @@ export async function DELETE(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error("Error deleting media file:", error)
     return NextResponse.json(
       { error: "Failed to delete media file completely" },
       { status: 500 }

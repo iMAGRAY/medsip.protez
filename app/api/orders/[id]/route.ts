@@ -5,12 +5,13 @@ import { getLogger } from '@/lib/dependency-injection'
 // GET - получение деталей заказа
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const logger = getLogger()
 
   try {
-    const orderId = parseInt(params.id)
+    const resolvedParams = await params
+    const orderId = parseInt(resolvedParams.id)
 
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -64,10 +65,11 @@ export async function GET(
 // PUT - обновление статуса заказа
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orderId = parseInt(params.id)
+    const resolvedParams = await params
+    const orderId = parseInt(resolvedParams.id)
     const body = await request.json()
     const { status, notes } = body
 
@@ -137,7 +139,6 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Ошибка обновления заказа:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }
@@ -148,10 +149,11 @@ export async function PUT(
 // DELETE - удаление заказа
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orderId = parseInt(params.id)
+    const resolvedParams = await params
+    const orderId = parseInt(resolvedParams.id)
 
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -211,7 +213,6 @@ export async function DELETE(
     }
 
   } catch (error) {
-    console.error('Ошибка удаления заказа:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }
