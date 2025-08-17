@@ -128,6 +128,7 @@ interface AdminStore {
 
   // Products
   loadProducts: (forceRefresh?: boolean) => Promise<void>
+  loadProductsPaginated: (page?: number, limit?: number, filters?: any) => Promise<{products: any[], hasMore: boolean, totalCount: number}>
   addProduct: (data: any) => Promise<void>
   updateProduct: (id: string, data: any) => Promise<void>
   deleteProduct: (id: string) => Promise<void>
@@ -559,8 +560,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         }
       }
 
-      // Use full mode to get category names for filtering
-      const response = await apiClient.getProducts({ fast: false })
+      // Use full mode to get category names for filtering, load ALL products for store
+      const response = await apiClient.getProducts({ fast: false, limit: 10000 })
 
       // API возвращает объект с полем data, а не массив напрямую
       const apiProducts = response?.data || response || []
@@ -580,6 +581,64 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     } catch (error) {
       // Ошибка при загрузке товаров
       set({ products: [] })
+    }
+  },
+
+  // NEW: Paginated products loading for infinite scroll
+  loadProductsPaginated: async (page: number = 1, limit: number = 20, filters?: any) => {
+    try {
+      const params: any = { 
+        fast: false, 
+        limit, 
+        page,
+        detailed: true 
+      }
+
+      // Add filters if provided
+      if (filters?.categoryId) {
+        params.category_id = filters.categoryId
+      }
+      if (filters?.manufacturerId) {
+        params.manufacturer_id = filters.manufacturerId
+      }
+      if (filters?.sort) {
+        params.sort = filters.sort
+      }
+
+      // Build query string manually for complex params
+      const queryParams = new URLSearchParams()
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key].toString())
+        }
+      })
+
+      const response = await fetch(`/api/products?${queryParams.toString()}`)
+      const result = await response.json()
+
+      if (result.success) {
+        const apiProducts = result.data || []
+        const transformedProducts = apiProducts.map(transformApiProduct)
+        
+        return {
+          products: transformedProducts,
+          hasMore: transformedProducts.length === limit, // If we got full page, assume there might be more
+          totalCount: result.totalCount || transformedProducts.length
+        }
+      } else {
+        return {
+          products: [],
+          hasMore: false,
+          totalCount: 0
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading paginated products:', error)
+      return {
+        products: [],
+        hasMore: false,
+        totalCount: 0
+      }
     }
   },
 

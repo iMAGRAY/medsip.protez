@@ -63,7 +63,7 @@ interface _Product {
   category_name?: string
 }
 
-const PRODUCTS_PER_PAGE = 12 // Количество товаров для загрузки за раз
+const PRODUCTS_PER_PAGE = 20 // Количество товаров для загрузки за раз
 
 export default function HomePage() {
   console.log('🏠 HomePage рендерится')
@@ -75,6 +75,7 @@ export default function HomePage() {
     initializeData,
     forceRefresh,
     isLoading,
+    loadProductsPaginated,
   } = useAdminStore()
 
   // Initialize data on mount
@@ -718,25 +719,27 @@ export default function HomePage() {
     hasMoreRef.current = newHasMore
   }, [processedProducts])
 
-  // Функция загрузки дополнительных товаров
-  const loadMoreProducts = useCallback(() => {
+  // IMPROVED: Загрузка дополнительных товаров - сначала локально, потом с сервера
+  const loadMoreProducts = useCallback(async () => {
     // Проверяем актуальное состояние через refs
     if (isLoadingMoreRef.current || !hasMoreRef.current) return
     
     setIsLoadingMore(true)
     isLoadingMoreRef.current = true
 
-    // Имитируем небольшую задержку для плавности
-    setTimeout(() => {
-      setCurrentPage(prevPage => {
-        const nextPage = prevPage + 1
-        const startIndex = (nextPage - 1) * PRODUCTS_PER_PAGE
-        const endIndex = startIndex + PRODUCTS_PER_PAGE
-        
-        // Используем ref для получения актуальных данных
-        const currentFiltered = filteredProductsRef.current || []
+    try {
+      const nextPage = currentPage + 1
+      const startIndex = (nextPage - 1) * PRODUCTS_PER_PAGE
+      const endIndex = startIndex + PRODUCTS_PER_PAGE
+      
+      // Используем ref для получения актуальных данных
+      const currentFiltered = filteredProductsRef.current || []
+      
+      // Проверяем, есть ли еще товары локально
+      if (startIndex < currentFiltered.length) {
+        // Загружаем из локального кеша
         const newProducts = currentFiltered.slice(startIndex, endIndex)
-
+        
         if (newProducts.length > 0) {
           setDisplayedProducts(prev => {
             // Дедупликация по ID для предотвращения дублированных ключей React
@@ -744,20 +747,62 @@ export default function HomePage() {
             const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id))
             return [...prev, ...uniqueNewProducts]
           })
+          
+          setCurrentPage(nextPage)
           const newHasMore = endIndex < currentFiltered.length
           setHasMore(newHasMore)
           hasMoreRef.current = newHasMore
-          return nextPage
         } else {
           setHasMore(false)
           hasMoreRef.current = false
-          return prevPage
         }
-      })
+      } else {
+        // Локальные товары закончились, пробуем загрузить с сервера
+        const serverPage = Math.ceil(currentFiltered.length / PRODUCTS_PER_PAGE) + 1
+        
+        // Подготавливаем фильтры для API
+        const filters: any = {
+          sort: sortBy.replace('-', '_') // Convert "name-asc" to "name_asc"
+        }
+
+        // Добавляем категорию если выбрана
+        if (activeCategoryId && activeCategory !== "All" && activeCategory !== "Все категории") {
+          filters.categoryId = activeCategoryId
+        }
+
+        // Вызываем новый метод пагинации
+        const result = await loadProductsPaginated(serverPage, PRODUCTS_PER_PAGE, filters)
+        
+        if (result.products.length > 0) {
+          // Добавляем новые товары к отфильтрованным
+          const updatedFiltered = [...currentFiltered, ...result.products]
+          setFilteredProducts(updatedFiltered)
+          filteredProductsRef.current = updatedFiltered
+          
+          // Добавляем к отображаемым
+          setDisplayedProducts(prev => {
+            const existingIds = new Set(prev.map(p => p.id))
+            const uniqueNewProducts = result.products.filter(p => !existingIds.has(p.id))
+            return [...prev, ...uniqueNewProducts]
+          })
+          
+          setCurrentPage(nextPage)
+          setHasMore(result.hasMore || result.products.length === PRODUCTS_PER_PAGE)
+          hasMoreRef.current = result.hasMore || result.products.length === PRODUCTS_PER_PAGE
+        } else {
+          setHasMore(false)
+          hasMoreRef.current = false
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading more products:', error)
+      setHasMore(false)
+      hasMoreRef.current = false
+    } finally {
       setIsLoadingMore(false)
       isLoadingMoreRef.current = false
-    }, 300)
-  }, [])
+    }
+  }, [currentPage, PRODUCTS_PER_PAGE, loadProductsPaginated, activeCategoryId, activeCategory, sortBy, filteredProductsRef])
 
   // Intersection Observer для автоматической подгрузки
   useEffect(() => {
