@@ -14,10 +14,7 @@ import {
   BarChart3,
   Image as ImageIcon,
   FileText,
-  Database,
-  Layers,
   Grid3X3,
-  Palette,
   Tag,
   Monitor,
   Activity,
@@ -25,13 +22,12 @@ import {
   Shield,
   Warehouse,
   ClipboardList,
-  Star,
   FileDown
 } from 'lucide-react'
 import { InstantLink } from '@/components/instant-link'
 import { AutoSkeleton, useSkeleton } from '@/components/skeleton-provider'
 import { useAuth } from './auth-guard'
-import { OrdersProvider, useOrders } from '@/lib/orders-context'
+import { useOrders } from '@/lib/orders-context'
 
 interface AdminLayoutProps {
   children: React.ReactNode

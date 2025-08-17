@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +12,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash2, Settings, Eye, EyeOff, Plus, Save, RefreshCw, Layers, Folder, Building, Package } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { SearchableCategorySelect } from '@/components/ui/searchable-category-select'
@@ -242,52 +241,52 @@ export default function CatalogMenuPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  const loadData = useCallback(async () => {
+      setLoading(true)
+      try {
 
-  const loadData = async () => {
-    setLoading(true)
-    try {
+        // Загружаем текущее меню
+        const menuResponse = await fetch('/api/catalog-menu')
+        const menuData = await menuResponse.json()
 
-      // Загружаем текущее меню
-      const menuResponse = await fetch('/api/catalog-menu')
-      const menuData = await menuResponse.json()
+        if (menuData.success) {
 
-      if (menuData.success) {
+          setMenuSettings(menuData.flat || [])
+        } else {
+          console.error('❌ Ошибка загрузки меню:', menuData.error)
+          toast({
+            title: "Ошибка",
+            description: "Не удалось загрузить настройки меню",
+            variant: "destructive"
+          })
+        }
 
-        setMenuSettings(menuData.flat || [])
-      } else {
-        console.error('❌ Ошибка загрузки меню:', menuData.error)
+        // Загружаем доступные сущности
+        const entitiesResponse = await fetch('/api/catalog-menu/available-entities')
+        const entitiesData = await entitiesResponse.json()
+
+        if (entitiesData.success) {
+
+          setAvailableEntities(entitiesData.data)
+        } else {
+          console.error('❌ Ошибка загрузки сущностей:', entitiesData.error)
+        }
+
+      } catch (error) {
+        console.error('💥 Ошибка при загрузке данных:', error)
         toast({
           title: "Ошибка",
-          description: "Не удалось загрузить настройки меню",
+          description: "Произошла ошибка при загрузке данных",
           variant: "destructive"
         })
+      } finally {
+        setLoading(false)
       }
+    }, [toast])
 
-      // Загружаем доступные сущности
-      const entitiesResponse = await fetch('/api/catalog-menu/available-entities')
-      const entitiesData = await entitiesResponse.json()
-
-      if (entitiesData.success) {
-
-        setAvailableEntities(entitiesData.data)
-      } else {
-        console.error('❌ Ошибка загрузки сущностей:', entitiesData.error)
-      }
-
-    } catch (error) {
-      console.error('💥 Ошибка при загрузке данных:', error)
-      toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при загрузке данных",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const handleToggleVisibility = async (item: CatalogMenuItem) => {
     if (!item.id) return
@@ -519,7 +518,7 @@ export default function CatalogMenuPage() {
   const parentOptions = menuSettings.filter(setting => setting.id !== editingId)
 
   // Типы сущностей
-  const entityTypes = [
+  const _entityTypes = [
     { value: 'spec_group', label: 'Группа характеристик', icon: Layers, color: 'text-blue-600' },
     { value: 'category', label: 'Категория', icon: Folder, color: 'text-green-600' },
     { value: 'manufacturer', label: 'Производитель', icon: Building, color: 'text-purple-600' },

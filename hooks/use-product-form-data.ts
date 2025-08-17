@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 
 export interface FormCategory {
@@ -125,44 +125,44 @@ export function useProductFormData() {
   }
 
   // Загрузка всех данных при монтировании
+    const loadAllData = useCallback(async () => {
+              setLoading(true)
+              setError(null)
+
+              try {
+                await Promise.all([
+                  loadCategories(),
+                  loadManufacturers(),
+                  loadModelLines()
+                ])
+              } catch (err) {
+                console.error('❌ Error loading form data:', err)
+              } finally {
+                setLoading(false)
+              }
+            }, [])
+
   useEffect(() => {
-    const loadAllData = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        await Promise.all([
-          loadCategories(),
-          loadManufacturers(),
-          loadModelLines()
-        ])
-      } catch (err) {
-        console.error('❌ Error loading form data:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadAllData()
-  }, [])
+  }, [loadAllData])
 
   // Получение модельных рядов по производителю
-  const getModelLinesByManufacturer = (manufacturerId: number) => {
+  const _getModelLinesByManufacturer = (manufacturerId: number) => {
     return modelLines.filter(ml => ml.manufacturer_id === manufacturerId)
   }
 
   // Получение категории по ID
-  const getCategoryById = (categoryId: number) => {
+  const _getCategoryById = (categoryId: number) => {
     return categories.find(cat => cat.id === categoryId)
   }
 
   // Получение производителя по ID
-  const getManufacturerById = (manufacturerId: number) => {
+  const _getManufacturerById = (manufacturerId: number) => {
     return manufacturers.find(man => man.id === manufacturerId)
   }
 
   // Получение модельного ряда по ID
-  const getModelLineById = (modelLineId: number) => {
+  const _getModelLineById = (modelLineId: number) => {
     return modelLines.find(ml => ml.id === modelLineId)
   }
 
@@ -182,9 +182,9 @@ export function useProductFormData() {
     loadModelLines,
 
     // Вспомогательные методы
-    getModelLinesByManufacturer,
-    getCategoryById,
-    getManufacturerById,
-    getModelLineById
+    getModelLinesByManufacturer: _getModelLinesByManufacturer,
+    getCategoryById: _getCategoryById,
+    getManufacturerById: _getManufacturerById,
+    getModelLineById: _getModelLineById
   }
 }

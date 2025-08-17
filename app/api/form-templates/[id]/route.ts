@@ -8,11 +8,12 @@ const pool = new Pool({
 
 // DELETE /api/form-templates/[id] - Delete form template
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const templateId = params.id
+    const resolvedParams = await params
+    const templateId = resolvedParams.id
 
     const result = await pool.query(`
       DELETE FROM form_templates
@@ -29,17 +30,17 @@ export async function DELETE(
       deleted: result.rows[0]
     })
   } catch (error) {
-    console.error('❌ Error deleting template:', error)
     return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
   }
 }
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const templateId = params.id
+    const resolvedParams = await params
+    const templateId = resolvedParams.id
 
     const result = await pool.query(`
       SELECT
@@ -59,7 +60,6 @@ export async function GET(
 
     return NextResponse.json(result.rows[0])
   } catch (error) {
-    console.error('❌ Error loading template:', error)
     return NextResponse.json({ error: 'Failed to load template' }, { status: 500 })
   }
 }

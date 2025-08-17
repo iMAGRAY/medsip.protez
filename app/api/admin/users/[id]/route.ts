@@ -16,7 +16,7 @@ function getDbConnection() {
 // PATCH - обновление пользователя
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -37,7 +37,8 @@ export async function PATCH(
       )
     }
 
-    const userId = parseInt(params.id)
+    const resolvedParams = await params
+    const userId = parseInt(resolvedParams.id)
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },
@@ -200,7 +201,6 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Error updating user:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -211,7 +211,7 @@ export async function PATCH(
 // DELETE - удаление пользователя
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -232,7 +232,8 @@ export async function DELETE(
       )
     }
 
-    const userId = parseInt(params.id)
+    const resolvedParams = await params
+    const userId = parseInt(resolvedParams.id)
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },
@@ -312,7 +313,6 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error deleting user:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -323,7 +323,7 @@ export async function DELETE(
 // GET - получение конкретного пользователя
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -335,17 +335,19 @@ export async function GET(
       )
     }
 
+    const resolvedParams = await params
+    
     // Проверяем права доступа
     if (!session.user.role_permissions?.includes('*') &&
         !session.user.role_permissions?.includes('users.manage') &&
-        parseInt(params.id) !== session.user_id) {
+        parseInt(resolvedParams.id) !== session.user_id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }
       )
     }
 
-    const userId = parseInt(params.id)
+    const userId = parseInt(resolvedParams.id)
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },
@@ -412,7 +414,6 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error getting user:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

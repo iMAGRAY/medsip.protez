@@ -37,7 +37,7 @@ const cacheUtils = {
     let expiredEntries = 0
     const now = Date.now()
 
-    for (const [key, value] of serverCache.entries()) {
+    for (const [, value] of serverCache.entries()) {
       if (value.expires > now) {
         validEntries++
       } else {

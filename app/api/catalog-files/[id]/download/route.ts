@@ -4,10 +4,11 @@ import { executeQuery } from '@/lib/db-connection'
 // GET - скачать каталог с подсчетом статистики
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const catalogId = parseInt(params.id)
+    const resolvedParams = await params
+    const catalogId = parseInt(resolvedParams.id)
 
     if (isNaN(catalogId)) {
       return NextResponse.json(
@@ -63,7 +64,6 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error downloading catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка скачивания каталога' },
       { status: 500 }

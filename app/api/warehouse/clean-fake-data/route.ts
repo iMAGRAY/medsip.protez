@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/db-connection';
 
 // POST - очистить все фейковые данные из складской системы
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
 
     // Очистка в правильном порядке (учитывая foreign key constraints)
@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка очистки фейковых данных:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({
       success: false,

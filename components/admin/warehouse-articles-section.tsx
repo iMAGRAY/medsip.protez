@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,14 +8,11 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { ProductSelector } from '@/components/admin/product-selector'
 import {
   Plus,
   Package,
   QrCode,
-  Weight,
-  Ruler,
   Warehouse,
   AlertTriangle,
   Loader2,
@@ -93,34 +90,34 @@ export function WarehouseArticlesSection() {
     expiry_date: ''
   })
 
+  const fetchData = useCallback(async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Загружаем складской инвентарь
+        const inventoryResponse = await fetch('/api/warehouse/inventory')
+        if (!inventoryResponse.ok) throw new Error('Ошибка загрузки инвентаря')
+        const inventoryData = await inventoryResponse.json()
+        setInventory(inventoryData.data || [])
+
+        // Загружаем секции
+        const sectionsResponse = await fetch('/api/warehouse/sections')
+        if (!sectionsResponse.ok) throw new Error('Ошибка загрузки секций')
+        const sectionsData = await sectionsResponse.json()
+        setSections(sectionsData.data || [])
+
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+        setError(error instanceof Error ? error.message : 'Ошибка загрузки данных')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     fetchData()
-  }, [])
-
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Загружаем складской инвентарь
-      const inventoryResponse = await fetch('/api/warehouse/inventory')
-      if (!inventoryResponse.ok) throw new Error('Ошибка загрузки инвентаря')
-      const inventoryData = await inventoryResponse.json()
-      setInventory(inventoryData.data || [])
-
-      // Загружаем секции
-      const sectionsResponse = await fetch('/api/warehouse/sections')
-      if (!sectionsResponse.ok) throw new Error('Ошибка загрузки секций')
-      const sectionsData = await sectionsResponse.json()
-      setSections(sectionsData.data || [])
-
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-      setError(error instanceof Error ? error.message : 'Ошибка загрузки данных')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [fetchData])
 
   const handleCreateArticle = async () => {
     if (!selectedProduct || !form.sku || !form.section_id || form.quantity === undefined) {

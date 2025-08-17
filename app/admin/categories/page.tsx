@@ -1,20 +1,16 @@
-"use client";
-import { useEffect, useState } from "react"
+"use client"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, Folder, FolderOpen, Package } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/hooks/use-toast"
-import { useAdminStore } from "@/lib/admin-store"
 
 import { SearchableCategorySelect } from '@/components/ui/searchable-category-select'
 
@@ -51,47 +47,47 @@ export default function CategoriesAdmin() {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set())
 
   // Загрузка данных
-  const loadCategories = async () => {
-    try {
+  const loadCategories = useCallback(async () => {
+      try {
 
-      const res = await fetch("/api/categories", {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        },
-        cache: 'no-store'
-      })
+        const res = await fetch("/api/categories", {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          cache: 'no-store'
+        })
 
-      if (res.ok) {
-        const apiResponse = await res.json()
-        const data = apiResponse.data || apiResponse
+        if (res.ok) {
+          const apiResponse = await res.json()
+          const data = apiResponse.data || apiResponse
 
-        setCategories(data)
-      } else {
-        const errorText = await res.text()
-        console.error("❌ Failed to load categories:", res.status, errorText)
+          setCategories(data)
+        } else {
+          const errorText = await res.text()
+          console.error("❌ Failed to load categories:", res.status, errorText)
+          toast({
+            title: "Ошибка",
+            description: `Не удалось загрузить категории: ${res.status}`,
+            variant: "destructive"
+          })
+        }
+      } catch (error) {
+        console.error("💥 Ошибка загрузки категорий:", error)
         toast({
           title: "Ошибка",
-          description: `Не удалось загрузить категории: ${res.status}`,
+          description: "Ошибка сетевого соединения при загрузке категорий",
           variant: "destructive"
         })
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("💥 Ошибка загрузки категорий:", error)
-      toast({
-        title: "Ошибка",
-        description: "Ошибка сетевого соединения при загрузке категорий",
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   useEffect(() => {
     loadCategories()
-  }, [])
+  }, [loadCategories])
 
   const resetCategoryForm = () => {
     setCategoryFormData({
@@ -110,13 +106,13 @@ export default function CategoriesAdmin() {
 
   const handleCategorySave = async () => {
     try {
-      const method = editingCategory ? 'PUT' : 'POST'
+      const _method = editingCategory ? 'PUT' : 'POST'
       const body = editingCategory
         ? { ...categoryFormData, id: editingCategory.id }
         : categoryFormData
 
       const res = await fetch('/api/categories', {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',

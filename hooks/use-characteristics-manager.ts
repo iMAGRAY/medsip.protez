@@ -70,14 +70,14 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   const dataReadyState: DataReadyState = useMemo(() => {
     const specGroupsLoaded = specGroups.length > 0
     const characteristicsLoaded = !productId || productCharacteristics.length >= 0 // Allow 0 for products without characteristics
-    const canOperate = !isLoading && !isInitializing && specGroupsLoaded && characteristicsLoaded
+    const _canOperate = !isLoading && !isInitializing && specGroupsLoaded && characteristicsLoaded
 
     return {
       isLoading,
       isInitializing,
       specGroupsLoaded,
       characteristicsLoaded,
-      canOperate
+      canOperate: _canOperate
     }
   }, [isLoading, isInitializing, specGroups.length, productCharacteristics.length, productId])
 
@@ -175,7 +175,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   }, [productId])
 
   // Save characteristics to API
-  const saveCharacteristicsToAPI = useCallback(async (characteristics: ProductCharacteristic[]) => {
+  const _saveCharacteristicsToAPI = useCallback(async (characteristics: ProductCharacteristic[]) => {
     if (!productId) {
       throw new Error('No product ID provided for saving characteristics')
     }
@@ -233,62 +233,37 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
   }, [productId])
 
   // Initialize data loading
+    const loadData = useCallback(async () => {
+              try {
+                setIsLoading(true)
+                setIsInitializing(true)
+                setError(null)
+
+                // Reset state for new products
+                if (isNewProduct) {
+                  setProductCharacteristics([])
+                  setSelectedCharacteristicIds(new Set())
+                }
+
+                         await Promise.all([
+                   loadSpecGroups(),
+                   loadProductCharacteristics()
+                 ])
+               } catch (error) {
+                 console.error('Failed to load data:', error)
+                setError('Не удалось загрузить данные')
+              } finally {
+                setIsLoading(false)
+                setIsInitializing(false)
+              }
+            }, [isNewProduct, loadSpecGroups, loadProductCharacteristics])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
-        setIsInitializing(true)
-        setError(null)
-
-        // Reset state for new products
-        if (isNewProduct) {
-          setProductCharacteristics([])
-          setSelectedCharacteristicIds(new Set())
-        }
-
-                 await Promise.all([
-           loadSpecGroups(),
-           loadProductCharacteristics()
-         ])
-       } catch (error) {
-         console.error('Failed to load data:', error)
-        setError('Не удалось загрузить данные')
-      } finally {
-        setIsLoading(false)
-        setIsInitializing(false)
-      }
-    }
-
     loadData()
-  }, [productId, isNewProduct, loadSpecGroups, loadProductCharacteristics])
-
-  // Helper function to process hierarchical groups
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    // Process flat groups from API into normalized structure
-    const processedGroups = groups.map((group: any): SpecGroup => {
-      // Fix: API endpoint returns enum values in 'characteristics' field
-      const enumValues = group.enum_values || group.enums || group.characteristics || []
-
-      return {
-        id: group.id?.toString() || group.group_id?.toString() || 'unknown',
-        name: group.name || group.group_name || 'Без названия',
-        description: group.description,
-        parent_id: group.parent_id,
-        source_type: group.source_type || 'spec_group',
-        original_id: group.original_id || group.id || group.group_id,
-        enums: enumValues,
-        enum_count: enumValues.length,
-        ordering: group.ordering || 0,
-        children: [], // Initialize empty children, will be populated by buildHierarchy
-        level: 0 // Will be set by buildHierarchy
-      }
-    })
-
-    return buildHierarchy(processedGroups)
-  }
+  }, [loadData])
 
   // Build hierarchy helper
-  const buildHierarchy = (flatGroups: SpecGroup[]): SpecGroup[] => {
+  const buildHierarchy = useCallback((flatGroups: SpecGroup[]): SpecGroup[] => {
     const groupMap = new Map<string, SpecGroup>()
     const rootGroups: SpecGroup[] = []
 
@@ -327,7 +302,32 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
 
     setLevels(rootGroups)
     return rootGroups
-  }
+  }, [])
+
+  // Helper function to process hierarchical groups
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    // Process flat groups from API into normalized structure
+    const processedGroups = groups.map((group: any): SpecGroup => {
+      // Fix: API endpoint returns enum values in 'characteristics' field
+      const enumValues = group.enum_values || group.enums || group.characteristics || []
+
+      return {
+        id: group.id?.toString() || group.group_id?.toString() || 'unknown',
+        name: group.name || group.group_name || 'Без названия',
+        description: group.description,
+        parent_id: group.parent_id,
+        source_type: group.source_type || 'spec_group',
+        original_id: group.original_id || group.id || group.group_id,
+        enums: enumValues,
+        enum_count: enumValues.length,
+        ordering: group.ordering || 0,
+        children: [], // Initialize empty children, will be populated by buildHierarchy
+        level: 0 // Will be set by buildHierarchy
+      }
+    })
+
+    return buildHierarchy(processedGroups)
+  }, [buildHierarchy])
 
   return {
     // Data
@@ -342,7 +342,7 @@ export function useCharacteristicsManager(productId?: number | null, isNewProduc
     // Actions
     setSelectedCharacteristicIds,
     setProductCharacteristics,
-    saveCharacteristicsToAPI,
+    saveCharacteristicsToAPI: _saveCharacteristicsToAPI,
     loadProductCharacteristics,
 
     // Computed

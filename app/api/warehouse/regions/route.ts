@@ -5,7 +5,7 @@ import { executeQuery } from '@/lib/db-connection';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const includeStats = searchParams.get('include_stats') === 'true';
+    const _includeStats = searchParams.get('include_stats') === 'true';
 
     const query = `
       SELECT
@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     });
   } catch (error) {
-    console.error('Ошибка получения регионов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения регионов'
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка создания региона:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания региона'
@@ -97,7 +95,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка обновления региона:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления региона'
@@ -150,7 +147,6 @@ export async function DELETE(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка удаления региона:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления региона'

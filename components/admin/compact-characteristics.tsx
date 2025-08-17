@@ -1,14 +1,12 @@
-'use client'
+"use client"
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
-import { Separator } from '@/components/ui/separator'
-import { Trash2, Package, Tag, Layers, Plus, Loader2, Edit2, Check, X, ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Trash2, Package, Tag, Layers, Plus, Loader2, Check, X, Search } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 interface CompactCharacteristicsProps {
@@ -82,7 +80,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
   const [openDropdownGroup, setOpenDropdownGroup] = useState<number | null>(null)
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null)
   const [dropdownSearchTerm, setDropdownSearchTerm] = useState<string>('')
-  const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [_expandedSections, _setExpandedSections] = useState<string[]>([])
   const [editingCharacteristic, setEditingCharacteristic] = useState<number | null>(null)
   const [editValue, setEditValue] = useState<string>('')
 
@@ -477,7 +475,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
     }
   }
 
-  const updateAdditionalValue = useCallback((valueId: number, additionalValue: string) => {
+  const _updateAdditionalValue = useCallback((valueId: number, additionalValue: string) => {
     // Если сейчас идет inline-редактирование, пропускаем
     if (editingCharacteristic !== null) {
       return
@@ -494,7 +492,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
 
             // Для новых товаров (без productId) сохраняем только в локальное состояние
     // Сохранение в БД произойдет при создании товара
-  }, [productId, editingCharacteristic])
+  }, [editingCharacteristic])
 
   const removeCharacteristic = (valueId: number) => {
     setSelectedCharacteristics(prev => {
@@ -644,7 +642,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
       } else {
         setGroupDialogError(data.error || 'Ошибка создания группы')
       }
-    } catch (e) {
+    } catch (_e) {
       setGroupDialogError('Ошибка соединения с сервером')
     } finally {
       setGroupDialogLoading(false)
@@ -697,7 +695,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
       } else {
         setValueDialogError(data.error || 'Ошибка создания характеристики')
       }
-    } catch (e) {
+    } catch (_e) {
       setValueDialogError('Ошибка соединения с сервером')
     } finally {
       setValueDialogLoading(false)
@@ -722,7 +720,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
     }).filter(section => section.groups.length > 0)
   }, [characteristicSections, selectedCharacteristics])
 
-  const groupedSelected = useMemo(() => Array.isArray(selectedCharacteristics) ? selectedCharacteristics.reduce((acc, char) => {
+  const _groupedSelected = useMemo(() => Array.isArray(selectedCharacteristics) ? selectedCharacteristics.reduce((acc, char) => {
     const groupName = char.group_name
     if (!acc[groupName]) acc[groupName] = []
     acc[groupName].push(char)
@@ -1185,7 +1183,7 @@ function CompactCharacteristicsComponent({ productId, onSave, readonly = false, 
                   return (
                     <div className="p-3 max-h-80 overflow-y-auto">
                       <div className="text-sm font-medium mb-3 border-b pb-2">
-                        Добавить в "{targetGroupName}"
+                        Добавить в &quot;{targetGroupName}&quot;
                       </div>
 
                       <div className="space-y-1">

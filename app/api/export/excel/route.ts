@@ -1,253 +1,63 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const ALLOWED_TABLES = [
-  'products',
-  'categories',
-  'model_series',
-  'manufacturers',
-  'product_sizes',
-  'product_images',
-  'site_settings',
-  'product_characteristics',
-  'catalog_menu_settings',
-  'spec_groups',
-  'characteristic_groups',
-]
-
-const COLUMN_TITLES: Record<string, Record<string, string>> = {
-  products: {
-    id: 'ID',
-    name: 'Название',
-    category: 'Категория',
-    weight: 'Вес',
-    battery_life: 'Время работы',
-    warranty: 'Гарантия',
-    in_stock: 'В наличии',
-    price: 'Цена',
-    sku: 'Артикул',
-    variants_count: 'Количество вариантов',
-    characteristics: 'Характеристики (EAV)',
-    created_at: 'Создан',
-    updated_at: 'Обновлён',
-    system: 'Система',
-  },
-  categories: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-    is_active: 'Активна',
-    created_at: 'Создана',
-    updated_at: 'Обновлена',
-  },
-  model_series: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-    category_id: 'Категория ID',
-    manufacturer_id: 'Производитель ID',
-    is_active: 'Активна',
-    created_at: 'Создана',
-    updated_at: 'Обновлена',
-  },
-  manufacturers: {
-    id: 'ID',
-    name: 'Название',
-    country: 'Страна',
-    created_at: 'Создан',
-    updated_at: 'Обновлён',
-  },
-  product_sizes: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-    is_active: 'Активен',
-    created_at: 'Создан',
-    updated_at: 'Обновлён',
-  },
-  product_images: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-    is_active: 'Активен',
-    created_at: 'Создан',
-    updated_at: 'Обновлён',
-  },
-  site_settings: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-    is_active: 'Активен',
-    created_at: 'Создан',
-    updated_at: 'Обновлён',
-  },
-  product_characteristics: {
-    id: 'ID',
-    product_id: 'Товар ID',
-    label: 'Метка',
-    value_text: 'Значение (текст)',
-    value_numeric: 'Значение (число)',
-    created_at: 'Создано',
-  },
-  catalog_menu_settings: {
-    id: 'ID',
-    name: 'Название',
-    value: 'Значение',
-    updated_at: 'Обновлено',
-  },
-  spec_groups: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-  },
-  characteristic_groups: {
-    id: 'ID',
-    name: 'Название',
-    description: 'Описание',
-  },
-}
-
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const url = new URL(request.url)
-    const tablesParam = url.searchParams.get('tables') || 'products'
-    const requested = tablesParam.split(',').map((t) => t.trim()).filter(Boolean)
-    const tables = requested.filter((t) => ALLOWED_TABLES.includes(t))
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
-    if (tables.length === 0) {
-      return NextResponse.json({ error: 'No valid tables requested' }, { status: 400 })
-    }
+    const need = await tablesExist(['products','product_categories','product_characteristics_simple','characteristics_values_simple'])
 
-    // dynamic import exceljs only here
     const Excel = await import('exceljs')
-    const workbook = new Excel.Workbook()
 
-    for (const table of tables) {
-      let rows: any[] = []
-      if (table === 'products') {
-        // Обновленный запрос для новой EAV системы
-        const query = `
-          SELECT
-            p.id,
-            p.name,
-            c.name AS category,
-            p.weight,
-            p.battery_life,
-            p.warranty,
-            p.in_stock,
-            p.price,
-            p.sku,
-            COUNT(DISTINCT pv.id) as variants_count,
-            STRING_AGG(
-              DISTINCT CONCAT(
-                COALESCE(cg.name, 'Прочее'), ': ',
-                COALESCE(ct.name, 'Неизвестно'), ' = ',
-                COALESCE(
-                  CASE
-                    WHEN ct.input_type = 'enum' THEN COALESCE(cv.display_name, cv.value)
-                    WHEN ct.input_type = 'boolean' THEN CASE WHEN pc.value_text = 'true' THEN 'Да' ELSE 'Нет' END
-                    WHEN ct.input_type = 'number' THEN pc.value_numeric::text
-                    WHEN ct.input_type = 'date' THEN pc.value_text
-                    ELSE pc.value_text
-                  END,
-                  'Не указано'
-                ),
-                CASE WHEN pv.sku IS NOT NULL AND pv.sku != '' THEN CONCAT(' (', pv.sku, ')') ELSE '' END
-              ),
-              ' | '
-              ORDER BY cg.ordering NULLS LAST, ct.sort_order NULLS LAST
-            ) as characteristics,
-            p.created_at,
-            p.updated_at
-          FROM products p
-          LEFT JOIN product_categories c ON c.id = p.category_id
-          LEFT JOIN product_variants pv ON pv.master_id = p.id
-          LEFT JOIN product_characteristics pc ON pc.product_id = p.id
-          LEFT JOIN characteristic_templates ct ON ct.id = pc.template_id
-            AND (ct.is_deleted = FALSE OR ct.is_deleted IS NULL)
-          LEFT JOIN characteristic_groups cg ON cg.id = ct.group_id
-            AND (cg.is_deleted = FALSE OR cg.is_deleted IS NULL)
-            AND cg.is_active = true
-          LEFT JOIN characteristic_units cu ON cu.id = ct.unit_id
-          LEFT JOIN characteristic_values cv ON cv.id = pc.value_preset_id
-            AND (cv.is_active = TRUE OR cv.is_active IS NULL)
-          GROUP BY p.id, c.name
-          ORDER BY p.id`
-        const result = await executeQuery(query)
-        rows = result.rows.map((r: any) => {
-          return {
-            id: r.id,
-            name: r.name,
-            category: r.category,
-            weight: r.weight,
-            battery_life: r.battery_life,
-            warranty: r.warranty,
-            in_stock: r.in_stock,
-            price: r.price,
-            sku: r.sku,
-            variants_count: r.variants_count,
-            characteristics: r.characteristics || 'Нет характеристик',
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-            system: 'eav_unified'
-          }
-        })
-      } else {
-        // generic select * for other tables
-        const result = await executeQuery(`SELECT * FROM ${table} ORDER BY 1 LIMIT 1000`)
-        rows = result.rows
-      }
+    const productsRes = await executeQuery(`
+      SELECT p.id, p.name, c.name AS category
+      FROM products p
+      LEFT JOIN product_categories c ON c.id = p.category_id
+      ORDER BY p.id
+    `)
 
-      const sheet = workbook.addWorksheet(table)
-      if (rows.length === 0) continue
+    let charsByProduct: Record<number, any[]> = {}
+    if (need.product_characteristics_simple && need.characteristics_values_simple) {
+      const charsRes = await executeQuery(`
+        SELECT
+          pc.product_id,
+          cv.value as label,
+          COALESCE(pc.additional_value, cv.value) as value
+        FROM product_characteristics_simple pc
+        JOIN characteristics_values_simple cv ON cv.id = pc.value_id
+        ORDER BY pc.product_id, cv.sort_order
+      `)
 
-      const headers = Object.keys(rows[0])
-      sheet.columns = headers.map((h) => ({ header: COLUMN_TITLES[table]?.[h] || h, key: h }))
-      rows.forEach((row) => {
-        sheet.addRow(row)
-      })
-
-      // Auto column width based on content
-      const sheetColumns = (sheet.columns || []) as any[]
-      sheetColumns.forEach((col) => {
-        let maxLength = col.header ? String(col.header).length : 10
-        col.eachCell?.({ includeEmpty: false }, (cell: any) => {
-          const len = cell && cell.value ? String(cell.value).length : 0
-          if (len > maxLength) maxLength = len
-        })
-        col.width = Math.min(Math.max(maxLength + 2, 12), 50)
-      })
-
-      // Header styling
-      const headerRow = sheet.getRow(1)
-      headerRow.font = { bold: true }
-      headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFEFEFEF' },
-        }
-      })
-
-      // Freeze header row and enable filters
-      sheet.views = [{ state: 'frozen', ySplit: 1 }]
-      sheet.autoFilter = {
-        from: {
-          row: 1,
-          column: 1,
-        },
-        to: {
-          row: 1,
-          column: headers.length,
-        },
-      }
+      charsByProduct = charsRes.rows.reduce((acc: any, r: any) => {
+        if (!acc[r.product_id]) acc[r.product_id] = []
+        acc[r.product_id].push({ label: r.label, value: r.value })
+        return acc
+      }, {})
     }
+
+    const workbook = new (await Excel).Workbook()
+    const sheet = workbook.addWorksheet('Products')
+
+    sheet.columns = [
+      { header: 'ID', key: 'id', width: 8 },
+      { header: 'Название', key: 'name', width: 32 },
+      { header: 'Категория', key: 'category', width: 20 },
+      { header: 'Характеристики', key: 'chars', width: 60 },
+    ]
+
+    productsRes.rows.forEach((p: any) => {
+      const charsArr = charsByProduct[p.id] || []
+      const charString = charsArr.map((c: any) => `${c.label}: ${c.value}`).join('; ')
+      sheet.addRow({ id: p.id, name: p.name, category: p.category, chars: charString })
+    })
 
     const buffer = await workbook.xlsx.writeBuffer()
+
     return new NextResponse(buffer as any, {
       status: 200,
       headers: {
@@ -256,7 +66,6 @@ export async function GET(request: Request) {
       },
     })
   } catch (error) {
-    console.error('Excel export error:', error)
     return NextResponse.json({ error: 'Export failed' }, { status: 500 })
   }
 }

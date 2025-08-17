@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
@@ -35,7 +35,7 @@ export function ProductPricingSection({
     onChange({ [field]: numericValue })
   }
 
-  const handleShowPriceChange = (checked: boolean) => {
+  const _handleShowPriceChange = (checked: boolean) => {
 
     onChange({ show_price: checked })
   }
@@ -110,7 +110,7 @@ export function ProductPricingSection({
         <div className="space-y-0.5 flex-1">
           <Label className="text-sm font-medium">Не показывать цену на сайте</Label>
           <p className="text-xs sm:text-sm text-gray-500">
-            Если включено, вместо цены будет показано "По запросу"
+            Если включено, вместо цены будет показано &quot;По запросу&quot;
           </p>
         </div>
         <Switch

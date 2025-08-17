@@ -6,7 +6,7 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
 
     // Проверяем, существует ли уже таблица
@@ -76,7 +76,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при создании таблицы:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка при создании таблицы',
@@ -85,7 +84,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Проверяем состояние таблицы
     const checkTableQuery = `
@@ -132,7 +131,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при проверке таблицы:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка при проверке таблицы',

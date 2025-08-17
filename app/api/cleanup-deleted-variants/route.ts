@@ -3,7 +3,7 @@ import { executeQuery } from '@/lib/db-connection';
 import { getCacheManager } from '@/lib/dependency-injection';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const cacheManager = getCacheManager();
   
   try {
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // 4. Очищаем кеш
     try {
       // Очищаем через cache manager
-      cacheManager.clearAll();
+      cacheManager.clear();
       
       // Принудительно очищаем Redis кеш
       try {

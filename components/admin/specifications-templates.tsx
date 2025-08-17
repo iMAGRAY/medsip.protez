@@ -1,15 +1,13 @@
-'use client'
+"use client"
 
 import React, { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Plus, CheckSquare, Square, Loader2, Database, ChevronDown, ChevronRight, Folder, FolderOpen, Package } from 'lucide-react'
 
 // @ts-nocheck
@@ -168,7 +166,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
   }
 
   // Функция для массового добавления характеристик
-  const addGroupSpecs = async (productId: number, specs: any[]) => {
+  const _addGroupSpecs = async (productId: number, specs: any[]) => {
     const response = await fetch(`/api/products/${productId}/characteristics-simple`, {
       method: 'POST',
       headers: {
@@ -220,7 +218,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
               } else {
                 errorCount++
               }
-            } catch (error) {
+            } catch (_error) {
               errorCount++
             }
           }
@@ -245,7 +243,7 @@ export function SpecificationsTemplates({ productId, onSpecificationsAdded }: Sp
             } else {
               errorCount++
             }
-          } catch (error) {
+          } catch (_error) {
             errorCount++
           }
         }

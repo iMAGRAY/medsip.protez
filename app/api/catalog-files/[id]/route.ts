@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { getCacheManager } from '@/lib/dependency-injection'
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
 // GET - получить информацию о каталоге
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const catalogId = parseInt(params.id)
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    const resolvedParams = await params
+    const catalogId = parseInt(resolvedParams.id)
 
     if (isNaN(catalogId)) {
       return NextResponse.json(
@@ -42,7 +47,6 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error fetching catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка загрузки каталога' },
       { status: 500 }
@@ -53,11 +57,14 @@ export async function GET(
 // PUT - обновить каталог
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     // Проверяем аутентификацию
     const session = await requireAuth(request)
     if (!session) {
@@ -77,7 +84,8 @@ export async function PUT(
       )
     }
 
-    const catalogId = parseInt(params.id)
+    const resolvedParams = await params
+    const catalogId = parseInt(resolvedParams.id)
 
     if (isNaN(catalogId)) {
       return NextResponse.json(
@@ -136,7 +144,6 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Error updating catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления каталога' },
       { status: 500 }
@@ -147,11 +154,14 @@ export async function PUT(
 // DELETE - удалить каталог
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cacheManager = getCacheManager()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
     // Проверяем аутентификацию
     const session = await requireAuth(request)
     if (!session) {
@@ -171,7 +181,8 @@ export async function DELETE(
       )
     }
 
-    const catalogId = parseInt(params.id)
+    const resolvedParams = await params
+    const catalogId = parseInt(resolvedParams.id)
 
     if (isNaN(catalogId)) {
       return NextResponse.json(
@@ -199,7 +210,6 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error deleting catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления каталога' },
       { status: 500 }

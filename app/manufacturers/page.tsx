@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import logger from "@/lib/logger"
+import { SafeImage } from "@/components/safe-image"
 
 interface Manufacturer {
   id: number
@@ -26,7 +26,7 @@ export default function ManufacturersPage() {
           setManufacturers(json.data)
         }
       } catch (err) {
-        logger.error("Failed to load manufacturers", err)
+        console.error("Failed to load manufacturers", err)
       } finally {
         setIsLoading(false)
       }
@@ -45,7 +45,7 @@ export default function ManufacturersPage() {
         {manufacturers.map(m => (
           <Card key={m.id} className="overflow-hidden">
             {m.logo_url && (
-              <img src={m.logo_url} alt={m.name} className="w-full h-32 object-contain p-4" />
+              <SafeImage src={m.logo_url} alt={m.name} width={320} height={128} className="w-full h-32 object-contain p-4" />
             )}
             <CardHeader>
               <CardTitle>{m.name}</CardTitle>

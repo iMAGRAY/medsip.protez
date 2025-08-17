@@ -8,7 +8,6 @@ import type {
 } from '@/lib/types/warehouse'
 
 import { apiClient } from '@/lib/unified-api-client'
-import { RUNTIME_CONFIG } from '@/lib/app-config'
 
 export class WarehouseService {
   private static instance: WarehouseService
@@ -269,18 +268,18 @@ export class WarehouseService {
 
   // Выполнение массовых операций
   async executeBulkOperation(
-    operation: string,
-    itemIds: string[],
-    params?: any
+    _operation: string,
+    _itemIds: string[],
+    _params?: any
   ): Promise<{ success: boolean; message: string; details?: any }> {
     try {
       const response = await fetch('/api/warehouse/bulk-operations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation,
-          itemIds,
-          params
+          operation: _operation,
+          itemIds: _itemIds,
+          params: _params
         })
       })
 

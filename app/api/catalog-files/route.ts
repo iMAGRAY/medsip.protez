@@ -2,21 +2,36 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 import { getCacheManager } from '@/lib/dependency-injection'
+import { guardDbOr503Fast } from '@/lib/api-guards'
+
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
 
 // GET - получить список каталогов
 export async function GET(request: NextRequest) {
-  const cacheManager = getCacheManager()
-
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const { searchParams } = new URL(request.url)
     const activeOnly = searchParams.get('active') !== 'false'
     const year = searchParams.get('year')
 
-    const cacheKey = `catalog-files:${activeOnly}:${year || 'all'}`
-    const cached = cacheManager.get(cacheKey)
-
-    if (cached && !searchParams.get('nocache')) {
-      return NextResponse.json(cached)
+    const tableCheck = await executeQuery(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema='public' AND table_name='catalog_files'
+      ) as exist
+    `)
+    if (!tableCheck.rows[0]?.exist) {
+      return NextResponse.json({ success: false, error: 'catalog_files schema is not initialized' }, { status: 503 })
     }
 
     let query = `
@@ -52,12 +67,8 @@ export async function GET(request: NextRequest) {
       data: result.rows
     }
 
-    // Кешируем на 5 минут
-    cacheManager.set(cacheKey, responseData, 5 * 60 * 1000)
-
     return NextResponse.json(responseData)
   } catch (error) {
-    console.error('Error fetching catalog files:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка загрузки файлов каталогов' },
       { status: 500 }
@@ -70,7 +81,13 @@ export async function POST(request: NextRequest) {
   const cacheManager = getCacheManager()
 
   try {
-    // Проверяем аутентификацию
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const session = await requireAuth(request)
     if (!session) {
       return NextResponse.json(
@@ -79,7 +96,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Проверяем права доступа
     if (!hasPermission(session.user, 'catalog.create') &&
         !hasPermission(session.user, 'catalog.*') &&
         !hasPermission(session.user, '*')) {
@@ -87,6 +103,16 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Access denied' },
         { status: 403 }
       )
+    }
+
+    const tableCheck = await executeQuery(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema='public' AND table_name='catalog_files'
+      ) as exist
+    `)
+    if (!tableCheck.rows[0]?.exist) {
+      return NextResponse.json({ success: false, error: 'catalog_files schema is not initialized' }, { status: 503 })
     }
 
     const body = await request.json()
@@ -119,7 +145,6 @@ export async function POST(request: NextRequest) {
 
     const result = await executeQuery(query, values)
 
-    // Очищаем кэш
     cacheManager.clear()
 
     return NextResponse.json({
@@ -129,7 +154,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating catalog file:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка создания каталога' },
       { status: 500 }

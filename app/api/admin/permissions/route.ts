@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Группируем права по категориям
-    const permissionsByCategory = AVAILABLE_PERMISSIONS.reduce((acc, permission) => {
+    const _permissionsByCategory = AVAILABLE_PERMISSIONS.reduce((acc, permission) => {
       const category = permission.category
       if (!acc[category]) {
         acc[category] = []
@@ -126,11 +126,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       permissions: AVAILABLE_PERMISSIONS,
-      permissionsByCategory
+      permissionsByCategory: _permissionsByCategory
     })
 
   } catch (error) {
-    console.error('Error getting permissions:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

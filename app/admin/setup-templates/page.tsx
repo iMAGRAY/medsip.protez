@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,27 +12,27 @@ export default function SetupTemplatesPage() {
   const [tableInfo, setTableInfo] = useState<any>(null)
   const [message, setMessage] = useState('')
 
-  const checkTableStatus = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/form-templates/setup')
-      const data = await response.json()
+  const checkTableStatus = useCallback(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/form-templates/setup')
+        const data = await response.json()
 
-      if (data.success) {
-        setStatus('exists')
-        setTableInfo(data.data)
-        setMessage(data.message)
-      } else {
+        if (data.success) {
+          setStatus('exists')
+          setTableInfo(data.data)
+          setMessage(data.message)
+        } else {
+          setStatus('missing')
+          setMessage(data.message)
+        }
+      } catch (_error) {
         setStatus('missing')
-        setMessage(data.message)
+        setMessage('Ошибка при проверке таблицы')
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      setStatus('missing')
-      setMessage('Ошибка при проверке таблицы')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    }, [])
 
   const createTable = async () => {
     try {
@@ -49,7 +49,7 @@ export default function SetupTemplatesPage() {
       } else {
         setMessage(`Ошибка: ${data.error}`)
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage('Ошибка при создании таблицы')
     } finally {
       setIsLoading(false)
@@ -58,7 +58,7 @@ export default function SetupTemplatesPage() {
 
   useEffect(() => {
     checkTableStatus()
-  }, [])
+  }, [checkTableStatus])
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">

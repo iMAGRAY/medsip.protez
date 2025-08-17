@@ -1,9 +1,5 @@
 import React from 'react'
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Star, Table2, Layers, Package } from 'lucide-react'
+import { Star, Layers, Package } from 'lucide-react'
 
 interface Characteristic {
   value_id: number
@@ -94,7 +90,7 @@ export default function ProductCharacteristics({
     return value.trim() || 'Не указано';
   };
 
-  const getValueDisplayIcon = (ch: Characteristic, value: string) => {
+  const getValueDisplayIcon = (ch: Characteristic, _value: string) => {
     // Цветовой индикатор для характеристик с цветом
     if (ch.color_hex && ch.color_hex.trim()) {
       return (

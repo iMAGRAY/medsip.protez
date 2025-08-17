@@ -120,7 +120,7 @@ export function ProductVariantForm({
     setActiveTab(value)
   }
   const [saving, setSaving] = useState(false)
-  const [attemptedSave, setAttemptedSave] = useState(false)
+  const [_attemptedSave, setAttemptedSave] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   // Функция валидации формы
@@ -345,12 +345,12 @@ export function ProductVariantForm({
     })
   }
 
-  const handleCharacteristicsChange = (characteristics: any[]) => {
-    setFormData(prev => ({ ...prev, characteristics }))
+  const handleCharacteristicsChange = (_characteristics: any[]) => {
+    setFormData(prev => ({ ...prev, characteristics: _characteristics }))
   }
   
-  const handleConfigurableCharacteristicsChange = (configurableCharacteristics: any[]) => {
-    setFormData(prev => ({ ...prev, configurableCharacteristics }))
+  const handleConfigurableCharacteristicsChange = (_configurableCharacteristics: any[]) => {
+    setFormData(prev => ({ ...prev, configurableCharacteristics: _configurableCharacteristics }))
   }
 
     return (
@@ -636,7 +636,7 @@ export function ProductVariantForm({
                         <div className="space-y-0.5">
                           <Label htmlFor="hidePrice">Не показывать цену на сайте</Label>
                           <p className="text-sm text-gray-500">
-                            Если включено, вместо цены будет показано "По запросу"
+                            Если включено, вместо цены будет показано &quot;По запросу&quot;
                           </p>
                         </div>
                         <Switch

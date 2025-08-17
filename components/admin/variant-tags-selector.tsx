@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
@@ -83,35 +83,28 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     sort_order: 0
   })
 
-  useEffect(() => {
-    fetchAllTags()
-    if (variantId) {
-      fetchVariantTags()
-    }
-  }, [variantId])
-
-  const fetchAllTags = async () => {
-    try {
-      // Получаем общие теги + личные теги этого варианта
-      const url = variantId 
-        ? `/api/product-tags?variant_id=${variantId}`
-        : '/api/product-tags'
+  const fetchAllTags = useCallback(async () => {
+      try {
+        // Получаем общие теги + личные теги этого варианта
+        const url = variantId 
+          ? `/api/product-tags?variant_id=${variantId}`
+          : '/api/product-tags'
+          
+        const response = await fetch(url, {
+          credentials: 'include',
+        })
+        const data = await response.json()
         
-      const response = await fetch(url, {
-        credentials: 'include',
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        setAllTags(data.data)
+        if (data.success) {
+          setAllTags(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        toast.error('Ошибка загрузки тегов')
       }
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      toast.error('Ошибка загрузки тегов')
-    }
-  }
+    }, [variantId])
 
-  const fetchVariantTags = async () => {
+  const fetchVariantTags = useCallback(async () => {
     try {
       const response = await fetch(`/api/variants/${variantId}/tags`, {
         credentials: 'include',
@@ -126,7 +119,14 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [variantId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (variantId) {
+      fetchVariantTags()
+    }
+  }, [fetchAllTags, fetchVariantTags, variantId])
 
   const handleTagToggle = async (tag: ProductTag, checked: boolean) => {
     if (isUpdating) return
@@ -234,7 +234,7 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
     setIsCreating(true)
     try {
       // Генерируем slug из названия, если не указан
-      const slug = newTagData.slug || newTagData.name
+      const _slug = newTagData.slug || newTagData.name
         .toLowerCase()
         .replace(/[а-яё]/g, (match) => {
           const ru = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
@@ -253,7 +253,7 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
         credentials: 'include',
         body: JSON.stringify({
           ...newTagData,
-          slug,
+          slug: _slug,
           is_active: true,
           variant_id: parseInt(variantId.toString()) // Создаем личный тег для этого варианта
         }),
@@ -485,9 +485,9 @@ export function VariantTagsSelector({ variantId, onChange, className = '' }: Var
                         <br />
                         Личные теги видны только у этого варианта и идеально подходят для:
                         <ul className="mt-1 ml-4 text-sm list-disc">
-                          <li>Размеров: "XXL", "Детский размер"</li>
-                          <li>Цветов: "Синий металлик", "Красный матовый"</li>
-                          <li>Особенностей: "Усиленная конструкция", "Облегченная версия"</li>
+                          <li>Размеров: &quot;XXL&quot;, &quot;Детский размер&quot;</li>
+                          <li>Цветов: &quot;Синий металлик&quot;, &quot;Красный матовый&quot;</li>
+                          <li>Особенностей: &quot;Усиленная конструкция&quot;, &quot;Облегченная версия&quot;</li>
                         </ul>
                       </AlertDescription>
                     </Alert>

@@ -3,11 +3,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { withCache, invalidateApiCache } from '@/lib/cache/cache-middleware'
 import { cacheKeys, cacheRemember, CACHE_TTL, invalidateCache, cachePatterns } from '@/lib/cache/cache-utils'
-import { categoryCache } from '@/lib/redis-client'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
+
+export const dynamic = 'force-dynamic'
+
+function _isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
 
 export const GET = withCache(async function GET(request: NextRequest) {
   try {
-    // Проверяем существование таблицы product_categories
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -19,29 +29,10 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE product_categories (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          parent_id INTEGER REFERENCES product_categories(id),
-          is_active BOOLEAN DEFAULT true,
-          sort_order INTEGER DEFAULT 0,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
-
-      // Добавляем несколько базовых категорий
-      await executeQuery(`
-        INSERT INTO product_categories (name, description, sort_order) VALUES
-        ('Протезы ног', 'Протезы нижних конечностей', 1),
-        ('Протезы рук', 'Протезы верхних конечностей', 2),
-        ('Ортезы', 'Ортопедические изделия', 3),
-        ('Аксессуары', 'Дополнительные принадлежности', 4)
-      `)
+      return NextResponse.json(
+        { success: true, data: [] },
+        { status: 200 }
+      )
     }
 
     const { searchParams } = new URL(request.url);
@@ -49,11 +40,9 @@ export const GET = withCache(async function GET(request: NextRequest) {
     const includeStats = searchParams.get('include_stats') === 'true';
     const nocache = searchParams.get('nocache') === 'true';
 
-    // Генерируем ключ кеша
     const cacheKey = flat ? cacheKeys.categoryList() : cacheKeys.categoryTree();
-    const ttl = CACHE_TTL.DAILY; // Категории меняются редко
+    const ttl = CACHE_TTL.DAILY;
 
-    // Функция для получения категорий
     const fetchCategories = async () => {
 
     const query = `
@@ -67,34 +56,24 @@ export const GET = withCache(async function GET(request: NextRequest) {
         created_at,
         updated_at
       FROM product_categories
-      WHERE is_active = true
+      WHERE (is_deleted = false OR is_deleted IS NULL)
+        AND is_active = true
       ORDER BY sort_order, name
     `;
 
     const result = await executeQuery(query);
     let categories = result.rows;
 
-    // Если нужна статистика, загружаем её одним запросом
     if (includeStats && categories.length > 0) {
-      // Проверяем существование таблицы products
-      const productsTableQuery = `
-        SELECT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-          AND table_name = 'products'
-        )
-      `
-
-      const productsTableExists = await executeQuery(productsTableQuery)
-
-      if (productsTableExists.rows[0].exists) {
+      const need = await tablesExist(['products'])
+      if (need.products) {
         const categoryIds = categories.map(c => c.id);
 
         const statsQuery = `
           SELECT
             c.id as category_id,
             COUNT(DISTINCT p.id) as products_count,
-            COUNT(DISTINCT CASE WHEN p.is_active = true THEN p.id END) as active_products_count
+            COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
           FROM product_categories c
           LEFT JOIN products p ON c.id = p.category_id
           WHERE c.id = ANY($1)
@@ -111,7 +90,6 @@ export const GET = withCache(async function GET(request: NextRequest) {
           });
         });
 
-        // Объединяем данные
         categories.forEach(category => {
           const stats = statsMap.get(category.id) || {
             productsCount: 0,
@@ -120,17 +98,12 @@ export const GET = withCache(async function GET(request: NextRequest) {
           category.stats = stats;
         });
       } else {
-        // Если таблица продуктов не существует, добавляем нулевые статистики
         categories.forEach(category => {
-          category.stats = {
-            productsCount: 0,
-            activeProductsCount: 0
-          };
-        });
+          category.stats = { productsCount: 0, activeProductsCount: 0 };
+        })
       }
     }
 
-    // Если не нужна плоская структура, строим дерево категорий
     if (!flat) {
       const categoriesMap = new Map();
       categories.forEach(cat => {
@@ -143,6 +116,10 @@ export const GET = withCache(async function GET(request: NextRequest) {
           const parent = categoriesMap.get(cat.parent_id);
           if (parent) {
             parent.children.push(categoriesMap.get(cat.id));
+          } else {
+            // Если родитель не найден (возможно неактивен или удален),
+            // показываем категорию как корневую
+            rootCategories.push(categoriesMap.get(cat.id));
           }
         } else {
           rootCategories.push(categoriesMap.get(cat.id));
@@ -158,13 +135,11 @@ export const GET = withCache(async function GET(request: NextRequest) {
       };
     };
 
-    // Если nocache=true, не используем кеш
     if (nocache) {
       const data = await fetchCategories();
       return NextResponse.json(data);
     }
 
-    // Получаем данные из кеша или выполняем запрос
     const responseData = await cacheRemember(
       cacheKey,
       ttl,
@@ -175,14 +150,8 @@ export const GET = withCache(async function GET(request: NextRequest) {
     return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('❌ Categories API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
-      { error: 'Failed to fetch categories', success: false, details: error.message },
+      { error: 'Failed to fetch categories', success: false, details: (error as any).message },
       { status: 500 }
     );
   }
@@ -230,8 +199,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(category, { status: 201 });
 
   } catch (error) {
-    console.error('❌ Categories API POST Error:', error);
-
     // Обработка дубликатов
     if (error.code === '23505') {
       return NextResponse.json(
@@ -252,7 +219,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { id, name, description, parent_id, image_url, sort_order } = body;
+    const { id, name, description, parent_id, image_url: _image_url, sort_order } = body;
 
     if (!id || !name) {
       return NextResponse.json(
@@ -289,7 +256,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ Categories API PUT Error:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления категории' },
       { status: 500 }
@@ -439,7 +405,6 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Categories API DELETE Error:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления категории' },
       { status: 500 }

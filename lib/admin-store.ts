@@ -1,17 +1,13 @@
 "use client"
 
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
 import type { Prosthetic } from "./data"
 import { apiClient } from "./api-client"
 import {
   type SiteSettings,
   type Category,
-  type Material,
-  type Feature,
   type ModelLine,
 } from "./admin-data"
-import { PROSTHETIC_FALLBACK_IMAGE } from "./fallback-image"
 
 // Transform API responses to frontend types
 const transformApiProduct = (apiProduct: any): Prosthetic => {
@@ -52,7 +48,7 @@ const transformApiProduct = (apiProduct: any): Prosthetic => {
   }
 }
 
-const transformApiCategory = (apiCategory: any): Category => ({
+const _transformApiCategory = (apiCategory: any): Category => ({
   id: apiCategory.id.toString(),
   name: apiCategory.name,
   description: apiCategory.description || "",
@@ -80,7 +76,7 @@ const transformApiModelLine = (apiModelLine: any): ModelLine => ({
   updatedAt: apiModelLine.updatedAt || apiModelLine.updated_at,
 })
 
-const transformApiSiteSettings = (apiSettings: any): SiteSettings => ({
+const _transformApiSiteSettings = (apiSettings: any): SiteSettings => ({
   id: apiSettings.id || 0,
   siteName: apiSettings.siteName || apiSettings.site_name || "",
   siteDescription: apiSettings.siteDescription || apiSettings.site_description || "",
@@ -132,6 +128,7 @@ interface AdminStore {
 
   // Products
   loadProducts: (forceRefresh?: boolean) => Promise<void>
+  loadProductsPaginated: (page?: number, limit?: number, filters?: any) => Promise<{products: any[], hasMore: boolean, totalCount: number}>
   addProduct: (data: any) => Promise<void>
   updateProduct: (id: string, data: any) => Promise<void>
   deleteProduct: (id: string) => Promise<void>
@@ -152,8 +149,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   },
 
   // Basic actions
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
+  setLoading: (_loading) => set({ loading: _loading }),
+  setError: (_error) => set({ error: _error }),
 
   // Принудительное обновление данных
   forceRefresh: async () => {
@@ -184,7 +181,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       }
     } catch (cacheError) {
-      console.warn('⚠️ Failed to clear cache via API in forceRefresh:', cacheError)
+      // Failed to clear cache via API in forceRefresh
     }
 
     // Перезагружаем данные с принудительным обновлением
@@ -222,7 +219,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         throw new Error(result.error || 'Ошибка синхронизации')
       }
     } catch (error) {
-      console.error('❌ Ошибка синхронизации:', error)
+      // Ошибка синхронизации
       throw error
     }
   },
@@ -263,26 +260,24 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         result: PromiseRejectedResult
       }[]
 
-      const succeeded = results.filter((r) => r.result.status === 'fulfilled') as {
+      const _succeeded = results.filter((r) => r.result.status === 'fulfilled') as {
         name: string
         result: PromiseFulfilledResult<void>
       }[]
 
       const endTime = performance.now()
-      const loadTime = Math.round(endTime - startTime)
+      const _loadTime = Math.round(endTime - startTime)
 
       if (failed.length > 0) {
-        console.warn(`Failed to load ${failed.length} data sources:`, failed.map(f => f.name))
-        failed.forEach((f) => {
-          console.error(`Failed to load ${f.name}:`, f.result.reason)
-        })
+        // Failed to load data sources
+        // Individual load failures logged
       }
 
       if (failed.length === results.length) {
         throw new Error("All data loading failed")
       }
 
-    } catch (error) {
+    } catch (_error) {
 
       store.setError("Failed to load data from database. Check console for details.")
     } finally {
@@ -295,7 +290,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     try {
       const settings = await apiClient.getSiteSettings()
       set({ siteSettings: settings })
-    } catch (error) {
+    } catch (_error) {
 
       set({ siteSettings: null })
     }
@@ -311,7 +306,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       const updated = await apiClient.updateSiteSettings(data)
       set({ siteSettings: updated })
     } catch (error) {
-      console.error('❌ Admin Store - updateSiteSettings failed:', error)
+      // Admin Store - updateSiteSettings failed
       throw error
     }
   },
@@ -342,7 +337,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const mapped = mapTree(apiTree)
       set({ categories: mapped })
-    } catch (error) {
+    } catch (_error) {
 
       set({ categories: [] })
     }
@@ -444,9 +439,9 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       if (!response.ok) throw new Error('Failed to fetch model lines')
       const result = await response.json()
       const apiModelLines = result.success ? result.data : (Array.isArray(result) ? result : [])
-      const modelLines = apiModelLines.map(transformApiModelLine)
-      set({ modelLines })
-    } catch (error) {
+      const _modelLines = apiModelLines.map(transformApiModelLine)
+      set({ modelLines: _modelLines })
+    } catch (_error) {
 
       set({ modelLines: [] })
     }
@@ -531,8 +526,8 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   // Products
   loadProducts: async (forceRefresh = false) => {
     try {
-      console.log('🔄 Загружаем товары...', forceRefresh ? '(принудительное обновление)' : '')
-      const startTime = performance.now()
+      // Загружаем товары
+      const _startTime = performance.now()
 
       // Принудительно очищаем кэш если требуется
       if (forceRefresh) {
@@ -561,31 +556,89 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
           }
         } catch (cacheError) {
-          console.warn('⚠️ Failed to clear cache via API:', cacheError)
+          // Failed to clear cache via API
         }
       }
 
-      // Use full mode to get category names for filtering
-      const response = await apiClient.getProducts({ fast: false })
+      // Use full mode to get category names for filtering, load ALL products for store
+      const response = await apiClient.getProducts({ fast: false, limit: 10000 })
 
       // API возвращает объект с полем data, а не массив напрямую
       const apiProducts = response?.data || response || []
 
       // Проверяем что это массив
       if (!Array.isArray(apiProducts)) {
-        console.warn('❌ API вернул не массив:', apiProducts)
+        // API вернул не массив
         set({ products: [] })
         return
       }
 
-      const products = apiProducts.map(transformApiProduct)
+      const _products = apiProducts.map(transformApiProduct)
 
-      const endTime = performance.now()
+      const _endTime = performance.now()
 
-      set({ products })
+      set({ products: _products })
     } catch (error) {
-      console.error('❌ Ошибка при загрузке товаров:', error)
+      // Ошибка при загрузке товаров
       set({ products: [] })
+    }
+  },
+
+  // NEW: Paginated products loading for infinite scroll
+  loadProductsPaginated: async (page: number = 1, limit: number = 20, filters?: any) => {
+    try {
+      const params: any = { 
+        fast: false, 
+        limit, 
+        page,
+        detailed: true 
+      }
+
+      // Add filters if provided
+      if (filters?.categoryId) {
+        params.category_id = filters.categoryId
+      }
+      if (filters?.manufacturerId) {
+        params.manufacturer_id = filters.manufacturerId
+      }
+      if (filters?.sort) {
+        params.sort = filters.sort
+      }
+
+      // Build query string manually for complex params
+      const queryParams = new URLSearchParams()
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key].toString())
+        }
+      })
+
+      const response = await fetch(`/api/products?${queryParams.toString()}`)
+      const result = await response.json()
+
+      if (result.success) {
+        const apiProducts = result.data || []
+        const transformedProducts = apiProducts.map(transformApiProduct)
+        
+        return {
+          products: transformedProducts,
+          hasMore: transformedProducts.length === limit, // If we got full page, assume there might be more
+          totalCount: result.totalCount || transformedProducts.length
+        }
+      } else {
+        return {
+          products: [],
+          hasMore: false,
+          totalCount: 0
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading paginated products:', error)
+      return {
+        products: [],
+        hasMore: false,
+        totalCount: 0
+      }
     }
   },
 
@@ -614,7 +667,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
           await get().forceRefresh()
 
         } catch (reloadError) {
-          console.error('❌ Error refreshing products after creation:', reloadError)
+          // Error refreshing products after creation
           // Fallback к обычной загрузке с принудительным обновлением
           get().loadProducts(true)
         }

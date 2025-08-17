@@ -76,6 +76,22 @@ export interface ProductVariant extends TimestampFields {
   is_bestseller: boolean;
   sort_order: number;
   
+  // Legacy product_sizes fields для backward compatibility
+  size_name?: string;
+  size_value?: string;
+  dimensions?: Record<string, any>;
+  specifications?: Record<string, any>;
+  
+  // Дополнительные поля из migration schema
+  weight?: number;
+  warranty_months?: number;
+  battery_life_hours?: number;
+  meta_title?: string;
+  meta_description?: string;
+  meta_keywords?: string;
+  custom_fields?: Record<string, any>;
+  cost_price?: number;
+  
   // Связанные данные
   characteristics?: VariantCharacteristic[];
 }
@@ -143,6 +159,18 @@ export interface VariantCharacteristic {
   additional_value?: string;
   
   // Связанные данные для отображения
+  group_name?: string;
+  value_name?: string;
+  color_hex?: string;
+}
+
+// Алиас для задачи TODO 23
+export interface VariantCharacteristics {
+  id: number;
+  variant_id: number;
+  value_id: number;
+  additional_value?: string;
+  // связанные данные
   group_name?: string;
   value_name?: string;
   color_hex?: string;
@@ -235,6 +263,10 @@ export interface OrderItem {
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+
+// ============== Legacy Compatibility ==============
+// Legacy support для backward compatibility
+export type ProductSize = ProductVariant; // Deprecated, use ProductVariant
 
 // ============== Фильтры ==============
 export interface ProductFilter {

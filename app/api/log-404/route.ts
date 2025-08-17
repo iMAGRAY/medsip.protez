@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ logged: true })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to log' }, { status: 500 })
   }
 }

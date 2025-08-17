@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { SearchableSelect } from "@/components/ui/searchable-select"
 import { useAdminStore } from "@/lib/admin-store"
-import { Trash2, Eye, EyeOff } from "lucide-react"
 
 interface BulkActionsProps {
   selectedIds: string[]

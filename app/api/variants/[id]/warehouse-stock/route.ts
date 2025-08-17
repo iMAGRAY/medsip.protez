@@ -3,11 +3,12 @@ import { pool } from '@/lib/db'
 
 // GET - получить остатки варианта по складам
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = parseInt(params.id)
+    const resolvedParams = await params
+    const variantId = parseInt(resolvedParams.id)
 
     const result = await pool.query(`
       SELECT 
@@ -27,7 +28,6 @@ export async function GET(
 
     return NextResponse.json(result.rows)
   } catch (error) {
-    console.error('Error fetching variant warehouse stock:', error)
     return NextResponse.json(
       { error: 'Failed to fetch warehouse stock' },
       { status: 500 }
@@ -38,10 +38,11 @@ export async function GET(
 // PUT - обновить остатки варианта по складам
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = parseInt(params.id)
+    const resolvedParams = await params
+    const variantId = parseInt(resolvedParams.id)
     const warehouseStocks = await request.json()
 
     if (!Array.isArray(warehouseStocks)) {
@@ -114,7 +115,6 @@ export async function PUT(
       throw error
     }
   } catch (error) {
-    console.error('Error updating variant warehouse stock:', error)
     return NextResponse.json(
       { error: 'Failed to update warehouse stock' },
       { status: 500 }

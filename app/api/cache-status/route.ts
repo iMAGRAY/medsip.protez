@@ -4,7 +4,7 @@ import { redisClient } from '@/lib/redis-client'
 import { logger } from '@/lib/logger'
 
 // GET /api/cache-status - получить статус Redis и статистику кеша
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Проверяем подключение к Redis
     const isConnected = await redisClient.ping()
@@ -18,14 +18,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем статистику кеша
-    const cacheStats = await getCacheStats()
+    const _cacheStats = await getCacheStats()
     
     // Получаем дополнительную информацию о Redis
     const info = {
       connected: isConnected,
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || '6379',
-      cacheStats,
+      cacheStats: _cacheStats,
       timestamp: new Date().toISOString()
     }
 

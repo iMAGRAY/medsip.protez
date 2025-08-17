@@ -1,12 +1,11 @@
 const { Pool } = require('pg');
 
+require('dotenv').config({ path: '.env.local' })
+require('dotenv').config({ path: 'database.env' })
 // Подключение к базе данных
 const pool = new Pool({
-  host: '212.113.118.141',
-  port: 5432,
-  database: 'default_db',
-  user: 'gen_user',
-  password: 'Q1w2e3r4t5!@'
+  connectionString: process.env.DATABASE_URL || `postgresql://${process.env.POSTGRESQL_USER || 'postgres'}:${encodeURIComponent(process.env.POSTGRESQL_PASSWORD || '')}@${process.env.POSTGRESQL_HOST || 'localhost'}:${process.env.POSTGRESQL_PORT || 5432}/${process.env.POSTGRESQL_DBNAME || 'default_db'}`,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 async function migrateCharacteristicsToEnums() {

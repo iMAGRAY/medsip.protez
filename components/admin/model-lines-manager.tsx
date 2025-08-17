@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,6 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Package,
   ChevronDown,
   ChevronRight,
   Layers
@@ -74,41 +73,31 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
     is_active: true
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true);
+        const [modelLinesResponse, manufacturersResponse, categoriesResponse] = await Promise.all([
+          apiClient.getModelLines(),
+          apiClient.getManufacturers(),
+          apiClient.getCategories()
+        ]);
 
-  useEffect(() => {
-    if (manufacturerId) {
-      loadModelLinesForManufacturer();
-    }
-  }, [manufacturerId]);
+        setModelLines(modelLinesResponse?.data || []);
+        setManufacturers(manufacturersResponse?.data || []);
+        setCategories(categoriesResponse?.data || []);
+      } catch (error) {
+        logger.error('Failed to load data:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить данные",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, [apiClient, logger, toast]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [modelLinesResponse, manufacturersResponse, categoriesResponse] = await Promise.all([
-        apiClient.getModelLines(),
-        apiClient.getManufacturers(),
-        apiClient.getCategories()
-      ]);
-
-      setModelLines(modelLinesResponse?.data || []);
-      setManufacturers(manufacturersResponse?.data || []);
-      setCategories(categoriesResponse?.data || []);
-    } catch (error) {
-      logger.error('Failed to load data:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadModelLinesForManufacturer = async () => {
+  const loadModelLinesForManufacturer = useCallback(async () => {
     if (!manufacturerId) return;
 
     try {
@@ -126,7 +115,17 @@ export function ModelLinesManager({ manufacturerId, onModelLineSelect, selectedM
     } finally {
       setLoading(false);
     }
-  };
+  }, [manufacturerId, apiClient, logger, toast]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    if (manufacturerId) {
+      loadModelLinesForManufacturer();
+    }
+  }, [manufacturerId, loadModelLinesForManufacturer]);
 
   const resetModelLineForm = () => {
     setModelLineForm({

@@ -5,11 +5,12 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 
 // GET - получить конфигурируемые характеристики
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: paramId } = await params
+    const id = parseInt(paramId);
     const pool = getPool();
     
     // Сначала проверяем, является ли это ID варианта товара
@@ -90,7 +91,7 @@ export async function GET(
 // POST/PUT - сохранить конфигурируемые характеристики
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -112,7 +113,8 @@ export async function POST(
       );
     }
 
-    const productId = parseInt(params.id);
+    const { id } = await params
+    const productId = parseInt(id);
     const { configurableCharacteristics } = await request.json();
     const pool = getPool();
     

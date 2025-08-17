@@ -1,14 +1,12 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, createContext, useContext } from "react"
+import React, { useCallback, useState, useEffect, createContext, useContext } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { LayoutDashboard, User, Shield } from "lucide-react"
+import { LayoutDashboard, User } from "lucide-react"
 import { logger } from "@/lib/logger"
 
 interface AuthGuardProps {
@@ -70,25 +68,25 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const loadSavedCredentials = useCallback(() => {
+      try {
+        const savedUsername = localStorage.getItem(STORAGE_KEYS.REMEMBERED_USERNAME)
+        const savedRememberPreference = localStorage.getItem(STORAGE_KEYS.REMEMBER_PREFERENCE)
+
+        if (savedUsername && savedRememberPreference === 'true') {
+          setCredentials(prev => ({ ...prev, username: savedUsername }))
+          setRememberMe(true)
+        }
+      } catch (error) {
+        console.warn('Failed to load saved credentials:', error)
+      }
+    }, [])
+
   // Загрузка сохраненных данных при инициализации
   useEffect(() => {
     loadSavedCredentials()
     checkAuthStatus()
-  }, [])
-
-  const loadSavedCredentials = () => {
-    try {
-      const savedUsername = localStorage.getItem(STORAGE_KEYS.REMEMBERED_USERNAME)
-      const savedRememberPreference = localStorage.getItem(STORAGE_KEYS.REMEMBER_PREFERENCE)
-
-      if (savedUsername && savedRememberPreference === 'true') {
-        setCredentials(prev => ({ ...prev, username: savedUsername }))
-        setRememberMe(true)
-      }
-    } catch (error) {
-      console.warn('Failed to load saved credentials:', error)
-    }
-  }
+  }, [loadSavedCredentials])
 
   const saveSavedCredentials = (username: string, remember: boolean) => {
     try {
@@ -126,7 +124,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // Проверка прав доступа
-  const hasPermission = (permission: string): boolean => {
+  const _hasPermission = (permission: string): boolean => {
     if (!authStatus.authenticated || !authStatus.user) return false
 
     const permissions = authStatus.user.permissions || []
@@ -195,7 +193,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
   }
 
-  const handleLogout = async () => {
+  const _handleLogout = async () => {
     try {
       const response = await fetch('/api/admin/auth/logout', {
         method: 'POST',
@@ -316,8 +314,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   const contextValue: AuthContextType = {
     authStatus,
-    hasPermission,
-    handleLogout
+    hasPermission: _hasPermission,
+    handleLogout: _handleLogout
   }
 
   return (

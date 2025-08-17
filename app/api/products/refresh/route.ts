@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 import { getCacheManager } from '@/lib/dependency-injection'
 import { invalidateRelated } from '@/lib/cache-manager'
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   const cacheManager = getCacheManager();
 
   try {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Package, MapPin, Loader2 } from 'lucide-react'
@@ -28,13 +28,7 @@ export function WarehouseStockDisplay({
   const [stocks, setStocks] = useState<WarehouseStock[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (productId || variantId) {
-      fetchStocks()
-    }
-  }, [productId, variantId])
-
-  const fetchStocks = async () => {
+  const fetchStocks = useCallback(async () => {
     setLoading(true)
     try {
       let url = ''
@@ -57,7 +51,13 @@ export function WarehouseStockDisplay({
     } finally {
       setLoading(false)
     }
-  }
+  }, [productId, variantId])
+
+  useEffect(() => {
+    if (productId || variantId) {
+      fetchStocks()
+    }
+  }, [productId, variantId, fetchStocks])
 
   const totalQuantity = stocks.reduce((sum, stock) => sum + stock.quantity, 0)
 

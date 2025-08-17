@@ -455,8 +455,8 @@ class UnifiedApiClient {
         body: formData,
         headers: {}, // Let browser set Content-Type for FormData
       }),
-      delete: (key) => this.post('/media/delete', { key }),
-      checkDuplicate: (hash) => this.post('/media/check-duplicate', { hash }),
+      delete: (_key) => this.post('/media/delete', { key: _key }),
+      checkDuplicate: (_hash) => this.post('/media/check-duplicate', { hash: _hash }),
       register: (data) => this.post('/media/register', data),
       sync: () => this.post('/media/sync'),
     },

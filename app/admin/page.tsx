@@ -26,7 +26,6 @@ import {
   Loader2,
   Activity,
   AlertCircle,
-  TrendingUp,
   FileText,
   Database,
   Server,
@@ -108,7 +107,7 @@ const saved = localStorage.getItem('warehouse-settings')
 // Применяем сохраненные настройки к зонам
       const updatedZones = baseStats.warehouse.zones.map(zone => {
         const savedZone = savedZones.find(s => s.name === zone.name)
-        const newCapacity = savedZone ? savedZone.capacity : zone.capacity
+        const _newCapacity = savedZone ? savedZone.capacity : zone.capacity
 
         return savedZone ? { ...zone, capacity: savedZone.capacity } : zone
       })
@@ -143,7 +142,7 @@ return {
     }
   }
 
-  const generateFallbackStats = (): DashboardStats => ({
+  const generateFallbackStats = useCallback((): DashboardStats => ({
     products: {
       total: products.length || 26, // Реальное количество товаров
       inStock: Math.floor((products.length || 26) * 0.85), // 85% в наличии
@@ -177,7 +176,7 @@ return {
       lastSync: new Date().toLocaleTimeString('ru-RU'),
       uptime: calculateRealisticUptime()
     }
-  })
+  }), [products.length])
 
   const loadDashboardData = useCallback(async () => {
     setLoadingStats(true)
@@ -212,7 +211,7 @@ return {
     } finally {
       setLoadingStats(false)
     }
-  }, [products.length, modelLines?.length, isLoading, initializeData])
+  }, [products.length, modelLines?.length, isLoading, initializeData, generateFallbackStats])
 
   // Инициализация дашборда (перемещен после объявления loadDashboardData)
   useEffect(() => {
@@ -676,14 +675,14 @@ try {
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-gray-700">Добавлен товар "Протез руки"</p>
+                    <p className="text-gray-700">Добавлен товар &quot;Протез руки&quot;</p>
                     <p className="text-xs text-gray-500">2 минуты назад</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-gray-700">Обновлена категория "Протезы"</p>
+                    <p className="text-gray-700">Обновлена категория &quot;Протезы&quot;</p>
                     <p className="text-xs text-gray-500">15 минут назад</p>
                   </div>
                 </div>

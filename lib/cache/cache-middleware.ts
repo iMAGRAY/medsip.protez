@@ -131,7 +131,7 @@ export async function cacheMiddleware(
     try {
       // Клонируем ответ для чтения
       const responseClone = response.clone()
-      const data = await responseClone.json()
+      const _data = await responseClone.json()
       
       // Сохраняем важные заголовки
       const headers: Record<string, string> = {}
@@ -142,7 +142,7 @@ export async function cacheMiddleware(
       })
       
       // Сохраняем в кеш
-      await apiCache.set(cacheKey, { data, headers }, config.ttl)
+      await apiCache.set(cacheKey, { data: _data, headers }, config.ttl)
       logger.debug(`API Cache set: ${pathname}, TTL: ${config.ttl}s`)
       
       // Добавляем заголовок

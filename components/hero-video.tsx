@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 
 const HeroVideo = () => {
@@ -11,18 +11,18 @@ const HeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   // Проверка только на очень медленное соединение для fallback
+    const checkSlowConnection = useCallback(() => {
+              // Проверка на медленное соединение
+              const isSlowConn = 'connection' in navigator &&
+                ((navigator as any).connection.effectiveType === '2g' ||
+                (navigator as any).connection.saveData === true)
+
+              setIsSlowConnection(isSlowConn)
+            }, [])
+
   useEffect(() => {
-    const checkSlowConnection = () => {
-      // Проверка на медленное соединение
-      const isSlowConn = 'connection' in navigator &&
-        ((navigator as any).connection.effectiveType === '2g' ||
-        (navigator as any).connection.saveData === true)
-
-      setIsSlowConnection(isSlowConn)
-    }
-
     checkSlowConnection()
-  }, [])
+  }, [checkSlowConnection])
 
   // Отслеживание скролла для эффекта параллакса
   useEffect(() => {
@@ -59,7 +59,7 @@ const HeroVideo = () => {
               setIsVideoLoaded(true)
               if (loadTimeout) clearTimeout(loadTimeout)
             })
-            .catch((error) => {
+            .catch((_error) => {
 
               // Не сразу показываем ошибку, пользователь может кликнуть
               setTimeout(() => {
@@ -113,10 +113,11 @@ const HeroVideo = () => {
   if (videoError || isSlowConnection) {
     return (
       <div className="relative w-full h-full overflow-hidden">
-        <img
+        <Image
           src={staticImageUrl}
           alt="Семья с протезом идет вместе"
-          className="relative w-full h-full object-cover transition-transform duration-75 ease-out
+          fill
+          className="relative object-cover transition-transform duration-75 ease-out
             sm:object-center object-left-center"
           style={{
             transform: `translateY(${scrollY * 0.1}px)`,
@@ -146,8 +147,7 @@ const HeroVideo = () => {
     <div className="relative w-full h-full overflow-hidden">
       <video
         ref={videoRef}
-        className="relative w-full h-full object-cover transition-transform duration-75 ease-out
-          sm:object-center object-left-center"
+        className="relative w-full h-full object-cover transition-transform duration-75 ease-out sm:object-center object-left-center"
         style={{
           transform: `translateY(${scrollY * 0.1}px)`,
           objectPosition: 'left center',

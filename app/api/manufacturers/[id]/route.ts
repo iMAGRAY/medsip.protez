@@ -2,22 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer GET")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
 
     // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
@@ -38,10 +38,18 @@ export async function GET(
     }
 
     const query = `
-      SELECT *
-      FROM manufacturers
-      WHERE id = $1
-    `;
+      SELECT 
+        m.id, m.name, m.description, m.website_url, m.country, m.founded_year, m.logo_url, m.is_active, m.sort_order,
+        m.created_at, m.updated_at,
+        COUNT(DISTINCT ms.id) as model_lines_count,
+        COUNT(DISTINCT p.id) as products_count,
+        COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
+      FROM manufacturers m
+      LEFT JOIN model_series ms ON m.id = ms.manufacturer_id
+      LEFT JOIN products p ON p.manufacturer_id = m.id
+      WHERE m.id = $1
+      GROUP BY m.id
+    `
 
     const result = await executeQuery(query, [manufacturerId]);
 
@@ -71,7 +79,7 @@ export async function GET(
         SELECT
           COUNT(DISTINCT ms.id) as model_lines_count,
           COUNT(DISTINCT p.id) as products_count,
-          COUNT(DISTINCT CASE WHEN p.is_active = true THEN p.id END) as active_products_count
+          COUNT(DISTINCT CASE WHEN (p.is_deleted = false OR p.is_deleted IS NULL) THEN p.id END) as active_products_count
         FROM manufacturers m
         LEFT JOIN model_series ms ON m.id = ms.manufacturer_id
         LEFT JOIN products p ON ms.id = p.series_id
@@ -100,14 +108,8 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
-      { error: 'Failed to fetch manufacturer', success: false, details: error.message },
+      { error: 'Failed to fetch manufacturer', success: false, details: (error as any).message },
       { status: 500 }
     );
   }
@@ -115,21 +117,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer PUT")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
     const data = await request.json();
 
     // Валидация обязательных полей
@@ -198,12 +200,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
 
     // Обработка дубликатов
     if ((error as any).code === '23505') {
@@ -221,22 +217,22 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in manufacturer DELETE")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const manufacturerId = params.id;
+    const resolvedParams = await params
+    const manufacturerId = resolvedParams.id;
 
     // Проверяем существование таблицы manufacturers
     const tableCheckQuery = `
@@ -319,7 +315,7 @@ export async function DELETE(
 
     // Удаляем производителя
     const deleteQuery = 'DELETE FROM manufacturers WHERE id = $1 RETURNING id';
-    const result = await executeQuery(deleteQuery, [manufacturerId]);
+    const _result = await executeQuery(deleteQuery, [manufacturerId]);
 
     return NextResponse.json({
       message: 'Manufacturer deleted successfully',
@@ -327,12 +323,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('❌ Manufacturer API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
       { error: 'Failed to delete manufacturer', success: false, details: error.message },
       { status: 500 }

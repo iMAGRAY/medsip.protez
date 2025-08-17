@@ -232,7 +232,6 @@ FROM product_categories c
     })
 
   } catch (error) {
-    console.error("❌ Catalog Subgroups API Error:", error)
     return NextResponse.json(
       {
         success: false,

@@ -69,7 +69,6 @@ export async function PUT(request: NextRequest) {
       throw error
     }
   } catch (error) {
-    console.error('Error updating variant images:', error)
     return NextResponse.json(
       { error: 'Failed to update variant images' },
       { status: 500 }
@@ -122,7 +121,6 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching variant images:', error)
     return NextResponse.json(
       { error: 'Failed to fetch variant images' },
       { status: 500 }

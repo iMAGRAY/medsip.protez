@@ -89,7 +89,7 @@ export const GET = withCache(async function GET(request: NextRequest) {
 
       // Убираем поле total из результатов
       const products = result.rows.map(row => {
-        const { total, ...product } = row
+        const { total: _total, ...product } = row
         return product
       })
 

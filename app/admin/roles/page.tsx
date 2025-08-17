@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,7 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import {
   Tabs,
@@ -51,7 +50,6 @@ import {
   AlertTriangle,
   Lock,
   User,
-  Users,
   Key,
   ChevronDown
 } from 'lucide-react'
@@ -100,30 +98,30 @@ export default function RolesPage() {
   // Проверяем, является ли текущий пользователь главным администратором
   const isSuperAdmin = authStatus.user?.id === 1
 
+  const loadRoles = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/admin/roles', {
+          credentials: 'include'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setRoles(data.roles || [])
+        } else {
+          setError('Ошибка загрузки ролей')
+        }
+      } catch (_error) {
+        setError('Ошибка соединения с сервером')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     loadRoles()
     loadPermissions()
-  }, [])
-
-  const loadRoles = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/admin/roles', {
-        credentials: 'include'
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setRoles(data.roles || [])
-      } else {
-        setError('Ошибка загрузки ролей')
-      }
-    } catch (error) {
-      setError('Ошибка соединения с сервером')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadRoles])
 
   const loadPermissions = async () => {
     try {
@@ -156,7 +154,7 @@ export default function RolesPage() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const _data = await response.json()
 
         loadRoles()
         setDeleteRole(null)
@@ -445,7 +443,7 @@ export default function RolesPage() {
 // Компонент формы роли
 function RoleForm({
   role,
-  permissions,
+  permissions: _permissions,
   permissionsByCategory,
   onSuccess,
   onCancel
@@ -514,7 +512,7 @@ function RoleForm({
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const _data = await response.json()
 
         onSuccess()
       } else {

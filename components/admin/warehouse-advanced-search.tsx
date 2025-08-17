@@ -1,13 +1,11 @@
 "use client"
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
@@ -18,23 +16,15 @@ import {
   Filter,
   X,
   Calendar as CalendarIcon,
-  MapPin,
-  Building2,
   Warehouse,
-  Package2,
-  Grid3x3,
   TrendingUp,
-  TrendingDown,
   Clock,
   Save,
   Star,
   History,
-  Settings,
   ChevronDown,
   ChevronUp,
-  RotateCcw,
-  Eye,
-  EyeOff
+  RotateCcw
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -105,7 +95,7 @@ export const WarehouseAdvancedSearch: React.FC<WarehouseAdvancedSearchProps> = (
   const [saveSearchName, setSaveSearchName] = useState('')
 
   // Доступные фильтры
-  const availableFilters: SearchFilter[] = [
+  const availableFilters: SearchFilter[] = useMemo(() => [
     {
       id: 'type',
       type: 'select',
@@ -179,7 +169,7 @@ export const WarehouseAdvancedSearch: React.FC<WarehouseAdvancedSearchProps> = (
         { value: 'kzn', label: 'Казань' }
       ]
     }
-  ]
+  ], [])
 
   // Быстрые фильтры
   const quickFilters: QuickFilter[] = [

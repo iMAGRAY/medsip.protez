@@ -1,8 +1,7 @@
 "use client"
 
 import { useInstantNavigation } from './instant-navigation-provider'
-import { ReactNode, MouseEvent, forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { ReactNode, MouseEvent } from 'react'
 
 interface InstantLinkProps {
   href: string

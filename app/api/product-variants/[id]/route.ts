@@ -3,11 +3,12 @@ import { pool } from '@/lib/db';
 
 // GET /api/product-variants/[id] - получить конкретный вариант товара
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
 
     const result = await pool.query(`
       SELECT
@@ -35,7 +36,6 @@ export async function GET(
     return NextResponse.json({ success: true, data: result.rows[0] });
 
   } catch (error) {
-    console.error('Ошибка получения варианта товара:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения варианта товара' },
       { status: 500 }
@@ -46,10 +46,11 @@ export async function GET(
 // PUT /api/product-variants/[id] - обновить вариант товара
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
     const body = await request.json();
     const { sku, price_override, stock_override, attributes_json } = body;
 
@@ -82,7 +83,6 @@ export async function PUT(
     return NextResponse.json(result.rows[0]);
 
   } catch (error) {
-    console.error('Ошибка обновления варианта товара:', error);
     return NextResponse.json(
       { error: 'Ошибка обновления варианта товара' },
       { status: 500 }
@@ -92,11 +92,12 @@ export async function PUT(
 
 // DELETE /api/product-variants/[id] - удалить вариант товара (soft delete)
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
 
     // Проверяем, что вариант существует
     const existingVariant = await pool.query(
@@ -123,7 +124,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Ошибка удаления варианта товара:', error);
     return NextResponse.json(
       { error: 'Ошибка удаления варианта товара' },
       { status: 500 }

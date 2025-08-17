@@ -17,7 +17,7 @@ const s3Client = new S3Client({
 const S3_BUCKET = process.env.S3_BUCKET!
 
 // POST /api/media/sync - Синхронизация файлов из S3 в базу данных
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   const pool = getPool()
 
   try {
@@ -80,8 +80,7 @@ export async function POST(request: NextRequest) {
         let fileHash: string
         try {
           fileHash = await calculateFileHashFromUrl(s3Url)
-        } catch (hashError) {
-          console.warn(`⚠️ Не удалось вычислить хеш для ${obj.Key}, используем ключ как хеш`)
+        } catch (_hashError) {
           fileHash = obj.Key.replace(/[^a-zA-Z0-9]/g, '')
         }
 
@@ -131,7 +130,6 @@ skipped++
         synced++
 
       } catch (error) {
-        console.error(`❌ Ошибка при синхронизации ${obj.Key}:`, error)
         errors++
       }
     }
@@ -146,7 +144,6 @@ skipped++
     })
 
   } catch (error) {
-    console.error('❌ Ошибка при синхронизации:', error)
     return NextResponse.json(
       {
         success: false,

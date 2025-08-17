@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useRouter } from 'next/navigation'
 import { AdminLayout } from '@/components/admin/admin-layout'
@@ -33,7 +33,7 @@ export default function CreateProductPage() {
     )
   }
 
-  const handleSave = async (savedProduct: any) => {
+  const handleSave = async (_savedProduct: any) => {
 
     // Принудительно обновляем список товаров в admin store
     try {

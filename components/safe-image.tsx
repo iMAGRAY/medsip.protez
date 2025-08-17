@@ -89,7 +89,7 @@ export function SafeImage({
     setHasError(false)
     setErrorCount(0) // Сбрасываем счетчик при успешной загрузке
     onLoad?.(e)
-  }, [currentSrc, useUnoptimized, onLoad])
+  }, [onLoad])
 
   // Обновляем src при изменении пропа
   React.useEffect(() => {
@@ -142,6 +142,7 @@ export function SafeImage({
     return (
       <Image
         {...imageProps}
+        alt={alt}
         fill
       />
     )
@@ -150,6 +151,7 @@ export function SafeImage({
   return (
     <Image
       {...imageProps}
+      alt={alt}
       width={width}
       height={height}
     />

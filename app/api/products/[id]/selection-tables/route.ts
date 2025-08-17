@@ -4,13 +4,14 @@ import { logger } from '@/lib/logger'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
+    const { id } = await params
+    const productId = parseInt(id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -56,8 +57,8 @@ export async function GET(
       }
     })
 
-    const duration = Date.now() - startTime
-    logger.info('Selection tables loaded', { productId, count: result.rows.length, duration })
+    const _duration = Date.now() - startTime
+    logger.info('Selection tables loaded', { productId, count: result.rows.length, duration: _duration })
 
     return NextResponse.json({
       success: true,
@@ -66,7 +67,7 @@ export async function GET(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading selection tables', error, 'API')
 
     return NextResponse.json({
@@ -79,7 +80,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
@@ -103,7 +104,8 @@ export async function PUT(
       )
     }
 
-    const productId = parseInt(params.id)
+    const { id } = await params
+    const productId = parseInt(id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -205,8 +207,8 @@ export async function PUT(
 
         await executeQuery('COMMIT')
 
-        const duration = Date.now() - startTime
-        logger.info('Selection tables updated', { productId, tablesCount, duration })
+        const _duration = Date.now() - startTime
+        logger.info('Selection tables updated', { productId, tablesCount, duration: _duration })
 
         return NextResponse.json({
           success: true,
@@ -226,7 +228,7 @@ export async function PUT(
     }
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Selection tables PUT error', error, 'API')
 
     return NextResponse.json({

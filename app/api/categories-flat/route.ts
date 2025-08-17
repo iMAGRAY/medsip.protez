@@ -1,12 +1,33 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
+import { guardDbOr503Fast } from '@/lib/api-guards'
+
+export const dynamic = 'force-dynamic'
+
+function _isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
 
 // GET /api/categories-flat - Получить плоский список всех активных категорий для форм товаров
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
 
-    // Сначала получаем просто все активные категории
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    const exists = await executeQuery(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema='public' AND table_name='product_categories'
+      ) as exist
+    `)
+    if (!exists.rows[0]?.exist) {
+      return NextResponse.json({ success: true, data: [], total: 0, flat: true }, { status: 200 })
+    }
+
     const query = `
       SELECT
         id,
@@ -14,21 +35,19 @@ export async function GET(request: NextRequest) {
         description,
         parent_id,
         type,
-        is_active,
+        (is_deleted = false OR is_deleted IS NULL) as is_active,
         created_at,
         updated_at
       FROM product_categories
-      WHERE is_active = true
+      WHERE (is_deleted = false OR is_deleted IS NULL)
       ORDER BY parent_id NULLS FIRST, name
     `
 
     const result = await executeQuery(query)
 
-    // Строим иерархию вручную
     const categoriesMap = new Map()
     const rootCategories = []
 
-    // Сначала создаем мапу всех категорий
     result.rows.forEach(row => {
       categoriesMap.set(row.id, {
         ...row,
@@ -40,7 +59,6 @@ export async function GET(request: NextRequest) {
       })
     })
 
-    // Теперь строим иерархию и вычисляем уровни
     const calculateHierarchy = (categoryId, level = 0, parentPath = '') => {
       const category = categoriesMap.get(categoryId)
       if (!category) return
@@ -49,7 +67,6 @@ export async function GET(request: NextRequest) {
       category.full_path = parentPath ? `${parentPath} → ${category.name}` : category.name
       category.display_name = '  '.repeat(level) + category.name
 
-      // Найдем всех детей
       result.rows.forEach(row => {
         if (row.parent_id === categoryId) {
           category.children.push(row.id)
@@ -58,7 +75,6 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Начинаем с корневых категорий
     result.rows.forEach(row => {
       if (row.parent_id === null) {
         rootCategories.push(row.id)
@@ -66,18 +82,17 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Преобразуем обратно в массив с правильным порядком
-    const flattenHierarchy = (categoryIds, result = []) => {
+    const flattenHierarchy = (categoryIds, resultArr = []) => {
       categoryIds.forEach(id => {
         const category = categoriesMap.get(id)
         if (category) {
-          result.push(category)
+          resultArr.push(category)
           if (category.children.length > 0) {
-            flattenHierarchy(category.children, result)
+            flattenHierarchy(category.children, resultArr)
           }
         }
       })
-      return result
+      return resultArr
     }
 
     const categories = flattenHierarchy(rootCategories)
@@ -86,13 +101,9 @@ export async function GET(request: NextRequest) {
     categories.forEach(cat => {
       levelCounts[cat.level] = (levelCounts[cat.level] || 0) + 1
     })
-    Object.entries(levelCounts).forEach(([level, count]) => {
 
-    })
-
-    // Убираем children из финального результата (не нужны в форме)
     const categoriesForForm = categories.map(cat => {
-      const { children, ...categoryData } = cat
+      const { children: _children, ...categoryData } = cat
       return categoryData
     })
 
@@ -105,13 +116,8 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Categories Flat API Error:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch categories',
-        details: error instanceof Error ? error.message : String(error)
-      },
+      { success: false, error: 'Failed to fetch categories', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }

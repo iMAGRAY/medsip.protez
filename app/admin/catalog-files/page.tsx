@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,8 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileDown, Share2, Plus, Pencil, Trash2, Upload, Eye, Calendar } from 'lucide-react'
+import { FileDown, Plus, Pencil, Trash2, Eye, Calendar } from 'lucide-react'
 import { formatDate } from "@/lib/utils"
 import { useAuth } from "@/components/admin/auth-guard"
 
@@ -45,7 +44,7 @@ interface CatalogFormData {
 }
 
 export default function CatalogFilesPage() {
-  const { authStatus, hasPermission } = useAuth()
+  const { authStatus: _authStatus, hasPermission } = useAuth()
   const [catalogs, setCatalogs] = useState<CatalogFile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,26 +59,6 @@ export default function CatalogFilesPage() {
   const canUpdateCatalogs = hasPermission('catalog.update') || hasPermission('catalog.*') || hasPermission('*')
   const canDeleteCatalogs = hasPermission('catalog.delete') || hasPermission('catalog.*') || hasPermission('*')
 
-  // Если нет прав на просмотр каталогов, показываем сообщение об ошибке
-  if (!canViewCatalogs) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-8">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <FileDown className="w-8 h-8 text-red-600" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">Доступ запрещен</h3>
-                <p className="text-gray-600">У вас нет прав для просмотра каталогов</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    )
-  }
 
   const [formData, setFormData] = useState<CatalogFormData>({
     title: '',
@@ -93,28 +72,28 @@ export default function CatalogFilesPage() {
   })
 
   // Загрузка каталогов
-  const loadCatalogs = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/catalog-files?active=false')
-      const data = await response.json()
+  const loadCatalogs = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/catalog-files?active=false')
+        const data = await response.json()
 
-      if (data.success) {
-        setCatalogs(data.data)
-      } else {
-        setError(data.error || 'Ошибка загрузки каталогов')
+        if (data.success) {
+          setCatalogs(data.data)
+        } else {
+          setError(data.error || 'Ошибка загрузки каталогов')
+        }
+      } catch (err) {
+        setError('Ошибка соединения с сервером')
+        console.error('Error loading catalogs:', err)
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      setError('Ошибка соединения с сервером')
-      console.error('Error loading catalogs:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   useEffect(() => {
     loadCatalogs()
-  }, [])
+  }, [loadCatalogs])
 
   // Обработка загрузки файла
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,10 +151,10 @@ export default function CatalogFilesPage() {
         ? `/api/catalog-files/${editingCatalog.id}`
         : '/api/catalog-files'
 
-      const method = editingCatalog ? 'PUT' : 'POST'
+      const _method = editingCatalog ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -259,6 +238,27 @@ export default function CatalogFilesPage() {
     const sizes = ['Б', 'КБ', 'МБ', 'ГБ']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
+  }
+
+  // Ранний возврат без прав — после хуков
+  if (!canViewCatalogs) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="flex flex-col items-center gap-4 p-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <FileDown className="w-8 h-8 text-red-600" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-2">Доступ запрещен</h3>
+                <p className="text-gray-600">У вас нет прав для просмотра каталогов</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    )
   }
 
   if (loading) {

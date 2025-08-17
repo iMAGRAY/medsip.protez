@@ -10,21 +10,10 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Check,
   X,
-  MoreHorizontal,
   Edit,
-  Trash2,
-  Copy,
-  Move,
-  Download,
-  Upload,
-  Settings,
   Filter,
   CheckSquare,
-  Square,
-  Play,
-  Pause,
   AlertTriangle,
   CheckCircle,
   Clock,
@@ -35,7 +24,6 @@ import {
   Building2,
   Grid3x3
 } from 'lucide-react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -95,8 +83,8 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   items,
   operations,
   onBulkOperation,
-  onItemUpdate,
-  loading = false
+  onItemUpdate: _onItemUpdate,
+  loading: _loading = false
 }) => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState('')
@@ -117,7 +105,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   })
   const [showProgressDialog, setShowProgressDialog] = useState(false)
   const [showBulkEditDialog, setShowBulkEditDialog] = useState(false)
-  const [bulkEditForm, setBulkEditForm] = useState({
+  const [_bulkEditForm, _setBulkEditForm] = useState({
     status: '',
     description: '',
     notes: ''
@@ -196,7 +184,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
     return filteredItems.length > 0 && filteredItems.every(item => selectedItems.has(item.id))
   }, [filteredItems, selectedItems])
 
-  const isPartiallySelected = useMemo(() => {
+  const _isPartiallySelected = useMemo(() => {
     return selectedItems.size > 0 && !isAllSelected
   }, [selectedItems.size, isAllSelected])
 
@@ -261,7 +249,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
   }
 
   // Группировка выбранных элементов по типам
-  const groupSelectedByType = () => {
+  const _groupSelectedByType = () => {
     const groups: Record<string, string[]> = {}
     selectedItems.forEach(itemId => {
       const item = items.find(i => i.id === itemId)
@@ -954,7 +942,7 @@ export const WarehouseBulkOperations: React.FC<WarehouseBulkOperationsProps> = (
           <AlertDialogHeader>
             <AlertDialogTitle>Подтверждение операции</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите выполнить операцию "{pendingOperation?.operation.label}"
+              Вы уверены, что хотите выполнить операцию &quot;{pendingOperation?.operation.label}&quot;
               для {selectedItems.size} элементов?
               {pendingOperation?.operation.type === 'delete' && (
                 <div className="mt-2 p-2 bg-red-50 rounded text-red-700 text-sm">

@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery, getPool } from '@/lib/db-connection'
+import { getPool } from '@/lib/db-connection'
 import { getCacheManager, getLogger } from '@/lib/dependency-injection'
 
 // PUT - обновление цены товара в заказе
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; itemId: string } }
+  { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
   const logger = getLogger()
   const cacheManager = getCacheManager()
 
   try {
-    const orderId = parseInt(params.id)
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await params
+    const orderId = parseInt(resolvedParams.id)
+    const itemId = parseInt(resolvedParams.itemId)
     const body = await request.json()
     const { custom_price, status, notes } = body
 
@@ -130,7 +131,7 @@ export async function PUT(
 
       logger.info('Order item updated successfully', logData)
 
-      const message = custom_price !== undefined
+      const _message = custom_price !== undefined
         ? 'Цена товара обновлена'
         : status !== undefined
           ? 'Статус товара обновлен'
@@ -143,7 +144,7 @@ export async function PUT(
         data: {
           item: updateItemResult.rows[0],
           newTotal: custom_price !== undefined ? newTotal : undefined,
-          message
+          message: _message
         }
       })
 

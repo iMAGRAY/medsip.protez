@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchableSelect } from "@/components/ui/searchable-select"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import { getApiClient, getLogger } from "@/lib/dependency-injection"
 import {
@@ -26,6 +25,7 @@ import {
   Star,
   ExternalLink
 } from "lucide-react"
+import { SafeImage } from "@/components/safe-image"
 
 interface Product {
   id: string;
@@ -107,41 +107,35 @@ export function ProductsManager({
 
   const [attemptedSave, setAttemptedSave] = useState(false)
 
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true);
+        const [productsData, modelLinesData, categoriesData] = await Promise.all([
+          apiClient.getProducts(),
+          apiClient.getModelLines(),
+          apiClient.getCategories()
+        ]);
+
+        setProducts(productsData || []);
+        setModelLines(modelLinesData || []);
+        setCategories(categoriesData || []);
+      } catch (error) {
+        logger.error('Failed to load data:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить данные",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, [apiClient, logger, toast]);
+
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
-  useEffect(() => {
-    if (modelLineId) {
-      loadProductsForModelLine();
-    }
-  }, [modelLineId]);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [productsData, modelLinesData, categoriesData] = await Promise.all([
-        apiClient.getProducts(),
-        apiClient.getModelLines(),
-        apiClient.getCategories()
-      ]);
-
-      setProducts(productsData || []);
-      setModelLines(modelLinesData || []);
-      setCategories(categoriesData || []);
-    } catch (error) {
-      logger.error('Failed to load data:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadProductsForModelLine = async () => {
+  const loadProductsForModelLine = useCallback(async () => {
     if (!modelLineId) return;
 
     try {
@@ -161,7 +155,13 @@ export function ProductsManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [modelLineId, apiClient, logger, toast]);
+
+  useEffect(() => {
+    if (modelLineId) {
+      loadProductsForModelLine();
+    }
+  }, [modelLineId, loadProductsForModelLine]);
 
   const resetProductForm = () => {
     setAttemptedSave(false)
@@ -248,7 +248,7 @@ export function ProductsManager({
             await loadData();
           }
         } catch (reloadError) {
-          console.error('❌ Error reloading data after save:', reloadError)
+          // Error reloading data after save
           // Fallback к обычной загрузке
           if (modelLineId) {
             await loadProductsForModelLine();
@@ -325,7 +325,7 @@ export function ProductsManager({
               await loadData();
             }
           } catch (reloadError) {
-            console.error('❌ Error reloading data after deletion:', reloadError)
+            // Error reloading data after deletion
             // Fallback к обычной загрузке
             if (modelLineId) {
               await loadProductsForModelLine();
@@ -389,7 +389,7 @@ export function ProductsManager({
     return modelLine?.name || 'Неизвестная линейка';
   };
 
-  const getCategoryName = (categoryId?: number) => {
+  const _getCategoryName = (categoryId?: number) => {
     if (!categoryId) return null;
     const category = categories.find(c => c.id === categoryId);
     return category?.name || 'Неизвестная категория';
@@ -524,7 +524,7 @@ export function ProductsManager({
                         <div className="space-y-0.5">
                           <Label className="text-sm font-medium">Не показывать цену</Label>
                           <p className="text-xs text-gray-500">
-                            Если включено, вместо цены будет показано "По запросу"
+                            Если включено, вместо цены будет показано &quot;По запросу&quot;
                           </p>
                         </div>
                         <Switch
@@ -690,13 +690,12 @@ export function ProductsManager({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {product.image_url && (
-                          <img
+                          <SafeImage
                             src={product.image_url}
                             alt={product.name}
+                            width={32}
+                            height={32}
                             className="h-8 w-8 object-cover rounded flex-shrink-0"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
                           />
                         )}
                         <div className="flex flex-wrap gap-1 flex-1 min-w-0">
@@ -774,13 +773,12 @@ export function ProductsManager({
                       }
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {product.image_url && (
-                          <img
+                          <SafeImage
                             src={product.image_url}
                             alt={product.name}
+                            width={40}
+                            height={40}
                             className="h-10 w-10 object-cover rounded flex-shrink-0"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
                           />
                         )}
                         <div className="flex-1 min-w-0">

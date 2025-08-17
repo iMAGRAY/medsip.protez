@@ -1,25 +1,19 @@
-'use client'
+"use client"
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 import { UI_CONFIG } from '@/lib/app-config'
 import {
   Plus,
   Trash2,
-  Save,
-  RotateCcw,
   Table2,
   PlusCircle,
-  MinusCircle,
-  Copy
+  MinusCircle
 } from 'lucide-react'
 interface TableData {
   title: string;
@@ -66,7 +60,7 @@ interface SelectionTablesEditorProps {
 export function SelectionTablesEditor({
   productId,
   productSku = '',
-  productName = '',
+  productName: _productName = '',
   onSave,
   isNewProduct = false,
   onNewProductChange,
@@ -109,15 +103,8 @@ export function SelectionTablesEditor({
       setActiveTab(allTableKeys[0]);
     }
   }, [allTableKeys, activeTab]);
-  // Load existing selection tables
-  useEffect(() => {
-    if (productId) {
-      loadSelectionTables()
-    } else {
-      setIsLoading(false) // Stop loading if no productId
-    }
-  }, [productId])
-  const loadSelectionTables = async () => {
+  
+  const loadSelectionTables = useCallback(async () => {
     if (!productId) return
     try {
       setIsLoading(true)
@@ -132,11 +119,21 @@ export function SelectionTablesEditor({
       } else {
         console.error('Failed to fetch selection tables')
       }
-    } catch (error) {
+    } catch (_error) {
+      console.error('Error loading selection tables')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [productId])
+
+  // Load existing selection tables
+  useEffect(() => {
+    if (productId) {
+      loadSelectionTables()
+    } else {
+      setIsLoading(false) // Stop loading if no productId
+    }
+  }, [productId, loadSelectionTables])
 
   // Хелпер для отложенного уведомления об изменениях
   const scheduleChangeNotification = useCallback(() => {
@@ -153,7 +150,7 @@ export function SelectionTablesEditor({
       }
     }, UI_CONFIG.TIMEOUTS.STATE_UPDATE_DELAY)
   }, [isNewProduct, onNewProductChange, onExistingProductChange])
-  const saveSelectionTables = async () => {
+  const _saveSelectionTables = async () => {
     if (!productId) {
       toast({
         title: "Ошибка",
@@ -297,28 +294,28 @@ export function SelectionTablesEditor({
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableTitle = (type: string, title: string) => {
+  const updateTableTitle = (type: string, _title: string) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], title } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], title: _title } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableHeaders = (type: string, headers: string[]) => {
+  const _updateTableHeaders = (type: string, _headers: string[]) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], headers } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], headers: _headers } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes
     scheduleChangeNotification()
   }
-  const updateTableRows = (type: string, rows: string[][]) => {
+  const _updateTableRows = (type: string, _rows: string[][]) => {
     setSelectionTables(prev => ({
       ...prev,
-      [type]: prev[type] ? { ...prev[type], rows } : createEmptyTable(type)
+      [type]: prev[type] ? { ...prev[type], rows: _rows } : createEmptyTable(type)
     }))
     setHasChanges(true)
     // Notify parent of changes

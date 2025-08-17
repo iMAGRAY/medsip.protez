@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -304,60 +304,63 @@ export default function ProductVariantsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingVariant, setEditingVariant] = useState<any | undefined>(undefined)
 
+  const fetchProduct = useCallback(async () => {
+      try {
+        const response = await fetch(`/api/products/${productId}`)
+        const data = await response.json()
+        if (data.success) {
+          setProduct(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error)
+        toast.error('Не удалось загрузить информацию о товаре')
+      }
+    }, [productId])
+
   useEffect(() => {
     fetchProduct()
+  }, [fetchProduct])
+
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
+        console.log('🔍 VARIANTS PAGE - Запрос:', url)
+        
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        console.log('📊 VARIANTS PAGE - Ответ:', {
+          success: data.success,
+          totalCount: data.data?.length || 0,
+          variants: data.data?.map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            is_active: v.is_active,
+            master_id: v.master_id
+          }))
+        })
+        
+        if (data.success) {
+          console.log('📊 VARIANTS PAGE - Загруженные варианты с show_price:', data.data.map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            show_price: v.show_price,
+            show_price_type: typeof v.show_price
+          })))
+          setVariants(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты')
+      } finally {
+        setLoading(false)
+      }
+    }, [productId])
+
+  useEffect(() => {
     fetchVariants()
-  }, [productId])
-
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`/api/products/${productId}`)
-      const data = await response.json()
-      if (data.success) {
-        setProduct(data.data)
-      }
-    } catch (error) {
-      console.error('Error fetching product:', error)
-      toast.error('Не удалось загрузить информацию о товаре')
-    }
-  }
-
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const url = `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true&only_active=false`
-      console.log('🔍 VARIANTS PAGE - Запрос:', url)
-      
-      const response = await fetch(url)
-      const data = await response.json()
-      
-      console.log('📊 VARIANTS PAGE - Ответ:', {
-        success: data.success,
-        totalCount: data.data?.length || 0,
-        variants: data.data?.map((v: any) => ({
-          id: v.id,
-          name: v.name,
-          is_active: v.is_active,
-          master_id: v.master_id
-        }))
-      })
-      
-      if (data.success) {
-        console.log('📊 VARIANTS PAGE - Загруженные варианты с show_price:', data.data.map((v: any) => ({
-          id: v.id,
-          name: v.name,
-          show_price: v.show_price,
-          show_price_type: typeof v.show_price
-        })))
-        setVariants(data.data)
-      }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [fetchVariants])
 
   const handleSaveVariant = async (formData: any) => {
     try {
@@ -372,12 +375,12 @@ export default function ProductVariantsPage() {
         ? `/api/v2/product-variants/${formData.id}`
         : '/api/v2/product-variants'
       
-      const method = formData.id ? 'PUT' : 'POST'
+      const _method = formData.id ? 'PUT' : 'POST'
       const payload = transformFormDataToVariant(formData)
 
       console.log('💾 Финальный payload для API:', {
         url,
-        method,
+        method: _method,
         images: payload.images,
         imagesCount: payload.images?.length || 0,
         hasImages: !!payload.images?.length
@@ -386,7 +389,7 @@ export default function ProductVariantsPage() {
       // Debug logging
       console.log('Saving variant:', {
         url,
-        method,
+        method: _method,
         formData,
         transformedPayload: payload,
         imagesField: payload.images,
@@ -423,7 +426,7 @@ export default function ProductVariantsPage() {
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
@@ -678,10 +681,10 @@ export default function ProductVariantsPage() {
                   <div className="flex flex-col items-center">
                     <Package className="w-12 h-12 text-gray-300 mb-4" />
                     <p className="text-lg font-medium text-gray-600 mb-2">Варианты товара не созданы</p>
-                    <p className="text-sm text-gray-500">
-                      Нажмите "Добавить вариант" чтобы создать первый вариант товара
-                    </p>
-                  </div>
+                                          <p className="text-sm text-gray-500">
+                        Нажмите &quot;Добавить вариант&quot; чтобы создать первый вариант товара
+                      </p>
+</div>
                 </TableCell>
               </TableRow>
             ) : (

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         p.description,
         p.category_id,
         p.manufacturer_id,
-        p.model_line_id,
+        p.series_id,
         p.article_number,
         p.price,
         p.created_at,
@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
       FROM products p
       LEFT JOIN product_categories c ON p.category_id = c.id
       LEFT JOIN manufacturers m ON p.manufacturer_id = m.id
-      LEFT JOIN model_series ml ON p.model_line_id = ml.id
+      LEFT JOIN model_series ml ON p.series_id = ml.id
       WHERE 1=1
     `;
 
-    const params = [];
+    const params: any[] = [];
     let paramIndex = 1;
 
     if (category) {
@@ -61,7 +61,6 @@ export async function GET(request: NextRequest) {
       query += ` AND EXISTS (SELECT 1 FROM warehouse_inventory wi WHERE wi.product_id = p.id)`;
     }
 
-    // Получаем общее количество записей
     let countQuery = `
       SELECT COUNT(*) as total
       FROM products p
@@ -70,8 +69,7 @@ export async function GET(request: NextRequest) {
       WHERE 1=1
     `;
 
-    // Применяем те же фильтры к count query
-    const countParams = [];
+    const countParams: any[] = [];
     let countParamIndex = 1;
 
     if (category) {
@@ -96,7 +94,6 @@ export async function GET(request: NextRequest) {
     const countResult = await executeQuery(countQuery, countParams);
     const total = parseInt(countResult.rows[0].total);
 
-    // Добавляем сортировку и пагинацию
     query += `
       ORDER BY p.name
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
@@ -116,7 +113,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Ошибка получения товаров для артикулов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения товаров для артикулов'
@@ -190,7 +186,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка создания складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания складского артикула'
@@ -271,7 +266,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка обновления складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления складского артикула'
@@ -323,7 +317,6 @@ export async function DELETE(request: NextRequest) {
       message: 'Складской артикул удален'
     });
   } catch (error) {
-    console.error('Ошибка удаления складского артикула:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления складского артикула'

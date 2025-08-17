@@ -117,7 +117,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Ошибка получения инвентаря:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения инвентаря'
@@ -187,10 +186,9 @@ export async function POST(request: NextRequest) {
                 'inventory:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
-            console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
         }
 
         return NextResponse.json({
@@ -198,7 +196,6 @@ export async function POST(request: NextRequest) {
             data: result.rows[0]
         });
     } catch (error) {
-        console.error('Ошибка добавления товара в инвентарь:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка добавления товара в инвентарь'
@@ -298,10 +295,9 @@ export async function PUT(request: NextRequest) {
                 'inventory:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
-            console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
         }
 
         return NextResponse.json({
@@ -309,7 +305,6 @@ export async function PUT(request: NextRequest) {
             data: result.rows[0]
         });
     } catch (error) {
-        console.error('Ошибка обновления товара в инвентаре:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка обновления товара в инвентаре'
@@ -363,7 +358,6 @@ export async function DELETE(request: NextRequest) {
             data: result.rows[0]
         });
     } catch (error) {
-        console.error('Ошибка удаления товара из инвентаря:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка удаления товара из инвентаря'

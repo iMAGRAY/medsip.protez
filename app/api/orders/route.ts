@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery, getPool } from '@/lib/db-connection'
+import { getPool } from '@/lib/db-connection'
 import { getCacheManager, getLogger } from '@/lib/dependency-injection'
 
 // POST - создание нового заказа
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       )
 
       const orderId = orderResult.rows[0].id
-      const createdAt = orderResult.rows[0].created_at
+      const _createdAt = orderResult.rows[0].created_at
 
       // Добавляем товары в заказ (статус не устанавливается по умолчанию)
       for (const item of items) {
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: {
           orderId,
-          createdAt,
+          createdAt: _createdAt,
           message: 'Заказ успешно создан'
         }
       })
@@ -115,8 +115,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Ошибка создания заказа:', error)
-
     // Возвращаем более информативное сообщение об ошибке в dev режиме
     const isDev = process.env.NODE_ENV === 'development'
     const errorMessage = isDev
@@ -132,8 +130,8 @@ export async function POST(request: NextRequest) {
 
 // GET - получение списка заказов (для админ панели)
 export async function GET(request: NextRequest) {
-  const logger = getLogger()
-  const cacheManager = getCacheManager()
+  const _logger = getLogger()
+  const _cacheManager = getCacheManager()
 
   try {
     const { searchParams } = new URL(request.url)
@@ -202,7 +200,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Ошибка получения заказов:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }

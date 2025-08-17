@@ -1,20 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
+export const dynamic = 'force-dynamic'
+
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 export async function GET(request: NextRequest) {
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in model lines GET")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    // Проверяем существование таблицы model_series
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -26,20 +35,7 @@ export async function GET(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE model_series (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          manufacturer_id INTEGER NOT NULL,
-          category_id INTEGER,
-          is_active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ success: false, error: 'Model series schema is not initialized' }, { status: 503 })
     }
 
     const { searchParams } = new URL(request.url);
@@ -53,7 +49,7 @@ export async function GET(request: NextRequest) {
         ms.description,
         ms.manufacturer_id,
         ms.category_id,
-        ms.is_active,
+        true as is_active,
         ms.created_at,
         ms.updated_at,
         m.name as manufacturer_name
@@ -61,7 +57,6 @@ export async function GET(request: NextRequest) {
       LEFT JOIN manufacturers m ON ms.manufacturer_id = m.id
     `;
 
-    // Проверяем существование таблицы product_categories
     const categoriesTableQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -72,7 +67,6 @@ export async function GET(request: NextRequest) {
 
     const categoriesTableExists = await executeQuery(categoriesTableQuery)
 
-    // Добавляем JOIN с категориями только если таблица существует
     if (categoriesTableExists.rows[0].exists) {
       query = `
         SELECT
@@ -81,7 +75,7 @@ export async function GET(request: NextRequest) {
           ms.description,
           ms.manufacturer_id,
           ms.category_id,
-          ms.is_active,
+          true as is_active,
           ms.created_at,
           ms.updated_at,
           m.name as manufacturer_name,
@@ -92,7 +86,7 @@ export async function GET(request: NextRequest) {
       `;
     }
 
-    const params = [];
+    const params = [] as any[]
     if (manufacturerId) {
       query += ' WHERE ms.manufacturer_id = $1';
       params.push(manufacturerId);
@@ -101,11 +95,9 @@ export async function GET(request: NextRequest) {
     query += ' ORDER BY ms.name';
 
     const result = await executeQuery(query, params);
-    const modelLines = result.rows;
+    const modelLines = result.rows as any[];
 
-    // Если нужны продукты, загружаем их
     if (includeProducts && modelLines.length > 0) {
-      // Проверяем существование таблицы products
       const productsTableQuery = `
         SELECT EXISTS (
           SELECT FROM information_schema.tables
@@ -124,7 +116,7 @@ export async function GET(request: NextRequest) {
             p.id,
             p.name,
             p.series_id as model_line_id,
-            p.is_active,
+            (p.is_deleted = false OR p.is_deleted IS NULL) as is_active,
             p.created_at
           FROM products p
           WHERE p.series_id = ANY($1)
@@ -133,22 +125,19 @@ export async function GET(request: NextRequest) {
 
         const productsResult = await executeQuery(productsQuery, [modelLineIds]);
 
-        // Группируем продукты по model_line_id
-        const productsByModelLine = new Map();
-        productsResult.rows.forEach(product => {
+        const productsByModelLine = new Map<number, any[]>();
+        productsResult.rows.forEach((product: any) => {
           if (!productsByModelLine.has(product.model_line_id)) {
             productsByModelLine.set(product.model_line_id, []);
           }
-          productsByModelLine.get(product.model_line_id).push(product);
+          productsByModelLine.get(product.model_line_id)!.push(product);
         });
 
-        // Добавляем продукты к линейкам моделей
         modelLines.forEach(modelLine => {
           modelLine.products = productsByModelLine.get(modelLine.id) || [];
           modelLine.products_count = modelLine.products.length;
         });
       } else {
-        // Если таблица продуктов не существует, добавляем пустые массивы
         modelLines.forEach(modelLine => {
           modelLine.products = [];
           modelLine.products_count = 0;
@@ -162,14 +151,8 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Model Lines API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
-      { error: 'Failed to fetch model lines', success: false, details: error.message },
+      { error: 'Failed to fetch model lines', success: false, details: (error as any).message },
       { status: 500 }
     );
   }
@@ -178,17 +161,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json({ success: false, error: 'Database config is not provided' }, { status: 503 })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in model lines POST")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    // Проверяем существование таблицы model_series
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -200,25 +184,11 @@ export async function POST(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE model_series (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          manufacturer_id INTEGER NOT NULL,
-          category_id INTEGER,
-          is_active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ success: false, error: 'Model series schema is not initialized' }, { status: 503 })
     }
 
     const data = await request.json();
 
-    // Валидация данных
     if (!data.name?.trim()) {
       return NextResponse.json(
         { error: 'Name is required', success: false },
@@ -258,14 +228,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('❌ Model Lines API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-
-    // Обработка дубликатов
     if ((error as any).code === '23505') {
       return NextResponse.json(
         { error: 'Model line with this name already exists', success: false },
@@ -274,7 +236,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to create model line', success: false, details: error.message },
+      { error: 'Failed to create model line', success: false, details: (error as any).message },
       { status: 500 }
     );
   }

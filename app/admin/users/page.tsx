@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -35,11 +35,7 @@ import {
   Edit,
   Trash2,
   Shield,
-  Eye,
-  EyeOff,
   UserCheck,
-  UserX,
-  Calendar,
   Mail,
   Key,
   AlertTriangle,
@@ -77,14 +73,14 @@ interface Role {
 
 type UserStatus = 'active' | 'inactive' | 'blocked' | 'pending';
 
-const statusColors = {
+const _statusColors = {
   active: 'bg-green-100 text-green-800',
   inactive: 'bg-gray-100 text-gray-800',
   blocked: 'bg-red-100 text-red-800',
   pending: 'bg-yellow-100 text-yellow-800'
 }
 
-const statusLabels = {
+const _statusLabels = {
   active: 'Активен',
   inactive: 'Неактивен',
   blocked: 'Заблокирован',
@@ -105,6 +101,31 @@ export default function UsersPage() {
   // Проверяем права доступа
   const canManageUsers = hasPermission('users.manage') || hasPermission('*')
 
+  const loadUsers = useCallback(async () => {
+      try {
+        const response = await fetch('/api/admin/users', {
+          credentials: 'include'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setUsers(data.users || [])
+        } else {
+          setError('Ошибка загрузки пользователей')
+        }
+      } catch (_error) {
+        setError('Ошибка соединения с сервером')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
+  useEffect(() => {
+    loadUsers()
+    loadRoles()
+  }, [loadUsers])
+
+  // Ранний возврат без прав — после хуков
   if (!canManageUsers) {
     return (
       <AdminLayout>
@@ -121,30 +142,6 @@ export default function UsersPage() {
         </div>
       </AdminLayout>
     )
-  }
-
-  useEffect(() => {
-    loadUsers()
-    loadRoles()
-  }, [])
-
-  const loadUsers = async () => {
-    try {
-      const response = await fetch('/api/admin/users', {
-        credentials: 'include'
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users || [])
-      } else {
-        setError('Ошибка загрузки пользователей')
-      }
-    } catch (error) {
-      setError('Ошибка соединения с сервером')
-    } finally {
-      setLoading(false)
-    }
   }
 
   const loadRoles = async () => {
@@ -192,7 +189,7 @@ export default function UsersPage() {
       } else {
         setError('Ошибка изменения статуса пользователя')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     }
   }
@@ -458,7 +455,7 @@ function UserForm({
 
     try {
       const url = user ? `/api/admin/users/${user.id}` : '/api/admin/users'
-      const method = user ? 'PATCH' : 'POST'
+      const _method = user ? 'PATCH' : 'POST'
 
       // Запрещаем изменение статуса главного администратора
       if (user?.id === 1 && formData.status !== 'active') {
@@ -468,7 +465,7 @@ function UserForm({
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(formData)
@@ -480,7 +477,7 @@ function UserForm({
         const data = await response.json()
         setError(data.error || 'Ошибка сохранения пользователя')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Ошибка соединения с сервером')
     } finally {
       setLoading(false)

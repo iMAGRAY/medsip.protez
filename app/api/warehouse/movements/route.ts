@@ -94,7 +94,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Ошибка получения движений товаров:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения движений товаров'
@@ -211,10 +210,9 @@ export async function POST(request: NextRequest) {
                     'inventory:*'
                 ]);
 
-                cacheManager.clearAll();
+                cacheManager.clear();
 
             } catch (cacheError) {
-                console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
             }
 
             return NextResponse.json({
@@ -229,7 +227,6 @@ export async function POST(request: NextRequest) {
         }
 
     } catch (error) {
-        console.error('Ошибка создания движения товара:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка создания движения товара'

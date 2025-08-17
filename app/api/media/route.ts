@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3'
 import path from 'path'
 import { getPool } from '@/lib/db-connection'
-import { Worker } from 'worker_threads'
 import { cpus } from 'os'
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -13,16 +13,16 @@ const s3Client = new S3Client({
   endpoint: process.env.S3_ENDPOINT || 'https://s3.amazonaws.com',
   region: process.env.S3_REGION || 'us-east-1',
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY!,
-    secretAccessKey: process.env.S3_SECRET_KEY!,
+    accessKeyId: process.env.S3_ACCESS_KEY || '',
+    secretAccessKey: process.env.S3_SECRET_KEY || '',
   },
   forcePathStyle: true,
 })
 
-const S3_BUCKET = process.env.S3_BUCKET!
+const S3_BUCKET = process.env.S3_BUCKET || ''
 
 // Контроль ресурсов
-const MAX_WORKERS = Math.min(cpus().length, 4) // Не более 4 воркеров
+const _MAX_WORKERS = Math.min(cpus().length, 4) // Не более 4 воркеров
 const BATCH_SIZE = 50 // Обрабатываем файлы батчами
 const MAX_DB_CONNECTIONS = 2 // Ограничиваем подключения к БД
 
@@ -33,19 +33,30 @@ const CACHE_TTL = 60000 // 1 минута
 // Semaphore для ограничения параллельных операций
 class Semaphore {
   private count: number
-  private waiting: Array<() => void> = []
+  private waiting: Array<{ resolve: () => void; timeout: NodeJS.Timeout }> = []
+  private readonly WAIT_TIMEOUT = 30000 // 30 секунд timeout для waiting promises
 
   constructor(count: number) {
     this.count = count
   }
 
   async acquire(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.count > 0) {
         this.count--
         resolve()
       } else {
-        this.waiting.push(resolve)
+        // Добавляем timeout для предотвращения бесконечного ожидания
+        const timeout = setTimeout(() => {
+          // Удаляем из очереди при timeout
+          const index = this.waiting.findIndex(w => w.timeout === timeout)
+          if (index >= 0) {
+            this.waiting.splice(index, 1)
+          }
+          reject(new Error('Semaphore acquire timeout after 30 seconds'))
+        }, this.WAIT_TIMEOUT)
+
+        this.waiting.push({ resolve, timeout })
       }
     })
   }
@@ -53,14 +64,43 @@ class Semaphore {
   release(): void {
     this.count++
     if (this.waiting.length > 0) {
-      const resolve = this.waiting.shift()!
+      const waiter = this.waiting.shift()!
+      clearTimeout(waiter.timeout) // Очищаем timeout
       this.count--
-      resolve()
+      waiter.resolve()
+    }
+  }
+
+  // Cleanup метод для очистки накопленных waiting promises
+  cleanup(): void {
+    // Отменяем все ожидающие promises
+    for (const waiter of this.waiting) {
+      clearTimeout(waiter.timeout)
+    }
+    this.waiting = []
+  }
+
+  // Метод для мониторинга состояния
+  getStats(): { count: number; waiting: number } {
+    return {
+      count: this.count,
+      waiting: this.waiting.length
     }
   }
 }
 
 const dbSemaphore = new Semaphore(MAX_DB_CONNECTIONS)
+
+// Cleanup semaphore при shutdown процесса
+process.on('SIGINT', () => {
+  dbSemaphore.cleanup()
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  dbSemaphore.cleanup()
+  process.exit(0)
+})
 
 // Параллельная обработка файлов
 async function processFilesInParallel(files: any[], batchSize: number = BATCH_SIZE) {
@@ -69,7 +109,6 @@ async function processFilesInParallel(files: any[], batchSize: number = BATCH_SI
   for (let i = 0; i < files.length; i += batchSize) {
     const batch = files.slice(i, i + batchSize)
 
-    // Обрабатываем батч параллельно
     const batchPromises = batch.map(async (obj) => {
       if (!obj.Key || !obj.Size || obj.Size <= 0) return null
 
@@ -105,7 +144,10 @@ async function enrichWithProductData(files: any[]): Promise<any[]> {
     const pool = getPool()
     const urls = files.map(f => f.url)
 
-    // Батчинг для больших массивов
+    // Проверяем наличие необходимых таблиц, иначе возвращаем как есть
+    const needed = await tablesExist(['product_images','products'])
+    if (!needed.product_images || !needed.products) return files
+
     const BATCH_SIZE_DB = 100
     const enrichmentMap = new Map<string, { product_id: number; product_name: string }>()
 
@@ -129,7 +171,6 @@ async function enrichWithProductData(files: any[]): Promise<any[]> {
       }
     }
 
-    // Применяем обогащение
     return files.map(file => {
       const match = enrichmentMap.get(file.url)
       if (match) {
@@ -147,14 +188,11 @@ async function enrichWithProductData(files: any[]): Promise<any[]> {
   }
 }
 
-// Быстрая сортировка с ограничением по времени
 function quickSortWithTimeout(arr: any[], timeLimit: number = 100): any[] {
   const startTime = Date.now()
 
   function quickSort(items: any[]): any[] {
     if (Date.now() - startTime > timeLimit) {
-      // Если время истекло, возвращаем частично отсортированный массив
-
       return items
     }
 
@@ -186,8 +224,11 @@ export async function GET(request: Request) {
   const requestId = Math.random().toString(36).substr(2, 9)
 
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url)
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100) // Ограничиваем лимит
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100)
     const continuationToken = searchParams.get('continuationToken')
     const fast = searchParams.get('fast') === 'true'
 
@@ -196,7 +237,7 @@ export async function GET(request: Request) {
     const cached = mediaCache.get(cacheKey)
 
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-return new NextResponse(JSON.stringify({
+      return new NextResponse(JSON.stringify({
         ...cached.data,
         performance: {
           ...cached.data.performance,
@@ -237,72 +278,73 @@ return new NextResponse(JSON.stringify({
       })
     }
 
-    // Получаем файлы из базы данных медиатеки
-    const dbStartTime = Date.now()
+    // Проверим наличие таблицы media_files
+    const need = await tablesExist(['media_files'])
+
     let registeredFiles: any[] = []
+    if (need.media_files) {
+      const dbStartTime = Date.now()
 
-    await dbSemaphore.acquire()
-    try {
-      const pool = getPool()
-      const dbQuery = `
-        SELECT
-          mf.id,
-          mf.file_hash,
-          mf.original_name,
-          mf.file_extension,
-          mf.file_size,
-          mf.mime_type,
-          mf.s3_key,
-          mf.s3_url,
-          mf.width,
-          mf.height,
-          mf.upload_count,
-          mf.created_at,
-          pi.product_id,
-          p.name AS product_name
-        FROM media_files mf
-        LEFT JOIN product_images pi ON pi.image_url = mf.s3_url
-        LEFT JOIN products p ON p.id = pi.product_id
-        ORDER BY mf.created_at DESC
-        LIMIT $1
-      `
+      await dbSemaphore.acquire()
+      try {
+        const pool = getPool()
+        const dbQuery = `
+          SELECT
+            mf.id,
+            mf.file_hash,
+            mf.original_name,
+            mf.file_extension,
+            mf.file_size,
+            mf.mime_type,
+            mf.s3_key,
+            mf.s3_url,
+            mf.width,
+            mf.height,
+            mf.upload_count,
+            mf.created_at,
+            pi.product_id,
+            p.name AS product_name
+          FROM media_files mf
+          LEFT JOIN product_images pi ON pi.image_url = mf.s3_url
+          LEFT JOIN products p ON p.id = pi.product_id
+          ORDER BY mf.created_at DESC
+          LIMIT $1
+        `
 
-      const dbResult = await pool.query(dbQuery, [limit])
+        const dbResult = await pool.query(dbQuery, [limit])
 
-      registeredFiles = dbResult.rows.map(row => ({
-        id: row.id,
-        name: row.original_name,
-        url: row.s3_url,
-        size: row.file_size,
-        uploadedAt: row.created_at,
-        type: row.file_extension || 'unknown',
-        source: 'database' as const,
-        key: row.s3_key,
-        hash: row.file_hash,
-        mimeType: row.mime_type,
-        width: row.width,
-        height: row.height,
-        uploadCount: row.upload_count,
-        productId: row.product_id,
-        productName: row.product_name
-      }))
+        registeredFiles = dbResult.rows.map(row => ({
+          id: row.id,
+          name: row.original_name,
+          url: row.s3_url,
+          size: row.file_size,
+          uploadedAt: row.created_at,
+          type: row.file_extension || 'unknown',
+          source: 'database' as const,
+          key: row.s3_key,
+          hash: row.file_hash,
+          mimeType: row.mime_type,
+          width: row.width,
+          height: row.height,
+          uploadCount: row.upload_count,
+          productId: row.product_id,
+          productName: row.product_name
+        }))
 
-    } finally {
-      dbSemaphore.release()
+      } finally {
+        dbSemaphore.release()
+      }
+
+      const _dbTime = Date.now() - dbStartTime
     }
 
-    const dbTime = Date.now() - dbStartTime
-
-    // Получаем файлы из S3 (для файлов, не зарегистрированных в БД)
+    // Получаем файлы из S3 (если конфиги заданы)
     const s3StartTime = Date.now()
     let s3Files: any[] = []
     let s3Time = 0
-    let response: any = { IsTruncated: false, NextContinuationToken: null } // Default values
+    let response: any = { IsTruncated: false, NextContinuationToken: null }
 
-    if (!process.env.S3_ENDPOINT || !process.env.S3_BUCKET) {
-
-      s3Time = Date.now() - s3StartTime
-    } else {
+    if (process.env.S3_ENDPOINT && S3_BUCKET && process.env.S3_ACCESS_KEY && process.env.S3_SECRET_KEY) {
       try {
         const listCommand = new ListObjectsV2Command({
           Bucket: S3_BUCKET,
@@ -315,48 +357,43 @@ return new NextResponse(JSON.stringify({
         s3Time = Date.now() - s3StartTime
 
         if (response.Contents && response.Contents.length > 0) {
-          // Параллельная обработка файлов
           const processStartTime = Date.now()
 
           const [processedFiles] = await Promise.all([
             processFilesInParallel(response.Contents, BATCH_SIZE)
           ])
 
-          const processTime = Date.now() - processStartTime
+          const _processTime = Date.now() - processStartTime
 
-          // Фильтруем файлы, которые уже есть в БД
           const registeredUrls = new Set(registeredFiles.map(f => f.url))
           s3Files = processedFiles.filter(file => !registeredUrls.has(file.url))
 
-          // Обогащение данными о продуктах для S3 файлов
           if (s3Files.length > 0 && s3Files.length <= 100) {
             try {
               const enrichStartTime = Date.now()
               s3Files = await enrichWithProductData(s3Files)
-              const enrichTime = Date.now() - enrichStartTime
+              const _enrichTime = Date.now() - enrichStartTime
 
-            } catch (dbErr) {
-              console.error(`⚠️ [${requestId}] Failed to enrich S3 files:`, dbErr)
-            }
+            } catch (_dbErr) {}
           }
         }
 
-      } catch (s3Error) {
-        console.error(`⚠️ [${requestId}] S3 Error:`, s3Error)
+      } catch (_) {
         s3Time = Date.now() - s3StartTime
       }
+    } else {
+      // Нет настроек S3 — возвращаем только зарегистрированные в БД
+      s3Time = Date.now() - s3StartTime
     }
 
-    // Объединяем файлы из БД и S3
     const allFiles = [...registeredFiles, ...s3Files]
 
-    // Быстрая сортировка с таймаутом
     const sortStartTime = Date.now()
     const sortedFiles = allFiles.length > 0 ? quickSortWithTimeout(allFiles, 100) : allFiles
-    const sortTime = Date.now() - sortStartTime
+    const _sortTime = Date.now() - sortStartTime
 
     const totalTime = Date.now() - startTime
-const responseData = {
+    const responseData = {
       files: sortedFiles,
       count: sortedFiles.length,
       hasMore: response.IsTruncated || false,
@@ -368,21 +405,18 @@ const responseData = {
       },
       performance: {
         totalTime,
-        dbTime,
         s3Time,
-        sortTime,
+        sortTime: _sortTime,
         fileCount: sortedFiles.length,
         requestId
       }
     }
 
-    // Кэшируем результат
     mediaCache.set(cacheKey, {
       data: responseData,
       timestamp: Date.now()
     })
 
-    // Очищаем старые записи кэша
     if (mediaCache.size > 50) {
       const oldestKey = mediaCache.keys().next().value
       if (oldestKey) {
@@ -396,33 +430,21 @@ const responseData = {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         'X-Response-Time': totalTime.toString(),
-        'X-S3-Time': s3Time.toString(),
         'X-Request-ID': requestId,
         'X-Cache': 'MISS'
       }
     })
 
   } catch (error) {
-    const totalTime = Date.now() - startTime
-    console.error(`💥 [${requestId}] API Error after ${totalTime}ms:`, error)
+    const _totalTime = Date.now() - startTime
 
     return NextResponse.json(
       {
         error: 'Failed to load media files',
         details: error instanceof Error ? error.message : String(error),
-        performance: {
-          totalTime,
-          error: true,
-          requestId
-        }
+        performance: { totalTime: _totalTime, error: true, requestId }
       },
-      {
-        status: 500,
-        headers: {
-          'X-Response-Time': totalTime.toString(),
-          'X-Request-ID': requestId
-        }
-      }
+      { status: 500 }
     )
   }
 }

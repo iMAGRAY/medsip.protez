@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Building
 } from "lucide-react"
+import { SafeImage } from "@/components/safe-image"
 
 interface Manufacturer {
   id: number;
@@ -55,26 +56,26 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
     logo_url: ''
   });
 
+  const loadManufacturers = useCallback(async () => {
+      try {
+        setLoading(true);
+        const data = await apiClient.getManufacturers();
+        setManufacturers(data || []);
+      } catch (error) {
+        logger.error('Failed to load manufacturers:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить производителей",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, [apiClient, logger, toast]);
+
   useEffect(() => {
     loadManufacturers();
-  }, []);
-
-  const loadManufacturers = async () => {
-    try {
-      setLoading(true);
-      const data = await apiClient.getManufacturers();
-      setManufacturers(data || []);
-    } catch (error) {
-      logger.error('Failed to load manufacturers:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить производителей",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loadManufacturers]);
 
   const resetManufacturerForm = () => {
     setManufacturerForm({
@@ -347,13 +348,12 @@ export function ManufacturersManager({ onManufacturerSelect, selectedManufacture
                     }
                     <div className="flex items-center gap-3">
                       {manufacturer.logo_url && (
-                        <img
+                        <SafeImage
                           src={manufacturer.logo_url}
                           alt={`${manufacturer.name} logo`}
+                          width={32}
+                          height={32}
                           className="h-8 w-8 object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
                         />
                       )}
                       <div>

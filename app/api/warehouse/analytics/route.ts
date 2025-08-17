@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/db-connection';
 
 // GET - получить реальную аналитику складской системы
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Общая статистика
     const summaryQuery = `
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
     const warehouseResult = await executeQuery(warehouseMetricsQuery);
 
     // Формируем алерты на основе реальных данных
-    const warehouseMetrics = warehouseResult.rows.map(warehouse => ({
+    const _warehouseMetrics = warehouseResult.rows.map(warehouse => ({
       ...warehouse,
       id: parseInt(warehouse.id),
       capacity: parseInt(warehouse.capacity || '0'),
@@ -224,12 +224,11 @@ export async function GET(request: NextRequest) {
           efficiency: parseFloat(region.efficiency),
           alerts_count: parseInt(region.alerts_count)
         })),
-        warehouseMetrics
+        warehouseMetrics: _warehouseMetrics
       }
     });
 
   } catch (error) {
-    console.error('Ошибка получения аналитики складов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения аналитики складов'

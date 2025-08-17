@@ -1,0 +1,32 @@
+{
+  "migrationId": "migration_1755327705925_33a3de8a",
+  "timestamp": "2025-08-16T07:01:50.291Z",
+  "duration": 4366,
+  "statistics": {
+    "startTime": 1755327705925,
+    "endTime": 1755327710291,
+    "totalProcessed": 1,
+    "migrated": 0,
+    "skipped": 2,
+    "errors": 0,
+    "validationErrors": 0,
+    "performance": {
+      "preValidationTime": 620,
+      "schemaEnhancementTime": 1121,
+      "migrationTime": 423,
+      "postVerificationTime": 643,
+      "backupTime": 1555
+    }
+  },
+  "rollbackData": {
+    "backupCreated": true,
+    "schemaChangesCount": 8,
+    "migratedRecordsCount": 0,
+    "errorsCount": 0
+  },
+  "recommendations": [
+    "🔍 Review skipped records for potential duplicates",
+    "🧪 Run comprehensive tests before deploying to production",
+    "📊 Monitor performance after deployment"
+  ]
+}

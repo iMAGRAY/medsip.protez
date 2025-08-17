@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -88,35 +88,28 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
     sort_order: 0
   })
 
-  useEffect(() => {
-    fetchAllTags()
-    if (productId) {
-      fetchProductTags()
-    }
-  }, [productId])
-
-  const fetchAllTags = async () => {
-    try {
-      // Получаем общие теги + личные теги этого товара
-      const url = productId 
-        ? `/api/product-tags?product_id=${productId}`
-        : '/api/product-tags'
+  const fetchAllTags = useCallback(async () => {
+      try {
+        // Получаем общие теги + личные теги этого товара
+        const url = productId 
+          ? `/api/product-tags?product_id=${productId}`
+          : '/api/product-tags'
+          
+        const response = await fetch(url, {
+          credentials: 'include', // Важно для передачи cookies
+        })
+        const data = await response.json()
         
-      const response = await fetch(url, {
-        credentials: 'include', // Важно для передачи cookies
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        setAllTags(data.data)
+        if (data.success) {
+          setAllTags(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        toast.error('Ошибка загрузки тегов')
       }
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      toast.error('Ошибка загрузки тегов')
-    }
-  }
+    }, [productId])
 
-  const fetchProductTags = async () => {
+  const fetchProductTags = useCallback(async () => {
     try {
       const response = await fetch(`/api/products/${productId}/tags`, {
         credentials: 'include', // Важно для передачи cookies
@@ -131,7 +124,14 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [productId])
+
+  useEffect(() => {
+    fetchAllTags()
+    if (productId) {
+      fetchProductTags()
+    }
+  }, [fetchAllTags, fetchProductTags, productId])
 
   const handleTagToggle = async (tag: ProductTag, checked: boolean) => {
     // Личные теги товара всегда выбраны и не могут быть сняты
@@ -234,7 +234,7 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
     setIsCreating(true)
     try {
       // Генерируем slug из названия, если не указан
-      const slug = newTagData.slug || newTagData.name
+      const _slug = newTagData.slug || newTagData.name
         .toLowerCase()
         .replace(/[а-яё]/g, (match) => {
           const ru = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
@@ -253,7 +253,7 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
         credentials: 'include',
         body: JSON.stringify({
           ...newTagData,
-          slug,
+          slug: _slug,
           is_active: true,
           product_id: parseInt(productId.toString()) // Создаем личный тег для этого товара
         }),
@@ -479,9 +479,9 @@ export function ProductTagsSelector({ productId, onChange }: ProductTagsSelector
                       <br />
                       Личные теги видны только у этого товара и идеально подходят для:
                       <ul className="mt-1 ml-4 text-sm list-disc">
-                        <li>Срочных акций: "Только сегодня -50%"</li>
-                        <li>Остатков: "Последний экземпляр"</li>
-                        <li>Уникальных предложений: "Подарок в комплекте"</li>
+                        <li>Срочных акций: &quot;Только сегодня -50%&quot;</li>
+                        <li>Остатков: &quot;Последний экземпляр&quot;</li>
+                        <li>Уникальных предложений: &quot;Подарок в комплекте&quot;</li>
                       </ul>
                     </AlertDescription>
                   </Alert>

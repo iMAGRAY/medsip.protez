@@ -2,12 +2,9 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Minus, Plus, Trash2, ClipboardList, Phone, MessageCircle, X, Share2 } from "lucide-react"
+import { Minus, Plus, Trash2, ClipboardList, Phone, MessageCircle, Share2 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { OrderForm } from "@/components/order-form"
 import { toast } from "sonner"

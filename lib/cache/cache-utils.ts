@@ -11,7 +11,7 @@ export const CACHE_TTL = {
 }
 
 // Версия кеша для инвалидации при изменении структуры
-const CACHE_VERSION = 'v1'
+const CACHE_VERSION = 'v5' // Changed to v5 to clear all cached data
 
 // Генерация ключей кеша
 export const cacheKeys = {
@@ -68,7 +68,7 @@ export function cached<T extends (...args: any[]) => Promise<any>>(
   ttl: number = CACHE_TTL.MEDIUM,
   cacheType: 'api' | 'product' | 'category' | 'page' | 'media' = 'api'
 ) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
     descriptor.value = async function (...args: Parameters<T>): Promise<ReturnType<T>> {
@@ -199,7 +199,7 @@ export async function getCacheStats() {
     stats.memory = {
       used: 'N/A' // Заглушка, так как client является private
     }
-  } catch (error) {
+  } catch (_error) {
     // Игнорируем ошибки получения информации о памяти
   }
 

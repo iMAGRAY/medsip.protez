@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const regionId = searchParams.get('region_id');
-    const includeStats = searchParams.get('include_stats') === 'true';
+    const _includeStats = searchParams.get('include_stats') === 'true';
 
     let query = `
       SELECT
@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
       data: result.rows
     });
   } catch (error) {
-    console.error('Ошибка получения городов:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения городов'
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка создания города:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка создания города'
@@ -107,7 +105,6 @@ export async function PUT(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка обновления города:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления города'
@@ -160,7 +157,6 @@ export async function DELETE(request: NextRequest) {
       data: result.rows[0]
     });
   } catch (error) {
-    console.error('Ошибка удаления города:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка удаления города'

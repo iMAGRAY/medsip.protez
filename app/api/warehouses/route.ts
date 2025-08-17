@@ -4,10 +4,8 @@ import { pool } from '@/lib/db'
 // GET - получить список складов
 export async function GET() {
   try {
-    console.log('Fetching warehouses...')
     
     if (!pool) {
-      console.error('Database pool is not initialized')
       return NextResponse.json(
         { error: 'Database connection error' },
         { status: 500 }
@@ -21,10 +19,8 @@ export async function GET() {
       ORDER BY sort_order, name
     `)
 
-    console.log('Warehouses fetched:', result.rows.length)
     return NextResponse.json(result.rows)
   } catch (error) {
-    console.error('Error fetching warehouses:', error)
     return NextResponse.json(
       { error: 'Failed to fetch warehouses', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -54,7 +50,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result.rows[0])
   } catch (error: any) {
-    console.error('Error creating warehouse:', error)
     
     if (error.code === '23505') {
       return NextResponse.json(

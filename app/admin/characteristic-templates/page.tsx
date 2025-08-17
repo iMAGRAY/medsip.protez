@@ -1,6 +1,7 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,24 +11,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import {
   Plus,
   Edit,
   Trash2,
   Save,
-  Eye,
   Settings,
   FileText,
   Hash,
   List,
   ToggleLeft,
-  Palette,
   Calendar,
-  Star,
-  ChevronRight
+  Star
 } from 'lucide-react'
 
 interface CharacteristicGroup {
@@ -73,6 +70,7 @@ interface Unit {
 }
 
 export default function CharacteristicTemplatesAdmin() {
+  const { toast } = useToast()
   const [groups, setGroups] = useState<CharacteristicGroup[]>([])
   const [templates, setTemplates] = useState<CharacteristicTemplate[]>([])
   const [units, setUnits] = useState<Unit[]>([])
@@ -95,42 +93,42 @@ export default function CharacteristicTemplatesAdmin() {
     preset_values: []
   })
 
+  const loadData = useCallback(async () => {
+      try {
+        setLoading(true)
+
+        const [groupsRes, templatesRes, unitsRes] = await Promise.all([
+          fetch('/api/admin/characteristic-groups'),
+          fetch('/api/admin/characteristic-templates'),
+          fetch('/api/characteristic-units')
+        ])
+
+        if (groupsRes.ok) {
+          const groupsData = await groupsRes.json()
+          setGroups(groupsData.data || groupsData.groups || [])
+        }
+
+        if (templatesRes.ok) {
+          const templatesData = await templatesRes.json()
+          setTemplates(templatesData.data || templatesData.templates || [])
+        }
+
+        if (unitsRes.ok) {
+          const unitsData = await unitsRes.json()
+          setUnits(unitsData.data || unitsData.units || [])
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+        toast({ title: 'Ошибка', description: 'Не удалось загрузить данные', variant: 'destructive' })
+      } finally {
+        setLoading(false)
+      }
+    }, [toast])
+
   // Загрузка данных
   useEffect(() => {
     loadData()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      setLoading(true)
-
-      const [groupsRes, templatesRes, unitsRes] = await Promise.all([
-        fetch('/api/admin/characteristic-groups'),
-        fetch('/api/admin/characteristic-templates'),
-        fetch('/api/characteristic-units')
-      ])
-
-      if (groupsRes.ok) {
-        const groupsData = await groupsRes.json()
-        setGroups(groupsData.data || [])
-      }
-
-      if (templatesRes.ok) {
-        const templatesData = await templatesRes.json()
-        setTemplates(templatesData.data || [])
-      }
-
-      if (unitsRes.ok) {
-        const unitsData = await unitsRes.json()
-        setUnits(unitsData.data || [])
-      }
-
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadData])
 
   // Фильтруем шаблоны по выбранной группе
   const filteredTemplates = selectedGroupId
@@ -182,10 +180,10 @@ export default function CharacteristicTemplatesAdmin() {
         ? `/api/admin/characteristic-templates/${editingTemplate.id}`
         : '/api/admin/characteristic-templates'
 
-      const method = editingTemplate ? 'PUT' : 'POST'
+      const _method = editingTemplate ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(templateForm)
       })

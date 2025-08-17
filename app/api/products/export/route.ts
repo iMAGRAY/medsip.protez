@@ -1,21 +1,33 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
-// Используем динамический импорт, чтобы модуль ExcelJS не попадал в edge-бандл
 
 export async function GET() {
   try {
-    // динамический импорт
     const Excel = await import('exceljs')
+
     const query = `
-      SELECT p.id, p.name, c.name AS category,
-             COALESCE(json_agg(json_build_object('label', pc.label, 'value',
-               COALESCE(pc.value_text, pc.value_numeric::text)) ORDER BY pc.id) FILTER (WHERE pc.id IS NOT NULL), '[]') AS characteristics
+      SELECT p.id, p.name, c.name AS category
       FROM products p
       LEFT JOIN product_categories c ON c.id = p.category_id
-      LEFT JOIN product_characteristics pc ON pc.product_id = p.id
-      GROUP BY p.id, c.name
-      ORDER BY p.id`
-    const result = await executeQuery(query)
+      ORDER BY p.id
+    `
+    const productsRes = await executeQuery(query)
+
+    const charsRes = await executeQuery(`
+      SELECT
+        pc.product_id,
+        cv.value as label,
+        COALESCE(pc.additional_value, cv.value) as value
+      FROM product_characteristics_simple pc
+      JOIN characteristics_values_simple cv ON cv.id = pc.value_id
+      ORDER BY pc.product_id, cv.sort_order
+    `)
+
+    const charsByProduct = charsRes.rows.reduce((acc: any, r: any) => {
+      if (!acc[r.product_id]) acc[r.product_id] = []
+      acc[r.product_id].push({ label: r.label, value: r.value })
+      return acc
+    }, {})
 
     const workbook = new Excel.Workbook()
     const sheet = workbook.addWorksheet('Products')
@@ -27,22 +39,10 @@ export async function GET() {
       { header: 'Характеристики', key: 'chars', width: 60 },
     ]
 
-    result.rows.forEach((row: any) => {
-      let charsArr: { label: string; value: string }[] = []
-
-      // PostgreSQL may already return parsed JSON or null/empty string
-      if (Array.isArray(row.characteristics)) {
-        charsArr = row.characteristics
-      } else if (typeof row.characteristics === 'string' && row.characteristics.trim()) {
-        try {
-          charsArr = JSON.parse(row.characteristics)
-        } catch (err) {
-          console.warn('⚠️ Failed to parse characteristics JSON for product', row.id, err)
-        }
-      }
-
-      const charString = charsArr.map((c) => `${c.label}: ${c.value}`).join('; ')
-      sheet.addRow({ id: row.id, name: row.name, category: row.category, chars: charString })
+    productsRes.rows.forEach((p: any) => {
+      const charsArr = charsByProduct[p.id] || []
+      const charString = charsArr.map((c: any) => `${c.label}: ${c.value}`).join('; ')
+      sheet.addRow({ id: p.id, name: p.name, category: p.category, chars: charString })
     })
 
     const buffer = await workbook.xlsx.writeBuffer()
@@ -55,7 +55,6 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error('Export error:', error)
     return NextResponse.json({ error: 'Export failed' }, { status: 500 })
   }
 }

@@ -13,9 +13,10 @@ const pool = new Pool({
 })
 
 // PUT - обновить секцию
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const resolvedParams = await params
+    const { id } = resolvedParams
     const body = await request.json()
     const { name, description, capacity, row_number, shelf_number, zone_id } = body
 
@@ -72,7 +73,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       client.release()
     }
   } catch (error) {
-    console.error('Ошибка обновления секции:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления секции' },
       { status: 500 }
@@ -81,9 +81,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE - удалить секцию (мягкое удаление)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const resolvedParams = await params
+    const { id } = resolvedParams
 
     const client = await pool.connect()
 
@@ -124,7 +125,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       client.release()
     }
   } catch (error) {
-    console.error('Ошибка удаления секции:', error)
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления секции' },
       { status: 500 }

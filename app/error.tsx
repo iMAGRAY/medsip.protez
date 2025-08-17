@@ -1,7 +1,7 @@
-'use client'
+"use client"
 import Link from 'next/link'
 
-export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+export default function Error({ error: _error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-slate-50">
       <h2 className="text-2xl font-bold text-slate-600">Произошла ошибка</h2>

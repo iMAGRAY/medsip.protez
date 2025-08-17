@@ -1,4 +1,5 @@
 "use client"
+import { SafeImage } from "@/components/safe-image"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -331,11 +332,7 @@ export function OrderForm({ isOpen, onClose, items, totalPrice, onOrderComplete 
               {items.map((item) => (
                 <div key={item.id} className="flex items-center justify-between py-2 border-b border-cyan-200/30 last:border-0">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      className="w-12 h-12 rounded-lg object-cover border border-cyan-200/30"
-                    />
+                    <SafeImage src={item.image_url} alt={item.name} width={48} height={48} className="w-12 h-12 rounded-lg object-cover border border-cyan-200/30" />
                     <div>
                       <p className="font-medium text-slate-800">{item.name}</p>
                       <p className="text-sm text-slate-600">

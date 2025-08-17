@@ -16,7 +16,6 @@ export async function PUT(request: NextRequest) {
     // Обновляем вместимость каждой зоны
     for (const zone of zones) {
       if (!zone.name || typeof zone.capacity !== 'number') {
-        console.warn('⚠️ Пропускаем зону с неверными данными:', zone);
         continue;
       }
 
@@ -29,9 +28,6 @@ export async function PUT(request: NextRequest) {
       `, [zone.capacity, zone.name]);
 
       if (updateResult.rows.length === 0) {
-        console.warn(`⚠️ Зона "${zone.name}" не найдена в базе данных`);
-      } else {
-
       }
     }
 
@@ -53,7 +49,6 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка обновления вместимости зон склада:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка обновления вместимости зон склада'
@@ -62,7 +57,7 @@ export async function PUT(request: NextRequest) {
 }
 
 // GET - получить текущую вместимость зон склада
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const zonesResult = await executeQuery(`
       SELECT id, name, capacity, updated_at
@@ -77,7 +72,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка получения вместимости зон склада:', error);
     return NextResponse.json({
       success: false,
       error: 'Ошибка получения вместимости зон склада'

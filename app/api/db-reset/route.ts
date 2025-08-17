@@ -16,7 +16,6 @@ export async function POST() {
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    console.error("Error resetting database connection:", error)
     return NextResponse.json({
       success: false,
       message: "Failed to reset database connection",

@@ -14,7 +14,6 @@ import {
   Copy,
   ExternalLink,
   ImageIcon,
-  Download,
   Grid3X3,
   Grid2X2,
   Rows3,
@@ -35,12 +34,10 @@ import { SafeImage } from "@/components/safe-image"
 import { useOptimizedMedia } from "@/hooks/use-optimized-media"
 import { VirtualizedMediaGrid } from "./virtualized-media-grid"
 import { toast } from "sonner"
-import { useToast } from '@/hooks/use-toast'
-import { logger } from '@/lib/logger'
 // Простой кеш настроек в памяти для клиентской стороны
 const settingsCache = new Map<string, any>()
 
-interface MediaFile {
+interface _MediaFile {
   name: string
   url: string
   size: number
@@ -52,7 +49,7 @@ interface MediaFile {
   key?: string
 }
 
-interface PerformanceData {
+interface _PerformanceData {
   totalTime: number
   s3Time?: number
   sortTime?: number
@@ -76,7 +73,7 @@ interface UserSettings {
   filterMode: FilterMode
 }
 
-export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
+export const MediaGallery = forwardRef<MediaGalleryRef>((_props, ref) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [enableVirtualization, setEnableVirtualization] = useState(true)
@@ -108,53 +105,53 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
     filterMode: 'all'
   })
 
-  const [settingsLoading, setSettingsLoading] = useState(true)
+  const [_settingsLoading, _setSettingsLoading] = useState(true)
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set())
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [deletedImages, setDeletedImages] = useState<Set<string>>(new Set())
 
+  const loadUserSettings = useCallback(async () => {
+      try {
+        _setSettingsLoading(true)
+
+        // Пытаемся загрузить из кеша
+        const cachedSettings = settingsCache.get('media-gallery-settings')
+        if (cachedSettings) {
+          setUserSettings(cachedSettings)
+          _setSettingsLoading(false)
+          return
+        }
+
+        // Загружаем с сервера (можно расширить API для пользовательских настроек)
+        const defaultSettings: UserSettings = {
+          viewMode: 'medium',
+          sortMode: 'date',
+          filterMode: 'all'
+        }
+
+        setUserSettings(defaultSettings)
+        // Кешируем настройки по умолчанию
+        settingsCache.set('media-gallery-settings', defaultSettings)
+
+      } catch (_error) {
+
+        // Используем настройки по умолчанию в случае ошибки
+        setUserSettings({
+          viewMode: 'medium',
+          sortMode: 'date',
+          filterMode: 'all'
+        })
+      } finally {
+        _setSettingsLoading(false)
+      }
+    }, [])
+
   // Загрузка пользовательских настроек
   useEffect(() => {
     loadUserSettings()
-  }, [])
+  }, [loadUserSettings])
 
-  const loadUserSettings = async () => {
-    try {
-      setSettingsLoading(true)
-
-      // Пытаемся загрузить из кеша
-      const cachedSettings = settingsCache.get('media-gallery-settings')
-      if (cachedSettings) {
-        setUserSettings(cachedSettings)
-        setSettingsLoading(false)
-        return
-      }
-
-      // Загружаем с сервера (можно расширить API для пользовательских настроек)
-      const defaultSettings: UserSettings = {
-        viewMode: 'medium',
-        sortMode: 'date',
-        filterMode: 'all'
-      }
-
-      setUserSettings(defaultSettings)
-      // Кешируем настройки по умолчанию
-      settingsCache.set('media-gallery-settings', defaultSettings)
-
-    } catch (error) {
-
-      // Используем настройки по умолчанию в случае ошибки
-      setUserSettings({
-        viewMode: 'medium',
-        sortMode: 'date',
-        filterMode: 'all'
-      })
-    } finally {
-      setSettingsLoading(false)
-    }
-  }
-
-  const saveUserSettings = async (newSettings: Partial<UserSettings>) => {
+  const saveUserSettings = useCallback(async (newSettings: Partial<UserSettings>) => {
     try {
       const updatedSettings = { ...userSettings, ...newSettings }
       setUserSettings(updatedSettings)
@@ -162,24 +159,24 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
       // Сохраняем в кеш для быстрого доступа
       settingsCache.set('media-gallery-settings', updatedSettings)
 
-    } catch (error) {
+    } catch (_error) {
 
       toast.error('Ошибка сохранения настроек')
     }
-  }
+  }, [userSettings])
 
   // Обработчики изменения настроек
-  const handleViewModeChange = useCallback((viewMode: ViewMode) => {
-    saveUserSettings({ viewMode })
-  }, [userSettings])
+  const handleViewModeChange = useCallback((_viewMode: ViewMode) => {
+    saveUserSettings({ viewMode: _viewMode })
+  }, [saveUserSettings])
 
-  const handleSortModeChange = useCallback((sortMode: SortMode) => {
-    saveUserSettings({ sortMode })
-  }, [userSettings])
+  const handleSortModeChange = useCallback((_sortMode: SortMode) => {
+    saveUserSettings({ sortMode: _sortMode })
+  }, [saveUserSettings])
 
-  const handleFilterModeChange = useCallback((filterMode: FilterMode) => {
-    saveUserSettings({ filterMode })
-  }, [userSettings])
+  const handleFilterModeChange = useCallback((_filterMode: FilterMode) => {
+    saveUserSettings({ filterMode: _filterMode })
+  }, [saveUserSettings])
 
   // Загрузка дополнительных файлов (теперь через оптимизированный хук)
   const handleLoadMore = useCallback(async () => {
@@ -280,7 +277,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
   }, [])
 
   // Удаление одного изображения с мгновенным исчезновением
-  const handleDeleteImage = useCallback(async (url: string, imageType?: string) => {
+  const handleDeleteImage = useCallback(async (url: string, _imageType?: string) => {
     try {
       if (!confirm("Вы уверены, что хотите удалить это изображение?")) {
         return
@@ -306,7 +303,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const _result = await response.json()
 
         // Обновляем уведомление об успехе
         toast.success("Изображение удалено")
@@ -333,7 +330,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
           return newDeleted
         })
       }
-    } catch (error) {
+    } catch (_error) {
 
       toast.error("Ошибка при удалении изображения")
 
@@ -386,7 +383,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
             failedImages.push(imageUrl)
 
           }
-        } catch (error) {
+        } catch (_error) {
           errorCount++
           failedImages.push(imageUrl)
 
@@ -424,7 +421,7 @@ export const MediaGallery = forwardRef<MediaGalleryRef>((props, ref) => {
         })
       }, 500)
 
-    } catch (error) {
+    } catch (_error) {
 
       toast.error("Ошибка при массовом удалении")
 

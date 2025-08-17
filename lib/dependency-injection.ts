@@ -1,4 +1,4 @@
-interface ServiceContainer {
+interface _ServiceContainer {
   apiClient: any;
   adminStore: any;
   cacheManager: any;
@@ -199,9 +199,9 @@ container.register('cacheManager', () => {
       return null;
     }
 
-    set(key: string, data: any, ttl: number = 300000): void {
+    set(key: string, _data: any, ttl: number = 300000): void {
       this.cache.set(key, {
-        data,
+        data: _data,
         expires: Date.now() + ttl
       });
     }
@@ -212,6 +212,10 @@ container.register('cacheManager', () => {
 
     clear(): void {
       this.cache.clear();
+    }
+
+    clearAll(): void {
+      this.clear();
     }
 
     getStats() {

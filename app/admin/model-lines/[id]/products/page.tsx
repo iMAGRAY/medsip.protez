@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,12 +19,9 @@ import {
   Edit,
   Trash2,
   Eye,
-  Calendar,
-  Building2,
   AlertTriangle,
   CheckCircle,
   Tag,
-  DollarSign,
   Ruler,
   Battery,
   Shield,
@@ -36,7 +34,6 @@ import {
   RussianRuble
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import { InstantLink } from "@/components/instant-link"
 
 interface ModelLine {
   id: number
@@ -95,9 +92,34 @@ export default function ModelLineProductsPage() {
     image_url: ''
   })
 
+  const loadData = useCallback(async () => {
+      try {
+        setIsLoading(true)
+
+        const response = await fetch(`/api/model-lines/${modelLineId}/products`)
+
+        const data = await response.json()
+
+        if (data.success) {
+          setModelLine(data.data.modelLine)
+          setProducts(data.data.products || [])
+          setFilteredProducts(data.data.products || [])
+
+        } else {
+          console.error('Ошибка API:', data.error)
+          setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
+      }
+    }, [modelLineId])
+
   useEffect(() => {
     loadData()
-  }, [modelLineId])
+  }, [loadData])
 
           // Фильтрация товаров по поисковому запросу
   useEffect(() => {
@@ -114,46 +136,21 @@ export default function ModelLineProductsPage() {
   }, [products, searchQuery])
 
   // Загрузка категорий для выпадающего списка
+    const loadCategories = useCallback(async () => {
+              try {
+                const response = await fetch('/api/categories')
+                const data = await response.json()
+                if (data.success) {
+                  setCategories(data.data)
+                }
+              } catch (error) {
+                console.error('Ошибка загрузки категорий:', error)
+              }
+            }, [])
+
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await fetch('/api/categories')
-        const data = await response.json()
-        if (data.success) {
-          setCategories(data.data)
-        }
-      } catch (error) {
-        console.error('Ошибка загрузки категорий:', error)
-      }
-    }
-
     loadCategories()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true)
-
-      const response = await fetch(`/api/model-lines/${modelLineId}/products`)
-
-      const data = await response.json()
-
-      if (data.success) {
-        setModelLine(data.data.modelLine)
-        setProducts(data.data.products || [])
-        setFilteredProducts(data.data.products || [])
-
-      } else {
-        console.error('Ошибка API:', data.error)
-        setMessage({ type: 'error', text: data.error || 'Ошибка загрузки данных' })
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [loadCategories])
 
   const handleDeleteProduct = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить товар "${name}"? Это действие нельзя отменить.`)) {
@@ -184,7 +181,7 @@ export default function ModelLineProductsPage() {
         loadData();
         setMessage({ type: 'error', text: data.error || 'Ошибка удаления' })
       }
-    } catch (error) {
+    } catch (_error) {
       // Возвращаем товар в список при ошибке
       loadData();
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
@@ -265,9 +262,11 @@ export default function ModelLineProductsPage() {
           {/* Product Image */}
           <div className="h-48 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={300}
+                height={200}
                 className="max-h-full max-w-full object-contain p-4"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -373,9 +372,11 @@ export default function ModelLineProductsPage() {
               {/* Image */}
               <div className="w-20 h-20 bg-slate-50 flex items-center justify-center rounded-lg flex-shrink-0">
                 {product.primary_image_url || product.image_url ? (
-                  <img
+                  <Image
                     src={product.primary_image_url || product.image_url || ''}
                     alt={product.name}
+                    width={80}
+                    height={80}
                     className="max-h-full max-w-full object-contain p-2"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
@@ -448,9 +449,11 @@ export default function ModelLineProductsPage() {
           {/* Large Image */}
           <div className="h-64 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={200}
+                height={200}
                 className="max-h-full max-w-full object-contain p-6"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -552,9 +555,11 @@ export default function ModelLineProductsPage() {
           {/* Small Image */}
           <div className="h-32 bg-slate-50 flex items-center justify-center">
             {product.primary_image_url || product.image_url ? (
-              <img
+              <Image
                 src={product.primary_image_url || product.image_url || ''}
                 alt={product.name}
+                width={120}
+                height={120}
                 className="max-h-full max-w-full object-contain p-2"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement

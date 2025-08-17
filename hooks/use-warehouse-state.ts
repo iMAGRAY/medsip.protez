@@ -199,16 +199,16 @@ export function useWarehouseState() {
       dispatch({ type: 'SET_ANALYTICS_DATA', payload: data })
   }, [])
 
-  const setDialog = useCallback((type: keyof WarehouseState['dialogs'], open: boolean) => {
-      dispatch({ type: 'SET_DIALOG', payload: { type, open } })
+  const setDialog = useCallback((_type: keyof WarehouseState['dialogs'], _open: boolean) => {
+      dispatch({ type: 'SET_DIALOG', payload: { type: _type, open: _open } })
   }, [])
 
   const setEditingItem = useCallback((item: any | null) => {
       dispatch({ type: 'SET_EDITING_ITEM', payload: item })
   }, [])
 
-  const setSelectedId = useCallback((type: keyof WarehouseState['selectedIds'], id: number) => {
-      dispatch({ type: 'SET_SELECTED_ID', payload: { type, id } })
+  const setSelectedId = useCallback((_type: keyof WarehouseState['selectedIds'], _id: number) => {
+      dispatch({ type: 'SET_SELECTED_ID', payload: { type: _type, id: _id } })
   }, [])
 
   const setBulkData = useCallback((data: BulkItem[]) => {
@@ -228,7 +228,7 @@ export function useWarehouseState() {
     }, [])
 
   // Стабильный объект actions через useMemo
-  const actions = useMemo(() => ({
+  const _actions = useMemo(() => ({
     setLoading,
     setError,
     setActiveTab,
@@ -266,5 +266,5 @@ export function useWarehouseState() {
     resetSelectedIds
   ])
 
-  return { state, actions }
+  return { state, actions: _actions }
 }

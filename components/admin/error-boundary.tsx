@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import React from 'react'
 import { Button } from '@/components/ui/button'
@@ -21,8 +21,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error }
+  static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
+    return { hasError: true, error: _error }
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {

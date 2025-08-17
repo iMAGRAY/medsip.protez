@@ -3,11 +3,12 @@ import { pool } from '@/lib/db';
 
 // GET /api/product-variants/[id]/characteristics-simple - получить характеристики варианта
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
 
     // Проверяем, что вариант существует
     const variantCheck = await pool.query(
@@ -89,7 +90,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Ошибка получения характеристик варианта:', error);
     return NextResponse.json(
       { error: 'Ошибка получения характеристик варианта' },
       { status: 500 }
@@ -100,10 +100,11 @@ export async function GET(
 // POST /api/product-variants/[id]/characteristics-simple - сохранить характеристики варианта
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
     const body = await request.json();
     const { characteristics } = body;
 
@@ -143,7 +144,6 @@ export async function POST(
         const { value_id, additional_value } = char;
 
         if (!value_id) {
-          console.warn('Пропускаем характеристику без value_id:', char);
           continue;
         }
 
@@ -154,7 +154,6 @@ export async function POST(
         );
 
         if (valueCheck.rows.length === 0) {
-          console.warn(`Пропускаем несуществующий value_id: ${value_id}`);
           continue;
         }
 
@@ -185,7 +184,6 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('Ошибка сохранения характеристик варианта:', error);
     return NextResponse.json(
       { error: 'Ошибка сохранения характеристик варианта' },
       { status: 500 }
@@ -195,11 +193,12 @@ export async function POST(
 
 // DELETE /api/product-variants/[id]/characteristics-simple - удалить характеристики варианта
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const variantId = params.id;
+    const resolvedParams = await params
+    const variantId = resolvedParams.id;
 
     // Удаляем все характеристики варианта
     const result = await pool.query(`
@@ -217,7 +216,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Ошибка удаления характеристик варианта:', error);
     return NextResponse.json(
       { error: 'Ошибка удаления характеристик варианта' },
       { status: 500 }

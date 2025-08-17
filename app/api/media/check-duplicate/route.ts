@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { hash, originalName, fileSize, mimeType } = body
+    const { hash, originalName: _originalName, fileSize: _fileSize, mimeType: _mimeType } = body
 
     if (!hash) {
       return NextResponse.json(
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Ошибка при проверке дубликата:', error)
     return NextResponse.json(
       { error: "Ошибка при проверке дубликата файла" },
       { status: 500 }

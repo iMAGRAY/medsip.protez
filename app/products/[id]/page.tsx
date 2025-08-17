@@ -1,29 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useParams, useRouter, notFound } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { sanitizeTitle } from "@/lib/utils/sanitize"
 import { SafeImage } from "@/components/safe-image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import Header from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ProductRecommendations } from "@/components/product-recommendations"
 import { ProductQuickView } from "@/components/product-quick-view"
 import { useAdminStore } from "@/lib/admin-store"
-import { ArrowLeft, Clock, FileText } from "lucide-react"
+import { ArrowLeft, FileText } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { Prosthetic } from "@/lib/data"
 import { PROSTHETIC_FALLBACK_IMAGE } from "@/lib/fallback-image"
-import { SimpleCharacteristics } from "@/components/admin/simple-characteristics"
 import ProductCharacteristicsMinimal from "@/components/product-characteristics-minimal"
 import SelectionTables from "@/components/product-selection-tables"
 import { ProductBasicInfo } from "@/components/product-basic-info"
 import { useCart } from "@/lib/cart-context"
-import { isProductAvailable, isProductOutOfStock, getActualPrice } from "@/lib/utils"
+import { getActualPrice } from "@/lib/utils"
 import React from "react"
-import { ChevronDown } from "lucide-react"
 import { ProductVariantSelectorGrid } from "@/components/product-variant-selector-grid"
 import { toast } from "sonner"
 import { ProductConfigurationSelector } from "@/components/product-configuration-selector"
@@ -97,8 +95,8 @@ export default function ProductPage() {
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false)
   const [quickViewProduct, setQuickViewProduct] = useState<Prosthetic | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
-  const [variantsLoading, setVariantsLoading] = useState(true)
-  const [hasVariants, setHasVariants] = useState(false)
+  const [_variantsLoading, _setVariantsLoading] = useState(true)
+  const [_hasVariants, _setHasVariants] = useState(false)
   const [referrerUrl, setReferrerUrl] = useState<string | null>(null)
   const [productImage, setProductImage] = useState<string | null>(null)
   const [selectedConfiguration, setSelectedConfiguration] = useState<Record<string, any>>({})
@@ -128,7 +126,7 @@ export default function ProductPage() {
   // Загружаем варианты товара при загрузке страницы
   const loadProductVariants = async (productId: string) => {
     try {
-      setVariantsLoading(true)
+      _setVariantsLoading(true)
       const response = await fetch(
         `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
       )
@@ -141,19 +139,19 @@ export default function ProductPage() {
         )
         
         if (filteredVariants.length > 0) {
-          setHasVariants(true)
+          _setHasVariants(true)
           console.log(`Loaded ${filteredVariants.length} variants for product ${productId}`)
         } else {
-          setHasVariants(false)
+          _setHasVariants(false)
         }
       } else {
-        setHasVariants(false)
+        _setHasVariants(false)
       }
     } catch (error) {
       console.error('Error loading product variants:', error)
-      setHasVariants(false)
+      _setHasVariants(false)
     } finally {
-      setVariantsLoading(false)
+      _setVariantsLoading(false)
     }
   }
 
@@ -238,13 +236,13 @@ export default function ProductPage() {
   }
 
   // Навигация в полноэкранном режиме
-  const nextFullscreenImage = () => {
+  const nextFullscreenImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length)
-  }
+  }, [images.length])
 
-  const prevFullscreenImage = () => {
+  const prevFullscreenImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
-  }
+  }, [images.length])
 
   // Открытие полноэкранного просмотра
   const openFullscreen = () => {
@@ -274,7 +272,7 @@ export default function ProductPage() {
 
 
   // Загрузка изображений продукта
-  const loadProductImages = async (productId: string) => {
+  const loadProductImages = useCallback(async (productId: string) => {
     setImagesLoading(true)
     try {
       // Сначала пытаемся загрузить из API изображений
@@ -303,7 +301,7 @@ export default function ProductPage() {
     } finally {
       setImagesLoading(false)
     }
-  }
+  }, [productImage])
 
   // Сохраняем referrer при первой загрузке
   useEffect(() => {
@@ -347,7 +345,7 @@ export default function ProductPage() {
         setIsLoading(false)
       })
     }
-  }, [params?.id, products])
+  }, [params?.id, products, loadProductImages])
 
   useEffect(() => {
     if (product) {
@@ -496,7 +494,7 @@ export default function ProductPage() {
       const title = selectedVariant 
         ? `${displayProduct.name} - ${selectedVariant.name}`
         : displayProduct.name
-      document.title = `${title} | МЕДСИП`
+      document.title = sanitizeTitle(`${title} | МЕДСИП`)
     }
   }, [displayProduct, selectedVariant])
 
@@ -520,42 +518,42 @@ export default function ProductPage() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isFullscreenOpen])
+  }, [isFullscreenOpen, nextFullscreenImage, prevFullscreenImage])
 
   // Загружаем конфигурируемые характеристики при изменении товара или варианта
+    const loadConfigurableCharacteristics = useCallback(async () => {
+              try {
+                // Определяем ID для загрузки характеристик
+                const idToLoad = selectedVariant ? selectedVariant.id : product?.id
+                if (!idToLoad) {
+                  setConfigurableCharacteristics([])
+                  return
+                }
+
+                console.log('🔍 Загрузка конфигурируемых характеристик для:', selectedVariant ? 'варианта' : 'товара', idToLoad)
+                
+                const response = await fetch(`/api/products/${idToLoad}/configurable-characteristics`)
+                const data = await response.json()
+                
+                if (data.success && data.data.configurable_characteristics) {
+                  setConfigurableCharacteristics(data.data.configurable_characteristics)
+                  console.log('✅ Загружено конфигурируемых характеристик:', {
+                    count: data.data.configurable_characteristics.length,
+                    characteristics: data.data.configurable_characteristics
+                  })
+                } else {
+                  console.log('⚠️ Нет конфигурируемых характеристик')
+                  setConfigurableCharacteristics([])
+                }
+              } catch (error) {
+                console.error('❌ Ошибка загрузки конфигурируемых характеристик:', error)
+                setConfigurableCharacteristics([])
+              }
+            }, [product?.id, selectedVariant])
+
   useEffect(() => {
-    const loadConfigurableCharacteristics = async () => {
-      try {
-        // Определяем ID для загрузки характеристик
-        const idToLoad = selectedVariant ? selectedVariant.id : product?.id
-        if (!idToLoad) {
-          setConfigurableCharacteristics([])
-          return
-        }
-
-        console.log('🔍 Загрузка конфигурируемых характеристик для:', selectedVariant ? 'варианта' : 'товара', idToLoad)
-        
-        const response = await fetch(`/api/products/${idToLoad}/configurable-characteristics`)
-        const data = await response.json()
-        
-        if (data.success && data.data.configurable_characteristics) {
-          setConfigurableCharacteristics(data.data.configurable_characteristics)
-          console.log('✅ Загружено конфигурируемых характеристик:', {
-            count: data.data.configurable_characteristics.length,
-            characteristics: data.data.configurable_characteristics
-          })
-        } else {
-          console.log('⚠️ Нет конфигурируемых характеристик')
-          setConfigurableCharacteristics([])
-        }
-      } catch (error) {
-        console.error('❌ Ошибка загрузки конфигурируемых характеристик:', error)
-        setConfigurableCharacteristics([])
-      }
-    }
-
     loadConfigurableCharacteristics()
-  }, [product?.id, selectedVariant?.id])
+  }, [loadConfigurableCharacteristics])
 
   if (isLoading) {
     return (
@@ -686,7 +684,7 @@ export default function ProductPage() {
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             className="object-contain transition-transform duration-300 group-hover:scale-105"
                             priority={currentImageIndex === 0}
-                            onError={(e) => {
+                            onError={(_e) => {
                               console.error('Image failed to load:', images[currentImageIndex])
                             }}
                           />

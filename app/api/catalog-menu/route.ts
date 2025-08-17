@@ -1,16 +1,32 @@
 import { NextResponse } from "next/server"
 import { executeQuery } from "@/lib/db-connection"
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
 export async function GET() {
 
   const startTime = Date.now()
 
   try {
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
 
-    // Сначала пробуем получить из настроек меню, если таблица существует
+    // Проверим доступность ключевых таблиц
+    const tmap = await tablesExist([
+      'catalog_menu_settings',
+      'product_categories',
+      'characteristics_groups_simple',
+      'manufacturers',
+      'model_series'
+    ])
+
+    // Если нет базовых таблиц меню — возвращаем 503 с сообщением
+    if (!tmap.catalog_menu_settings) {
+      return NextResponse.json({ success: false, error: 'catalog_menu_settings not initialized' }, { status: 503 })
+    }
+
+    // Сначала пробуем получить из настроек меню
     let result;
     try {
-      // ОПТИМИЗИРОВАННЫЙ ЗАПРОС: получаем все данные одним запросом с LEFT JOIN
       const optimizedQuery = `
         SELECT
           cms.id,
@@ -28,16 +44,15 @@ export async function GET() {
           cms.custom_url,
           cms.created_at,
           cms.updated_at,
-          -- Подсчет дочерних элементов одним запросом
           CASE
             WHEN cms.entity_type = 'category' THEN
-              COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)
+              ${tmap.product_categories ? `COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)` : '0'}
             WHEN cms.entity_type = 'spec_group' THEN
-              COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)
+              ${tmap.characteristics_groups_simple ? `COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cms.entity_id::integer AND is_active = true), 0)` : '0'}
             WHEN cms.entity_type = 'manufacturer' THEN
-              COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = cms.entity_id::integer AND is_active = true), 0)
+              ${tmap.model_series ? `COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = cms.entity_id::integer), 0)` : '0'}
             WHEN cms.entity_type = 'manufacturers_category' THEN
-              COALESCE((SELECT COUNT(*) FROM manufacturers WHERE is_active = true), 0)
+              ${tmap.manufacturers ? `COALESCE((SELECT COUNT(*) FROM manufacturers), 0)` : '0'}
             ELSE 0
           END as children_count
         FROM catalog_menu_settings cms
@@ -47,14 +62,12 @@ export async function GET() {
 
       result = await executeQuery(optimizedQuery);
 
-    } catch (error) {
-
-      result = { rows: [] };
+    } catch (_error) {
+      result = { rows: [] } as any
     }
 
     if (result.rows.length === 0) {
-
-      // ОПТИМИЗИРОВАННЫЙ FALLBACK: один запрос вместо UNION ALL
+      // Fallback: формируем меню из существующих сущностей
       const fallbackQuery = `
         SELECT
           'fallback_' || type_order as id,
@@ -74,7 +87,6 @@ export async function GET() {
           updated_at,
           children_count
         FROM (
-          -- Группы характеристик
           SELECT
             1 as type_order,
             'spec_group' as entity_type,
@@ -91,13 +103,12 @@ export async function GET() {
             null as custom_url,
             cg.created_at,
             cg.updated_at,
-            COALESCE((SELECT COUNT(*) FROM characteristics_values_simple WHERE group_id = cg.id AND is_active = true), 0) as children_count
-          FROM characteristics_groups_simple cg
-          WHERE cg.is_active = true AND cg.parent_id IS NULL
+            ${tmap.characteristics_groups_simple ? `COALESCE((SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = cg.id AND is_active = true), 0)` : '0'} as children_count
+          FROM ${tmap.characteristics_groups_simple ? 'characteristics_groups_simple' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} cg
+          WHERE ${tmap.characteristics_groups_simple ? 'cg.is_active = true AND cg.parent_id IS NULL' : '1=0'}
 
           UNION ALL
 
-          -- Категории
           SELECT
             2 as type_order,
             'category' as entity_type,
@@ -114,13 +125,12 @@ export async function GET() {
             null as custom_url,
             c.created_at,
             c.updated_at,
-            COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = c.id AND is_active = true), 0) as children_count
-FROM product_categories c
-          WHERE c.is_active = true AND c.parent_id IS NULL
+            ${tmap.product_categories ? `COALESCE((SELECT COUNT(*) FROM product_categories WHERE parent_id = c.id AND is_active = true), 0)` : '0'} as children_count
+          FROM ${tmap.product_categories ? 'product_categories' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::int parent_id, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} c
+          WHERE ${tmap.product_categories ? 'c.is_active = true AND c.parent_id IS NULL' : '1=0'}
 
           UNION ALL
 
-          -- Производители
           SELECT
             3 as type_order,
             'manufacturer' as entity_type,
@@ -137,22 +147,21 @@ FROM product_categories c
             null as custom_url,
             m.created_at,
             m.updated_at,
-            COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = m.id AND is_active = true), 0) as children_count
-          FROM manufacturers m
-          WHERE m.is_active = true
-        ) combined_data
+            ${tmap.model_series ? `COALESCE((SELECT COUNT(*) FROM model_series WHERE manufacturer_id = m.id), 0)` : '0'} as children_count
+          FROM ${tmap.manufacturers ? 'manufacturers' : '(SELECT NULL::int id, NULL::text name, NULL::text description, NULL::timestamp created_at, NULL::timestamp updated_at LIMIT 0)'} m
+        ) combined
         ORDER BY sort_order, name
       `;
 
       const fallbackResult = await executeQuery(fallbackQuery)
-      const fallbackHierarchy = buildHierarchy(fallbackResult.rows.map(row => ({
+      const fallbackHierarchy = buildHierarchy(fallbackResult.rows.map((row: any) => ({
         id: row.id,
         entity_type: row.entity_type,
         entity_id: row.entity_id,
         name: row.name,
         description: row.description,
         parent_id: null,
-        children_count: row.children_count?.toString() || '0',
+        children_count: (row.children_count || 0).toString(),
         is_visible: true,
         is_expanded: false,
         show_in_main_menu: true,
@@ -161,86 +170,71 @@ FROM product_categories c
       })))
 
       const responseTime = Date.now() - startTime
-return NextResponse.json({
+      return NextResponse.json({
         success: true,
         data: fallbackHierarchy,
         flat: fallbackResult.rows,
         total: fallbackResult.rows.length,
         source: 'optimized_fallback',
-        performance: {
-          response_time_ms: responseTime,
-          optimized: true
-        }
+        performance: { response_time_ms: responseTime, optimized: true }
       })
     }
 
-    // ОПТИМИЗИРОВАННАЯ обработка результата: без Promise.all и множественных запросов
-    const menuItems = result.rows.map(row => {
-      return {
-        id: row.id,
-        entity_type: row.entity_type,
-        entity_id: row.entity_id,
-        name: row.name,
-        description: row.description,
-        parent_id: row.parent_id,
-        sort_order: row.sort_order,
-        is_visible: row.is_visible,
-        is_expanded: row.is_expanded,
-        show_in_main_menu: row.show_in_main_menu,
-        icon: row.icon,
-        css_class: row.css_class,
-        custom_url: row.custom_url,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        children_count: (row.children_count || 0).toString(), // UI ожидает строку
+    type Row = {
+      id: string | number
+      entity_type: string
+      entity_id: string | number
+      name: string
+      description: string | null
+      parent_id: number | null
+      sort_order: number
+      is_visible: boolean
+      is_expanded: boolean
+      show_in_main_menu: boolean
+      icon: string | null
+      css_class: string | null
+      custom_url: string | null
+      created_at: any
+      updated_at: any
+      children_count: number | null
+    }
 
-        // Дополнительные данные в зависимости от типа
-        ...(row.entity_type === 'spec_group' && {
-          characteristics_count: row.children_count || 0,
-          original_name: row.name,
-          original_description: row.description
-        }),
-        ...(row.entity_type === 'category' && {
-          subcategories_count: row.children_count || 0,
-          original_name: row.name,
-          original_description: row.description
-        }),
-        ...(row.entity_type === 'manufacturer' && {
-          model_series_count: row.children_count || 0,
-          original_name: row.name,
-          original_description: row.description
-        })
-      }
-    })
+    const menuItems = (result.rows as Row[]).map((row: Row) => ({
+      id: row.id,
+      entity_type: row.entity_type,
+      entity_id: row.entity_id,
+      name: row.name,
+      description: row.description,
+      parent_id: row.parent_id,
+      sort_order: row.sort_order,
+      is_visible: row.is_visible,
+      is_expanded: row.is_expanded,
+      show_in_main_menu: row.show_in_main_menu,
+      icon: row.icon,
+      css_class: row.css_class,
+      custom_url: row.custom_url,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      children_count: (row.children_count || 0).toString(),
+      ...(row.entity_type === 'spec_group' && { characteristics_count: row.children_count || 0, original_name: row.name, original_description: row.description }),
+      ...(row.entity_type === 'category' && { subcategories_count: row.children_count || 0, original_name: row.name, original_description: row.description }),
+      ...(row.entity_type === 'manufacturer' && { model_series_count: row.children_count || 0, original_name: row.name, original_description: row.description })
+    }))
 
-    // Строим иерархию
     const hierarchy = buildHierarchy(menuItems)
 
     const responseTime = Date.now() - startTime
-return NextResponse.json({
+    return NextResponse.json({
       success: true,
       data: hierarchy,
       flat: menuItems,
       total: menuItems.length,
       source: 'optimized_database',
-      performance: {
-        response_time_ms: responseTime,
-        optimized: true,
-        items_processed: menuItems.length
-      }
+      performance: { response_time_ms: responseTime, optimized: true, items_processed: menuItems.length }
     })
   } catch (error) {
     const responseTime = Date.now() - startTime
-    console.error("❌ Catalog Menu API error:", error)
-
-    return NextResponse.json({
-      success: false,
-      error: "Failed to load catalog menu",
-      performance: {
-        response_time_ms: responseTime,
-        error: true
-      }
-    }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Failed to load catalog menu", performance: { response_time_ms: responseTime, error: true } }, { status: 500 })
   }
 }
 
@@ -299,8 +293,7 @@ export async function POST(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error creating menu item:", error)
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // unique violation
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') { // unique violation
       return NextResponse.json(
         { success: false, error: 'Элемент меню для этой сущности уже существует' },
         { status: 409 }
@@ -364,7 +357,6 @@ export async function PUT(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error updating menu item:", error)
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления элемента меню' },
       { status: 500 }
@@ -402,7 +394,6 @@ export async function DELETE(request: Request) {
     })
 
   } catch (error) {
-    console.error("Error deleting menu item:", error)
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления элемента меню' },
       { status: 500 }
@@ -410,7 +401,6 @@ export async function DELETE(request: Request) {
   }
 }
 
-// Функция для построения иерархии
 function buildHierarchy(items: any[], parentId: number | null = null): any[] {
   return items
     .filter(item => item.parent_id === parentId)
@@ -419,7 +409,6 @@ function buildHierarchy(items: any[], parentId: number | null = null): any[] {
       children: buildHierarchy(items, item.id)
     }))
     .sort((a, b) => {
-      // Сортируем сначала по sort_order, затем по имени
       if (a.sort_order !== b.sort_order) {
         return a.sort_order - b.sort_order
       }
@@ -427,11 +416,6 @@ function buildHierarchy(items: any[], parentId: number | null = null): any[] {
     })
 }
 
-// Функция для автоматического добавления всех производителей в категорию "Производители"
-// ОТКЛЮЧЕНА: теперь используется динамическая загрузка через API catalog-subgroups
-async function expandManufacturersCategories(menuItems: any[]): Promise<any[]> {
-  // Просто возвращаем исходные элементы без статического добавления детей
-  // Дочерние элементы будут загружаться динамически через API catalog-subgroups
-
+async function _expandManufacturersCategories(menuItems: any[]): Promise<any[]> {
   return menuItems
 }

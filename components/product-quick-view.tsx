@@ -9,8 +9,8 @@ import { ProductVariantSelectorModal } from "@/components/product-variant-select
 
 import { useAdminStore } from "@/lib/admin-store"
 import type { Prosthetic } from "@/lib/data"
-import { Package, Clock, Shield, Tag, ChevronLeft, ChevronRight, X, Building, Layers, Plus, ShoppingCart } from "lucide-react"
-import { useState, useEffect, useMemo } from "react"
+import { Package, Clock, Shield, Tag, ChevronLeft, ChevronRight, X, Building } from "lucide-react"
+import { useState, useMemo } from "react"
 import { PROSTHETIC_FALLBACK_IMAGE } from "@/lib/fallback-image"
 import { isProductOutOfStock, isProductAvailable, getActualPrice } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -86,7 +86,7 @@ export function ProductQuickView({ product, isOpen, onClose, onProductChange }: 
   }, [selectedVariant, product])
 
   // Проверяем доступность с учетом выбранного варианта
-  const isAvailable = useMemo(() => {
+  const _isAvailable = useMemo(() => {
     if (!product) return false
     
     if (selectedVariant) {

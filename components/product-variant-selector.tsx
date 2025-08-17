@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -61,93 +61,93 @@ export function ProductVariantSelector({
   const [viewingVariant, setViewingVariant] = useState<ProductVariant | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'gallery'>('list')
 
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        // Используем v2 API для получения вариантов с изображениями
+        let response = await fetch(`/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`)
+        let data = await response.json()
+        
+        // Если вариантов нет, проверяем не является ли сам товар вариантом
+        if (!data.data || data.data.length === 0) {
+          // Получаем информацию о товаре
+          const productResponse = await fetch(`/api/products/${productId}`)
+          const productData = await productResponse.json()
+          
+          if (productData.success && productData.data) {
+            // Проверяем есть ли у товара master_id в таблице product_variants
+            const variantCheckResponse = await fetch(`/api/product-variants/${productId}`)
+            const variantCheckData = await variantCheckResponse.json()
+            
+            if (variantCheckData.success && variantCheckData.data && variantCheckData.data.master_id) {
+              // Если товар сам является вариантом, загружаем все варианты его мастер-товара
+              response = await fetch(`/api/v2/product-variants?master_id=${variantCheckData.data.master_id}&include_images=true&include_characteristics=true`)
+              data = await response.json()
+            }
+          }
+        }
+        
+        if (data.data && data.data.length > 0) {
+          // Преобразуем данные из нового формата
+          const transformedVariants = data.data.map((v: any) => {
+            return {
+              id: v.id,
+              productId: v.master_id,
+              sizeName: v.name || v.attributes?.size || 'Вариант',
+              sizeValue: v.attributes?.size_value || '',
+              name: v.name,
+              description: v.description,
+              sku: v.sku,
+              price: v.price ? parseFloat(v.price) : undefined,
+              discountPrice: v.discount_price ? parseFloat(v.discount_price) : undefined,
+              stockQuantity: v.stock_quantity,
+              weight: v.weight,
+              dimensions: v.dimensions,
+              specifications: v.attributes?.specifications,
+              isAvailable: v.is_active && v.stock_status !== 'out_of_stock',
+              sortOrder: v.sort_order,
+              imageUrl: v.primary_image_url,
+              primary_image_url: v.primary_image_url,
+              images: v.images || [],
+              variant_images: v.variant_images || v.images || [],
+              warranty: v.warranty_months ? `${v.warranty_months} месяцев` : undefined,
+              batteryLife: v.battery_life_hours ? `${v.battery_life_hours} часов` : undefined,
+              metaTitle: v.meta_title,
+              metaDescription: v.meta_description,
+              metaKeywords: v.meta_keywords,
+              isFeatured: v.is_featured,
+              isNew: v.is_new,
+              isBestseller: v.is_bestseller,
+              customFields: v.custom_fields,
+              characteristics: v.attributes?.characteristics,
+              selectionTables: v.attributes?.selection_tables
+            }
+          })
+          
+          setVariants(transformedVariants)
+          // Автоматически выбираем первый доступный вариант
+          const firstAvailable = transformedVariants.find((v: ProductVariant) => v.isAvailable)
+          if (firstAvailable) {
+            setSelectedVariant(firstAvailable)
+            onVariantSelect(firstAvailable)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+      } finally {
+        setLoading(false)
+      }
+    }, [productId, onVariantSelect])
+
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      // Используем v2 API для получения вариантов с изображениями
-      let response = await fetch(`/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`)
-      let data = await response.json()
-      
-      // Если вариантов нет, проверяем не является ли сам товар вариантом
-      if (!data.data || data.data.length === 0) {
-        // Получаем информацию о товаре
-        const productResponse = await fetch(`/api/products/${productId}`)
-        const productData = await productResponse.json()
-        
-        if (productData.success && productData.data) {
-          // Проверяем есть ли у товара master_id в таблице product_variants
-          const variantCheckResponse = await fetch(`/api/product-variants/${productId}`)
-          const variantCheckData = await variantCheckResponse.json()
-          
-          if (variantCheckData.success && variantCheckData.data && variantCheckData.data.master_id) {
-            // Если товар сам является вариантом, загружаем все варианты его мастер-товара
-            response = await fetch(`/api/v2/product-variants?master_id=${variantCheckData.data.master_id}&include_images=true&include_characteristics=true`)
-            data = await response.json()
-          }
-        }
-      }
-      
-      if (data.data && data.data.length > 0) {
-        // Преобразуем данные из нового формата
-        const transformedVariants = data.data.map((v: any) => {
-          return {
-            id: v.id,
-            productId: v.master_id,
-            sizeName: v.name || v.attributes?.size || 'Вариант',
-            sizeValue: v.attributes?.size_value || '',
-            name: v.name,
-            description: v.description,
-            sku: v.sku,
-            price: v.price ? parseFloat(v.price) : undefined,
-            discountPrice: v.discount_price ? parseFloat(v.discount_price) : undefined,
-            stockQuantity: v.stock_quantity,
-            weight: v.weight,
-            dimensions: v.dimensions,
-            specifications: v.attributes?.specifications,
-            isAvailable: v.is_active && v.stock_status !== 'out_of_stock',
-            sortOrder: v.sort_order,
-            imageUrl: v.primary_image_url,
-            primary_image_url: v.primary_image_url,
-            images: v.images || [],
-            variant_images: v.variant_images || v.images || [],
-            warranty: v.warranty_months ? `${v.warranty_months} месяцев` : undefined,
-            batteryLife: v.battery_life_hours ? `${v.battery_life_hours} часов` : undefined,
-            metaTitle: v.meta_title,
-            metaDescription: v.meta_description,
-            metaKeywords: v.meta_keywords,
-            isFeatured: v.is_featured,
-            isNew: v.is_new,
-            isBestseller: v.is_bestseller,
-            customFields: v.custom_fields,
-            characteristics: v.attributes?.characteristics,
-            selectionTables: v.attributes?.selection_tables
-          }
-        })
-        
-        setVariants(transformedVariants)
-        // Автоматически выбираем первый доступный вариант
-        const firstAvailable = transformedVariants.find((v: ProductVariant) => v.isAvailable)
-        if (firstAvailable) {
-          setSelectedVariant(firstAvailable)
-          onVariantSelect(firstAvailable)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleVariantChange = (variantId: string) => {
+  const handleVariantChange = useCallback((variantId: string) => {
     const variant = variants.find(v => v.id.toString() === variantId)
     setSelectedVariant(variant || null)
     onVariantSelect(variant || null)
-  }
+  }, [variants, onVariantSelect])
 
   const handleViewDetails = (variant: ProductVariant, e: React.MouseEvent) => {
     e.stopPropagation()

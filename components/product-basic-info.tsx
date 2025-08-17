@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package, CheckCircle, Building, Shield, FileText, ChevronDown } from "lucide-react"
+import { Package, Building, Shield, FileText, ChevronDown } from "lucide-react"
 
 interface ProductBasicInfoProps {
   product: {

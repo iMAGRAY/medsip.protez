@@ -2,46 +2,61 @@
 // GET /api/specifications - Get all specification groups and enums with hierarchical structure
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db-connection';
+import { guardDbOr503Fast } from '@/lib/api-guards'
 
-export async function GET(request: NextRequest) {
+export const dynamic = 'force-dynamic'
+
+export async function GET(_request: NextRequest) {
   try {
+    const fast = guardDbOr503Fast()
+    if (fast) return fast
+
     const pool = getPool();
     const client = await pool.connect();
 
-    // Получаем иерархическую структуру spec_groups
+    const exists = await client.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema='public' AND table_name = ANY($1)
+    `, [[
+      'characteristics_groups_simple',
+      'characteristics_values_simple',
+      'product_categories'
+    ]] )
+    const names = new Set(exists.rows.map((r: any) => r.table_name))
+    if (!names.has('characteristics_groups_simple') || !names.has('characteristics_values_simple')) {
+      client.release()
+      return NextResponse.json({ success: true, data: [], hierarchical: true, total_groups: 0, characteristic_groups_count: 0, manufacturers_count: 0 })
+    }
+
     const characteristicGroupsQuery = await client.query(`
       WITH RECURSIVE characteristic_tree AS (
-        -- Базовый случай: корневые группы
         SELECT
           sg.id,
           sg.name,
           sg.description,
           sg.parent_id,
-          sg.ordering,
+          sg.sort_order,
           sg.show_in_main_params,
           sg.main_params_priority,
-          sg.main_params_label_override,
           sg.is_active,
           0 as level,
-          ARRAY[sg.ordering, sg.id] as path
+          ARRAY[sg.sort_order, sg.id] as path
         FROM characteristics_groups_simple sg
         WHERE sg.parent_id IS NULL AND sg.is_active = true
 
         UNION ALL
 
-        -- Рекурсивный случай: дочерние группы
         SELECT
           sg.id,
           sg.name,
           sg.description,
           sg.parent_id,
-          sg.ordering,
+          sg.sort_order,
           sg.show_in_main_params,
           sg.main_params_priority,
-          sg.main_params_label_override,
           sg.is_active,
           st.level + 1,
-          st.path || ARRAY[sg.ordering, sg.id]
+          st.path || ARRAY[sg.sort_order, sg.id]
         FROM characteristics_groups_simple sg
         INNER JOIN characteristic_tree st ON sg.parent_id = st.id
         WHERE sg.is_active = true
@@ -51,77 +66,76 @@ export async function GET(request: NextRequest) {
         st.name,
         st.description,
         st.parent_id,
-        st.ordering,
+        st.sort_order as ordering,
         st.show_in_main_params,
         st.main_params_priority,
-        st.main_params_label_override,
         st.level,
         COALESCE(
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'id',         se.id,
               'value',      se.value,
-              'display_name', se.display_name,
+              'display_name', se.description,
               'color_hex',  se.color_hex,
-              'ordering',   se.ordering
-            ) ORDER BY se.ordering
+              'ordering',   se.sort_order
+            ) ORDER BY se.sort_order
           ) FILTER (WHERE se.id IS NOT NULL),
           '[]'::json
         ) AS enum_values,
         (SELECT COUNT(*) FROM characteristics_groups_simple WHERE parent_id = st.id) as children_count
       FROM characteristic_tree st
-              LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
-      GROUP BY st.id, st.name, st.description, st.parent_id, st.ordering, st.show_in_main_params, st.main_params_priority, st.main_params_label_override, st.level, st.path
-      ORDER BY st.path, st.ordering
+      LEFT JOIN characteristics_values_simple se ON se.group_id = st.id
+      GROUP BY st.id, st.name, st.description, st.parent_id, st.sort_order, st.show_in_main_params, st.main_params_priority, st.level, st.path
+      ORDER BY st.path, st.sort_order
+      LIMIT 1000
     `);
 
-    // Получаем производителей из categories с иерархической структурой
-    const manufacturersQuery = await client.query(`
-      WITH RECURSIVE hierarchy AS (
-        -- Корневые узлы производителей
-        SELECT
-          c.id,
-          c.name,
-          c.description,
-          c.parent_id,
-          c.sort_order,
-          0 as level,
-          ARRAY[c.id] as path
-        FROM product_categories c
-        WHERE c.parent_id IS NULL
-          AND c.is_active = true
-          AND c.type = 'specification'
+    let manufacturersQuery = { rows: [] }
+    if (names.has('product_categories')) {
+      manufacturersQuery = await client.query(`
+        WITH RECURSIVE hierarchy AS (
+          SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.parent_id,
+            c.sort_order,
+            0 as level,
+            ARRAY[c.id] as path
+          FROM product_categories c
+          WHERE c.parent_id IS NULL
+            AND c.is_active = true
 
-        UNION ALL
+          UNION ALL
 
-        -- Дочерние узлы
+          SELECT
+            c.id,
+            c.name,
+            c.description,
+            c.parent_id,
+            c.sort_order,
+            h.level + 1,
+            h.path || c.id
+          FROM product_categories c
+          JOIN hierarchy h ON c.parent_id = h.id
+          WHERE c.is_active = true
+        )
         SELECT
-          c.id,
-          c.name,
-          c.description,
-          c.parent_id,
-          c.sort_order,
-          h.level + 1,
-          h.path || c.id
-        FROM product_categories c
-        JOIN hierarchy h ON c.parent_id = h.id
-        WHERE c.is_active = true AND c.type = 'specification'
-      )
-      SELECT
-        id,
-        name,
-        description,
-        parent_id,
-        sort_order,
-        level,
-        (SELECT COUNT(*) FROM product_categories WHERE parent_id = hierarchy.id) as children_count
-      FROM hierarchy
-      ORDER BY path, sort_order
-    `);
+          id,
+          name,
+          description,
+          parent_id,
+          sort_order,
+          level,
+          (SELECT COUNT(*) FROM product_categories WHERE parent_id = hierarchy.id) as children_count
+        FROM hierarchy
+        ORDER BY path, sort_order
+        LIMIT 2000
+      `);
+    }
 
     client.release();
 
-    // Строим иерархическую структуру spec_groups
     const characteristicGroupsMap = new Map();
     const rootCharacteristicGroups = [];
 
@@ -134,7 +148,6 @@ export async function GET(request: NextRequest) {
         ordering: row.ordering,
         show_in_main_params: row.show_in_main_params,
         main_params_priority: row.main_params_priority,
-        main_params_label_override: row.main_params_label_override,
         level: row.level,
         source_type: 'characteristic_group',
         original_id: row.id,
@@ -151,7 +164,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Строим дерево spec_groups
     characteristicGroupsQuery.rows.forEach((row: any) => {
       if (row.parent_id !== null) {
         const parent = characteristicGroupsMap.get(`char_${row.parent_id}`);
@@ -162,7 +174,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Строим иерархическую структуру manufacturers
     const manufacturersMap = new Map();
     const rootManufacturers = [];
 
@@ -189,7 +200,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Строим дерево manufacturers
     manufacturersQuery.rows.forEach((row: any) => {
       if (row.parent_id !== null) {
         const parent = manufacturersMap.get(`cat_${row.parent_id}`);
@@ -200,7 +210,6 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Объединяем все данные
     const allData = [
       ...rootCharacteristicGroups,
       ...rootManufacturers
@@ -215,7 +224,6 @@ export async function GET(request: NextRequest) {
       manufacturers_count: rootManufacturers.length
     });
   } catch (error) {
-    console.error('Ошибка получения групп характеристик:', error);
     return NextResponse.json({ success: false, error: 'Ошибка получения данных' }, { status: 500 });
   }
 }
@@ -265,7 +273,6 @@ export async function POST(request: NextRequest) {
       data: characteristic
     });
   } catch (error) {
-    console.error('Ошибка создания характеристики:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка создания характеристики' },
       { status: 500 }

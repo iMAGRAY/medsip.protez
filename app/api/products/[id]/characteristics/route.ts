@@ -4,10 +4,11 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 
 // GET /api/products/[id]/characteristics - получить характеристики товара из EAV системы
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id);
 
   try {
     if (isNaN(productId)) {
@@ -59,7 +60,6 @@ export async function GET(
     return formatOldCharacteristics(oldSystemResult.rows, productId);
 
   } catch (error) {
-    console.error('❌ Ошибка получения характеристик товара:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка получения характеристик товара', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -68,7 +68,7 @@ export async function GET(
 }
 
 // Функция для форматирования характеристик из новой EAV системы
-function formatEAVCharacteristics(rows: any[], productId: number) {
+function _formatEAVCharacteristics(rows: any[], _productId: number) {
   const groupedCharacteristics: any = {};
 
   rows.forEach((row: any) => {
@@ -170,7 +170,7 @@ function formatEAVCharacteristics(rows: any[], productId: number) {
 }
 
 // Функция для форматирования характеристик из старой системы (fallback)
-function formatOldCharacteristics(rows: any[], productId: number) {
+function formatOldCharacteristics(rows: any[], _productId: number) {
   const groupedCharacteristics: any = {};
 
   rows.forEach((row: any) => {
@@ -237,9 +237,10 @@ function formatOldCharacteristics(rows: any[], productId: number) {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id);
 
   try {
     // Проверяем аутентификацию
@@ -274,7 +275,6 @@ export async function POST(
     try {
       body = await request.json();
     } catch (error) {
-      console.error('❌ Ошибка парсинга JSON:', error);
       return NextResponse.json({
         error: 'Invalid JSON in request body'
       }, { status: 400 });
@@ -288,7 +288,6 @@ export async function POST(
         let { variant_id, characteristics } = variantData;
 
         if (!variant_id || !characteristics || !Array.isArray(characteristics)) {
-          console.warn('Пропускаем невалидные данные варианта:', variantData);
           continue;
         }
 
@@ -327,12 +326,10 @@ export async function POST(
                 // Обновляем variant_id для дальнейшего использования
                 variant_id = newVariantId;
               } else {
-                console.error(`❌ Не удалось создать базовый вариант для продукта ${productId}`);
-                continue;
+                  continue;
               }
             }
           } catch (createError) {
-            console.error(`❌ Ошибка создания базового варианта:`, createError);
             continue;
           }
         }
@@ -357,10 +354,10 @@ export async function POST(
             }
 
             try {
-              const deleteResult = await pool.query(deleteQuery, deleteParams);
+              const _deleteResult = await pool.query(deleteQuery, deleteParams);
 
             } catch (deleteError) {
-              console.error(`❌ Ошибка удаления характеристики:`, deleteError);
+              // Error deleting characteristic
             }
           }
         }
@@ -399,7 +396,6 @@ export async function POST(
           let template_id = char.template_id;
 
           if (!template_id) {
-            console.warn('❌ Пропускаем характеристику без template_id:', char);
             continue;
           }
 
@@ -432,7 +428,6 @@ export async function POST(
                 let createTemplateResult;
                 if (existingTemplateResult.rows.length > 0) {
                   // Используем существующий шаблон
-
                   createTemplateResult = existingTemplateResult;
                 } else {
                   // Создаем новый шаблон
@@ -445,20 +440,16 @@ export async function POST(
                 }
 
                 if (createTemplateResult.rows.length > 0) {
-
                   // Обновляем template_id на созданный шаблон
                   template_id = createTemplateResult.rows[0].id;
                   templateCheck = createTemplateResult;
                 } else {
-                  console.warn(`❌ Не удалось создать базовый шаблон для группы ${template_id}`);
                   continue;
                 }
               } catch (createError) {
-                console.error(`❌ Ошибка создания базового шаблона для группы ${template_id}:`, createError);
                 continue;
               }
             } else {
-              console.warn(`❌ Группа ${template_id} не найдена или неактивна`);
               continue;
             }
           }
@@ -523,8 +514,6 @@ export async function POST(
 
             savedCharacteristics.push(upsertResult.rows[0]);
           } catch (upsertError) {
-            console.error(`❌ Ошибка UPSERT характеристики:`, upsertError.message);
-            console.error(`❌ Данные:`, { variant_id, template_id, enum_value_id, raw_value });
             continue;
           }
         }
@@ -564,7 +553,6 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка сохранения характеристик товара (новая система):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка сохранения характеристик товара', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -574,9 +562,10 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id);
 
   try {
     // Проверяем аутентификацию
@@ -662,7 +651,6 @@ export async function DELETE(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка удаления характеристик товара (новая система):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления характеристик товара', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

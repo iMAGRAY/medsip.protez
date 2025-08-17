@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { useOrders } from "@/lib/orders-context"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import {
   ClipboardList,
@@ -24,7 +23,6 @@ import {
   Package,
   User,
   Search,
-  Filter,
   RefreshCw,
   CheckCircle,
   Clock,
@@ -34,7 +32,6 @@ import {
   Trash2,
   Share2,
   Copy,
-  Download,
   MessageCircle,
   FileSpreadsheet,
   Archive,
@@ -91,8 +88,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [page, _setPage] = useState(1)
+  const [_totalPages, _setTotalPages] = useState(1)
   const [updating, setUpdating] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState('active')
@@ -102,29 +99,29 @@ export default function OrdersPage() {
   const [showOrderDialog, setShowOrderDialog] = useState(false)
   const { refreshOrdersCount } = useOrders()
 
-  const loadOrders = async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '50'
-      })
+  const loadOrders = useCallback(async () => {
+      try {
+        setLoading(true)
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: '50'
+        })
 
-      const response = await fetch(`/api/orders?${params}`)
-      const data = await response.json()
+        const response = await fetch(`/api/orders?${params}`)
+        const data = await response.json()
 
-      if (data.success) {
-        setOrders(data.data.orders)
-        setTotalPages(data.data.pagination.pages)
-      } else {
-        console.error('Ошибка загрузки заказов:', data.error)
+        if (data.success) {
+          setOrders(data.data.orders)
+          _setTotalPages(data.data.pagination.pages)
+        } else {
+          console.error('Ошибка загрузки заказов:', data.error)
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки заказов:', error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Ошибка загрузки заказов:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [page])
 
   // Функция для фильтрации заказов по вкладкам
   const getOrdersByTab = (tabName: string) => {
@@ -318,13 +315,13 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadOrders()
-  }, [page, activeTab])
+  }, [loadOrders])
 
-  const formatDate = (dateString: string) => {
+  const _formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('ru-RU')
   }
 
-  const getStatusBadge = (status: string) => {
+  const _getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
     const Icon = config.icon
     return (
@@ -449,7 +446,7 @@ export default function OrdersPage() {
              <AlertDialogHeader>
                <AlertDialogTitle>Удалить заказ?</AlertDialogTitle>
                <AlertDialogDescription>
-                 Заказ #{deletingOrderId} будет перемещен в раздел "Удаленные".
+                 Заказ #{deletingOrderId} будет перемещен в раздел &quot;Удаленные&quot;.
                  Вы сможете восстановить его в любое время.
                </AlertDialogDescription>
              </AlertDialogHeader>
@@ -588,7 +585,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  Конфигурация: ${configText}`;
   }
@@ -635,7 +632,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  _Конфигурация: ${configText}_`;
   }
@@ -653,7 +650,7 @@ ${order.items?.map(item => {
     toast.success('Переход в WhatsApp...')
   }
 
-  const shareViaEmail = () => {
+  const _shareViaEmail = () => {
     if (!order) {
       toast.error('Заказ не найден')
       return
@@ -678,7 +675,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\nКонфигурация: ${configText}`;
   }
@@ -727,7 +724,7 @@ ${order.items?.map(item => {
   // Добавляем конфигурацию, если есть
   if (item.configuration && Object.keys(item.configuration).length > 0) {
     const configText = Object.entries(item.configuration)
-      .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+      .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
       .join(', ');
     itemText += `\n  Конфигурация: ${configText}`;
   }
@@ -886,7 +883,7 @@ ${order.items?.map(item => {
         item.product_name,
         item.configuration && Object.keys(item.configuration).length > 0
           ? Object.entries(item.configuration)
-              .map(([key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
+              .map(([_key, config]: [string, any]) => `${config.characteristic_name}: ${config.value_name}`)
               .join(', ')
           : '',
         item.sku || '',
@@ -1613,7 +1610,7 @@ function DeletedOrdersTable({
     return new Date(dateString).toLocaleString('ru-RU')
   }
 
-  const getStatusBadge = (status: string) => {
+  const _getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
     const Icon = config.icon
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -64,59 +64,59 @@ export function ProductVariantSelectorHorizontal({
   const [variants, setVariants] = useState<ProductVariantV2[]>([])
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
   const [loading, setLoading] = useState(true)
+ 
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
+        )
+        const data = await response.json()
+        
+        if (data.success && data.data) {
+          // Фильтруем варианты: если есть только один вариант "Standard", не показываем его
+          let filteredVariants = data.data
+          if (data.data.length === 1 && data.data[0].name?.includes('Standard')) {
+            // Не показываем селектор и не выбираем вариант автоматически
+            setVariants([])
+            setLoading(false)
+            return
+          }
+          
+          setVariants(filteredVariants)
+          
+          // Выбираем начальный вариант
+          let variantToSelect = null
+          
+          if (initialVariantId) {
+            variantToSelect = filteredVariants.find((v: ProductVariantV2) => v.id === initialVariantId)
+          }
+          
+          if (!variantToSelect && filteredVariants.length > 0) {
+            // Не выбираем автоматически, пусть пользователь сам выберет
+            // variantToSelect остается null
+          }
+          
+          if (variantToSelect) {
+            handleVariantSelect(variantToSelect)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты товара')
+      } finally {
+        setLoading(false)
+      }
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
-      )
-      const data = await response.json()
-      
-      if (data.success && data.data) {
-        // Фильтруем варианты: если есть только один вариант "Standard", не показываем его
-        let filteredVariants = data.data
-        if (data.data.length === 1 && data.data[0].name?.includes('Standard')) {
-          // Не показываем селектор и не выбираем вариант автоматически
-          setVariants([])
-          setLoading(false)
-          return
-        }
-        
-        setVariants(filteredVariants)
-        
-        // Выбираем начальный вариант
-        let variantToSelect = null
-        
-        if (initialVariantId) {
-          variantToSelect = filteredVariants.find((v: ProductVariantV2) => v.id === initialVariantId)
-        }
-        
-        if (!variantToSelect && filteredVariants.length > 0) {
-          // Не выбираем автоматически, пусть пользователь сам выберет
-          // variantToSelect остается null
-        }
-        
-        if (variantToSelect) {
-          handleVariantSelect(variantToSelect)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты товара')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleVariantSelect = (variant: ProductVariantV2) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2) => {
     setSelectedVariant(variant)
     onVariantChange(variant)
-  }
+  }, [onVariantChange])
 
   const handleReturnToMaster = () => {
     setSelectedVariant(null)
@@ -223,7 +223,7 @@ export function ProductVariantSelectorHorizontal({
               {variants[0].attributes && Object.keys(variants[0].attributes).length > 0 && (
                 <div className="flex gap-2 mt-1">
                   {Object.entries(variants[0].attributes)
-                    .filter(([key, value]) => {
+                    .filter(([_key, value]) => {
                       // Показываем только простые значения (строки, числа, булевы)
                       return typeof value !== 'object' && !Array.isArray(value) && value !== null
                     })
@@ -379,7 +379,7 @@ export function ProductVariantSelectorHorizontal({
                           // Если атрибуты - это объект
                           if (typeof attrs === 'object' && !Array.isArray(attrs)) {
                             return Object.entries(attrs)
-                              .filter(([key, value]) => {
+                              .filter(([_key, value]) => {
                                 // Показываем только простые значения (строки, числа, булевы)
                                 return typeof value !== 'object' && !Array.isArray(value) && value !== null
                               })

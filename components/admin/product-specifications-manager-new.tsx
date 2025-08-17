@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,33 +9,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Plus,
-  Edit,
   Trash2,
   Settings,
-  Database,
-  Type,
   ChevronDown,
   ChevronRight,
-  Folder,
   FolderOpen,
   Package,
-  Tag,
   Star,
   Save,
   Search,
   Check,
   X,
   Target,
-  Zap,
-  BookOpen,
-  Archive,
-  Palette
+  Archive
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { SearchableSelect } from '@/components/ui/searchable-select'
@@ -105,8 +95,8 @@ interface ProductSpecificationsManagerProps {
 
 export function ProductSpecificationsManagerNew({
   productId,
-  productName,
-  specifications = [],
+  productName: _productName,
+  specifications: _specifications = [],
   onSpecificationsChange,
   isNewProduct = false
 }: ProductSpecificationsManagerProps) {
@@ -121,7 +111,7 @@ export function ProductSpecificationsManagerNew({
   const [activeStep, setActiveStep] = useState<'groups' | 'configure' | 'manage'>('groups')
   const [selectedGroups, setSelectedGroups] = useState<Set<number>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+  const [_expandedGroups, _setExpandedGroups] = useState<Set<string>>(new Set())
 
   // Диалоги
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false)
@@ -151,7 +141,25 @@ export function ProductSpecificationsManagerNew({
 
   // ID редактируемой характеристики (метка)
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null)
-  const [editingLabelValue, setEditingLabelValue] = useState<string>('')
+  const [editingLabelValue, setEditingLabelValue] = useState<string>('')  
+
+  // Функция для обработки данных характеристик из API (должна быть выше использования)
+  const processApiCharacteristics = useCallback((apiData: any[]): ProductCharacteristic[] => {
+    return apiData.map(item => ({
+      id: `char_${item.id}`,
+      group_id: item.group_id,
+      group_name: item.group_name,
+      characteristic_type: item.type === 'enum' ? 'select' : item.type,
+      label: item.label || item.group_name,
+      value_numeric: item.value_numeric,
+      value_text: item.value_text,
+      selected_enum_value: item.enum_value,
+      unit_code: item.unit_code,
+      is_primary: false,
+      is_required: false,
+      sort_order: 0
+    }))
+  }, [])
 
   // Функция для инициализации свернутых групп
   useEffect(() => {
@@ -164,37 +172,71 @@ export function ProductSpecificationsManagerNew({
   }, [selectedGroups])
 
   // Загрузка данных
+    const loadData = useCallback(async () => {
+              try {
+                setLoading(true)
+
+                // Сбрасываем состояние для новых товаров
+                if (isNewProduct) {
+                  setSelectedGroups(new Set())
+                  setProductCharacteristics([])
+                  setActiveStep('groups')
+                }
+
+                await Promise.all([
+                  loadSpecGroups(),
+                  loadProductCharacteristics(),
+                  loadTemplates()
+                ])
+              } finally {
+                setLoading(false)
+              }
+            }, [isNewProduct])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true)
-
-        // Сбрасываем состояние для новых товаров
-        if (isNewProduct) {
-          setSelectedGroups(new Set())
-          setProductCharacteristics([])
-          setActiveStep('groups')
-        }
-
-        await Promise.all([
-          loadSpecGroups(),
-          loadProductCharacteristics(),
-          loadTemplates()
-        ])
-      } finally {
-        setLoading(false)
-      }
-    }
     loadData()
-  }, [productId, isNewProduct])
+  }, [loadData])
 
   // Синхронизация с родительским компонентом
   useEffect(() => {
 
     onSpecificationsChange(productCharacteristics)
-  }, [productCharacteristics]) // Убираем onSpecificationsChange из зависимостей
+  }, [productCharacteristics, onSpecificationsChange])
 
-  const loadSpecGroups = async () => {
+  // Вспомогательная функция для обработки иерархических групп (перемещена выше использования)
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    const processGroup = (group: any, _index: number): SpecGroup | null => {
+      let groupId: number;
+
+      // Обрабатываем разные форматы ID
+      if (typeof group.id === 'string' && group.id.startsWith('spec_')) {
+        // Извлекаем числовую часть из формата spec_XXX
+        const numericPart = group.id.replace('spec_', '');
+        groupId = Number(numericPart);
+      } else {
+        // Обычное преобразование в число
+        groupId = Number(group.id);
+      }
+
+      // Если ID не является корректным числом, пропускаем эту группу
+      if (isNaN(groupId) || groupId <= 0) {
+        // Skipping group with invalid ID
+        return null
+      }
+
+      const processedGroup: SpecGroup = {
+        id: groupId,
+        name: group.name || `Group ${groupId}`,
+        description: group.description || ''
+      }
+
+      return processedGroup
+    }
+
+    return groups.map((group, index) => processGroup(group, index)).filter(Boolean) as SpecGroup[]
+  }, [])
+
+  const loadSpecGroups = useCallback(async () => {
     try {
       const res = await fetch('/api/specifications')
       if (res.ok) {
@@ -203,18 +245,18 @@ export function ProductSpecificationsManagerNew({
         const processedGroups = processHierarchicalGroups(data)
 
         if (process.env.NODE_ENV === 'development') {
-          console.log('📊 Loaded spec groups:', processedGroups.map(g => ({ id: g.id, name: g.name, type: typeof g.id })))
+          // Spec groups loaded
         }
 
         setSpecGroups(processedGroups)
       }
     } catch (error) {
-      console.error('Error loading spec groups:', error)
+      // Error loading spec groups
       toast.error('Не удалось загрузить группы характеристик')
     }
-  }
+  }, [processHierarchicalGroups])
 
-  const loadProductCharacteristics = async () => {
+  const loadProductCharacteristics = useCallback(async () => {
     if (!productId || isNewProduct) {
               // Для новых товаров не загружаем характеристики
       if (process.env.NODE_ENV === 'development') {
@@ -236,7 +278,7 @@ export function ProductSpecificationsManagerNew({
 
         if (process.env.NODE_ENV === 'development') {
 
-          console.log('Group IDs from characteristics:', Array.from(existingGroupIds))
+          // Group IDs from characteristics
         }
 
         setSelectedGroups(existingGroupIds)
@@ -247,9 +289,9 @@ export function ProductSpecificationsManagerNew({
         }
       }
     } catch (error) {
-      console.error('Error loading product characteristics:', error)
+      // Error loading product characteristics
     }
-  }
+  }, [productId, isNewProduct, processApiCharacteristics])
 
   const loadTemplates = async () => {
     try {
@@ -259,76 +301,15 @@ export function ProductSpecificationsManagerNew({
 
         setTemplates(data)
       } else {
-        console.error('Failed to load templates:', res.status, res.statusText)
+        // Failed to load templates
       }
     } catch (error) {
-      console.error('Error loading templates:', error)
+      // Error loading templates
     }
   }
 
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    const processGroup = (group: any, index: number): SpecGroup | null => {
-      let groupId: number;
-
-      // Обрабатываем разные форматы ID
-      if (typeof group.id === 'string' && group.id.startsWith('spec_')) {
-        // Извлекаем числовую часть из формата spec_XXX
-        const numericPart = group.id.replace('spec_', '');
-        groupId = Number(numericPart);
-      } else {
-        // Обычное преобразование в число
-        groupId = Number(group.id);
-      }
-
-      // Если ID не является корректным числом, пропускаем эту группу
-      if (isNaN(groupId) || groupId <= 0) {
-        console.warn(`⚠️ Skipping group with invalid ID: ${group.name} (id: ${group.id})`)
-        return null
-      }
-
-      const finalId = groupId
-
-      if (process.env.NODE_ENV === 'development') {
-
-      }
-
-      const processedGroup = {
-        id: finalId,
-        name: group.name || 'Unnamed Group',
-        description: group.description || '',
-        enum_count: group.enum_count || 0,
-        enum_values: group.enum_values || group.enums || [],
-        parent_id: group.parent_id || null,
-        level: group.level || 0,
-        children: group.children ? group.children.map((child: any, childIndex: number) => processGroup(child, childIndex + 100)).filter(Boolean) : [],
-        source_type: 'spec_group' as const,
-        original_id: finalId,
-        enums: group.enums || group.enum_values || [],
-        ordering: group.ordering || 0
-      }
-
-      return processedGroup
-    }
-
-    return groups.map((group, index) => processGroup(group, index)).filter(Boolean) as SpecGroup[]
-  }
-
-  const processApiCharacteristics = (apiData: any[]): ProductCharacteristic[] => {
-    return apiData.map(item => ({
-      id: `char_${item.id}`,
-      group_id: item.group_id,
-      group_name: item.group_name,
-      characteristic_type: item.type === 'enum' ? 'select' : item.type,
-      label: item.label || item.group_name,
-      value_numeric: item.value_numeric,
-      value_text: item.value_text,
-      selected_enum_value: item.enum_value,
-      unit_code: item.unit_code,
-      is_primary: false,
-      is_required: false,
-      sort_order: 0
-    }))
-  }
+  // УДАЛЕНА дублированная функция processHierarchicalGroups - уже определена выше
+  // УДАЛЕНА дублированная функция processApiCharacteristics - уже определена выше
 
   // Управление выбором групп
   const handleGroupToggle = (groupId: number, event?: React.MouseEvent) => {
@@ -337,14 +318,14 @@ export function ProductSpecificationsManagerNew({
 
     // Проверяем, что groupId является корректным числом
     if (isNaN(groupId) || groupId === 0) {
-      console.error('Invalid groupId:', groupId)
+      // Invalid groupId
       toast.error('Ошибка: некорректный ID группы')
       return
     }
 
     // Для отладки - потом можно убрать
     if (process.env.NODE_ENV === 'development') {
-      console.log('Toggling group:', groupId, 'Type:', typeof groupId, 'Current selected:', Array.from(selectedGroups))
+      // Toggling group
     }
 
     setSelectedGroups(prev => {
@@ -362,7 +343,7 @@ export function ProductSpecificationsManagerNew({
       }
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('New selected groups:', Array.from(newSelected))
+        // New selected groups
       }
 
       return newSelected
@@ -472,7 +453,7 @@ export function ProductSpecificationsManagerNew({
       })
 
       if (res.ok) {
-        const savedTemplate = await res.json()
+        const _savedTemplate = await res.json()
 
         toast.success('Шаблон сохранён')
         setIsTemplateDialogOpen(false)
@@ -480,11 +461,11 @@ export function ProductSpecificationsManagerNew({
         await loadTemplates()
       } else {
         const errorData = await res.json().catch(() => ({}))
-        console.error('❌ Failed to save template:', errorData)
+        // Failed to save template
         toast.error('Не удалось сохранить шаблон')
       }
     } catch (error) {
-      console.error('❌ Error saving template:', error)
+      // Error saving template
       toast.error('Не удалось сохранить шаблон')
     } finally {
       setSaving(false)
@@ -503,11 +484,11 @@ export function ProductSpecificationsManagerNew({
         await loadTemplates()
       } else {
         const errorData = await res.json().catch(() => ({}))
-        console.error('❌ Failed to delete template:', errorData)
+        // Failed to delete template
         toast.error('Не удалось удалить шаблон')
       }
     } catch (error) {
-      console.error('❌ Error deleting template:', error)
+      // Error deleting template
       toast.error('Не удалось удалить шаблон')
     }
   }
@@ -521,12 +502,12 @@ export function ProductSpecificationsManagerNew({
         const groupExists = specGroups.find(g => g.id === Number(char.group_id))
 
         if (!hasValidGroupId) {
-          console.warn('⚠️ Characteristic has invalid group_id:', char)
+          // Characteristic has invalid group_id
           return false
         }
 
         if (!groupExists) {
-          console.warn('⚠️ Group not found for characteristic:', char)
+          // Group not found for characteristic
           return false
         }
 
@@ -572,7 +553,7 @@ export function ProductSpecificationsManagerNew({
         toast.success(`Шаблон "${template.name}" применён (${templateCharacteristics.length} характеристик)`)
       }
 
-      console.log('📊 Final selected groups:', Array.from(finalGroupIds))
+      // Final selected groups
 
       setProductCharacteristics(finalCharacteristics)
       setSelectedGroups(finalGroupIds)
@@ -584,7 +565,7 @@ export function ProductSpecificationsManagerNew({
       setIsTemplateDialogOpen(false) // Закрываем диалог
 
     } catch (error) {
-      console.error('Error applying template:', error)
+      // Error applying template
       toast.error('Не удалось применить шаблон')
     }
   }
@@ -680,8 +661,7 @@ export function ProductSpecificationsManagerNew({
               variant="outline"
               size="sm"
               onClick={() => {
-                console.log('Current selectedGroups:', Array.from(selectedGroups))
-                console.log('Current specGroups:', specGroups.map(g => ({ id: g.id, name: g.name })))
+                // State logged to console
 
                 toast.success('Состояние выведено в консоль')
               }}
@@ -822,7 +802,7 @@ export function ProductSpecificationsManagerNew({
         {Array.from(selectedGroups).map(groupId => {
           const group = specGroups.find(g => g.id === groupId)
           if (!group) {
-            console.warn('Group not found for ID:', groupId)
+            // Group not found for ID
             return null
           }
 
@@ -1311,7 +1291,7 @@ export function ProductSpecificationsManagerNew({
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            console.log('🔥 Apply template (replace) button clicked:', template);
+                            // Apply template (replace) button clicked
                             handleApplyTemplate(template, 'replace');
                           }}
                         >
@@ -1321,7 +1301,7 @@ export function ProductSpecificationsManagerNew({
                           size="sm"
                           type="button"
                           onClick={() => {
-                            console.log('🔥 Apply template (merge) button clicked:', template);
+                            // Apply template (merge) button clicked
                             handleApplyTemplate(template, 'merge');
                           }}
                         >
@@ -1402,7 +1382,7 @@ export function ProductSpecificationsManagerNew({
                               loadTemplates();
                             } else {
                               toast.error('Ошибка создания тестового шаблона');
-                              console.error('❌ Test template creation failed:', result);
+                              // Test template creation failed
                             }
                           } catch (error) {
                             console.error('❌ Error creating test template:', error);
@@ -1791,12 +1771,7 @@ export function ProductSpecificationsManagerNew({
 
   // Отладочная информация
   if (process.env.NODE_ENV === 'development') {
-    console.log('Current component state:', {
-      specGroups: specGroups.length,
-      selectedGroups: Array.from(selectedGroups),
-      productCharacteristics: productCharacteristics.length,
-      activeStep
-    })
+    // Current component state logged
   }
 
   return (

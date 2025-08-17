@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -66,27 +67,27 @@ export default function ManufacturersAdminPage() {
     logo_url: ''
   })
 
+  const loadManufacturers = useCallback(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/manufacturers')
+        const data = await response.json()
+
+        if (data.success) {
+          setManufacturers(data.data)
+        } else {
+          setMessage({ type: 'error', text: 'Ошибка загрузки производителей' })
+        }
+      } catch (_error) {
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     loadManufacturers()
-  }, [])
-
-  const loadManufacturers = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/manufacturers')
-      const data = await response.json()
-
-      if (data.success) {
-        setManufacturers(data.data)
-      } else {
-        setMessage({ type: 'error', text: 'Ошибка загрузки производителей' })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [loadManufacturers])
 
   const resetForm = () => {
     setFormData({
@@ -134,7 +135,7 @@ export default function ManufacturersAdminPage() {
         ? `/api/manufacturers/${editingManufacturer.id}`
         : '/api/manufacturers'
 
-      const method = editingManufacturer ? 'PUT' : 'POST'
+      const _method = editingManufacturer ? 'PUT' : 'POST'
 
       const payload = {
         ...formData,
@@ -142,7 +143,7 @@ export default function ManufacturersAdminPage() {
       }
 
       const response = await fetch(url, {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -162,7 +163,7 @@ export default function ManufacturersAdminPage() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Ошибка сохранения' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     } finally {
       setIsSubmitting(false)
@@ -349,9 +350,11 @@ export default function ManufacturersAdminPage() {
                 {/* Logo */}
                 {manufacturer.logo_url && (
                   <div className="h-32 bg-slate-50 flex items-center justify-center p-4">
-                    <img
+                    <Image
                       src={manufacturer.logo_url}
                       alt={manufacturer.name}
+                      width={200}
+                      height={100}
                       className="max-h-full max-w-full object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement

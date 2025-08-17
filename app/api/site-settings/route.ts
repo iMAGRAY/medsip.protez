@@ -2,39 +2,43 @@
 import { NextRequest, NextResponse } from "next/server"
 import { executeQuery, testConnection } from "@/lib/db-connection"
 
+export const dynamic = 'force-dynamic'
+
+function isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
+
 // Add a simple handler for all methods to debug
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json(getFallbackSettings(), { status: 503, headers: corsHeaders() })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in site-settings GET")
-      return NextResponse.json(getFallbackSettings(), {
-        status: 503,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-      })
+      return NextResponse.json(getFallbackSettings(), { status: 503, headers: corsHeaders() })
+    }
+
+    const exists = await executeQuery(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'site_settings'
+      ) AS exist
+    `)
+    if (!exists.rows?.[0]?.exist) {
+      return NextResponse.json(getFallbackSettings(), { status: 503, headers: corsHeaders() })
     }
 
     const result = await executeQuery("SELECT * FROM site_settings ORDER BY id DESC LIMIT 1")
 
     if (result.rows.length === 0) {
-      // Return default settings if none exist
-
-      return NextResponse.json(getFallbackSettings(), {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-      })
+      return NextResponse.json(getFallbackSettings(), { headers: corsHeaders() })
     }
 
-    // Map database fields to camelCase format for frontend consistency
     const settings = result.rows[0]
     const mappedSettings = {
       id: settings.id,
@@ -51,36 +55,14 @@ export async function GET(request: NextRequest) {
       updatedAt: settings.updated_at,
     }
 
-    return NextResponse.json(mappedSettings, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
-  } catch (error) {
-    console.error("Database error in site-settings GET:", error)
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    })
-
-    // Return default settings if database is unavailable
-    return NextResponse.json(getFallbackSettings(), {
-      status: 503,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
+    return NextResponse.json(mappedSettings, { headers: corsHeaders() })
+  } catch (_error) {
+    return NextResponse.json(getFallbackSettings(), { status: 503, headers: corsHeaders() })
   }
 }
 
-export async function POST(request: NextRequest) {
-// Treat POST as PUT for compatibility
-  return PUT(request)
+export async function POST(_request: NextRequest) {
+  return new NextResponse(null, { status: 405, headers: corsHeaders() })
 }
 
 export async function PUT(request: NextRequest) {
@@ -88,103 +70,20 @@ export async function PUT(request: NextRequest) {
   let body
   try {
     body = await request.json()
-
-  } catch (error) {
-    console.error("🔧 Site Settings API: Failed to parse request body:", error)
-    return NextResponse.json({ error: "Invalid JSON body" }, {
-      status: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
+  } catch (_error) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400, headers: corsHeaders() })
   }
 
   try {
-    // Проверяем соединение с базой данных
+    if (!isDbConfigured()) {
+      return NextResponse.json({ ...body, id: 1, updated_at: new Date().toISOString(), error: "Database config is not provided" }, { status: 503, headers: corsHeaders() })
+    }
+
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in site-settings PUT")
-      return NextResponse.json({
-        ...body,
-        id: 1,
-        updated_at: new Date().toISOString(),
-        error: "Database connection failed, changes not saved"
-      }, {
-        status: 503,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-      })
+      return NextResponse.json({ ...body, id: 1, updated_at: new Date().toISOString(), error: "Database connection failed, changes not saved" }, { status: 503, headers: corsHeaders() })
     }
 
-    const updateFields = []
-    const values = []
-    let paramCount = 1
-
-    // Обработка полей как в camelCase (от фронтенда), так и в snake_case (для совместимости)
-    if (body.siteName || body.site_name) {
-      updateFields.push(`site_name = $${paramCount}`)
-      values.push(body.siteName || body.site_name)
-      paramCount++
-    }
-    if (body.siteDescription !== undefined || body.site_description !== undefined) {
-      updateFields.push(`site_description = $${paramCount}`)
-      values.push(body.siteDescription !== undefined ? body.siteDescription : body.site_description)
-      paramCount++
-    }
-    if (body.heroTitle || body.hero_title) {
-      updateFields.push(`hero_title = $${paramCount}`)
-      values.push(body.heroTitle || body.hero_title)
-      paramCount++
-    }
-    if (body.heroSubtitle || body.hero_subtitle) {
-      updateFields.push(`hero_subtitle = $${paramCount}`)
-      values.push(body.heroSubtitle || body.hero_subtitle)
-      paramCount++
-    }
-    if (body.contactEmail || body.contact_email) {
-      updateFields.push(`contact_email = $${paramCount}`)
-      values.push(body.contactEmail || body.contact_email)
-      paramCount++
-    }
-    if (body.contactPhone || body.contact_phone) {
-      updateFields.push(`contact_phone = $${paramCount}`)
-      values.push(body.contactPhone || body.contact_phone)
-      paramCount++
-    }
-    if (body.address) {
-      updateFields.push(`address = $${paramCount}`)
-      values.push(body.address)
-      paramCount++
-    }
-    if (body.socialMedia || body.social_media) {
-      updateFields.push(`social_media = $${paramCount}`)
-      values.push(JSON.stringify(body.socialMedia || body.social_media))
-      paramCount++
-    }
-    if (body.additionalContacts || body.additional_contacts) {
-      updateFields.push(`additional_contacts = $${paramCount}`)
-      values.push(JSON.stringify(body.additionalContacts || body.additional_contacts))
-      paramCount++
-    }
-
-    if (updateFields.length === 0) {
-
-      return NextResponse.json({ error: "No fields to update" }, {
-        status: 400,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-      })
-    }
-
-    // Проверяем существование таблицы site_settings
     const tableCheckQuery = `
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -196,27 +95,27 @@ export async function PUT(request: NextRequest) {
     const tableExists = await executeQuery(tableCheckQuery)
 
     if (!tableExists.rows[0].exists) {
-
-      // Создаем таблицу если она не существует
-      await executeQuery(`
-        CREATE TABLE site_settings (
-          id SERIAL PRIMARY KEY,
-          site_name VARCHAR(255) NOT NULL DEFAULT 'МедСИП Протезирование',
-          site_description TEXT,
-          hero_title TEXT,
-          hero_subtitle TEXT,
-          contact_email VARCHAR(255),
-          contact_phone VARCHAR(255),
-          address TEXT,
-          social_media JSONB DEFAULT '{}',
-          additional_contacts JSONB DEFAULT '[]',
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `)
+      return NextResponse.json({ ...body, id: 1, updated_at: new Date().toISOString(), error: "Site settings schema is not initialized" }, { status: 503, headers: corsHeaders() })
     }
 
-    // Try to update existing record first
+    const updateFields = []
+    const values = []
+    let paramCount = 1
+
+    if (body.siteName || body.site_name) { updateFields.push(`site_name = $${paramCount}`); values.push(body.siteName || body.site_name); paramCount++ }
+    if (body.siteDescription !== undefined || body.site_description !== undefined) { updateFields.push(`site_description = $${paramCount}`); values.push(body.siteDescription !== undefined ? body.siteDescription : body.site_description); paramCount++ }
+    if (body.heroTitle || body.hero_title) { updateFields.push(`hero_title = $${paramCount}`); values.push(body.heroTitle || body.hero_title); paramCount++ }
+    if (body.heroSubtitle || body.hero_subtitle) { updateFields.push(`hero_subtitle = $${paramCount}`); values.push(body.heroSubtitle || body.hero_subtitle); paramCount++ }
+    if (body.contactEmail || body.contact_email) { updateFields.push(`contact_email = $${paramCount}`); values.push(body.contactEmail || body.contact_email); paramCount++ }
+    if (body.contactPhone || body.contact_phone) { updateFields.push(`contact_phone = $${paramCount}`); values.push(body.contactPhone || body.contact_phone); paramCount++ }
+    if (body.address) { updateFields.push(`address = $${paramCount}`); values.push(body.address); paramCount++ }
+    if (body.socialMedia || body.social_media) { updateFields.push(`social_media = $${paramCount}`); values.push(JSON.stringify(body.socialMedia || body.social_media)); paramCount++ }
+    if (body.additionalContacts || body.additional_contacts) { updateFields.push(`additional_contacts = $${paramCount}`); values.push(JSON.stringify(body.additionalContacts || body.additional_contacts)); paramCount++ }
+
+    if (updateFields.length === 0) {
+      return NextResponse.json({ error: "No fields to update" }, { status: 400, headers: corsHeaders() })
+    }
+
     const updateQuery = `
       UPDATE site_settings
       SET ${updateFields.join(", ")}, updated_at = NOW()
@@ -226,7 +125,6 @@ export async function PUT(request: NextRequest) {
 
     let result = await executeQuery(updateQuery, values)
 
-    // If no record was updated, insert a new one
     if (result.rows.length === 0) {
       const insertQuery = `
         INSERT INTO site_settings (
@@ -250,7 +148,6 @@ export async function PUT(request: NextRequest) {
       result = await executeQuery(insertQuery, insertValues)
     }
 
-    // Преобразуем результат из snake_case в camelCase для фронтенда
     const settings = result.rows[0]
     const mappedSettings = {
       id: settings.id,
@@ -267,50 +164,15 @@ export async function PUT(request: NextRequest) {
       updatedAt: settings.updated_at,
     }
 
-    return NextResponse.json(mappedSettings, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
-  } catch (error) {
-    console.error("Database error in site-settings PUT:", error)
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    })
-
-    // Return fallback response
-    const fallbackSettings = {
-      id: 1,
-      ...body,
-      updated_at: new Date().toISOString(),
-      error: "Database error, changes not saved"
-    }
-
-    return NextResponse.json(fallbackSettings, {
-      status: 503,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
+    return NextResponse.json(mappedSettings, { headers: corsHeaders() })
+  } catch (_error) {
+    const fallbackSettings = { id: 1, ...body, updated_at: new Date().toISOString(), error: "Database error, changes not saved" }
+    return NextResponse.json(fallbackSettings, { status: 503, headers: corsHeaders() })
   }
 }
 
-export async function OPTIONS(request: NextRequest) {
-
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  })
+export async function OPTIONS(_request: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: corsHeaders() })
 }
 
 function getFallbackSettings() {
@@ -332,5 +194,13 @@ function getFallbackSettings() {
     additionalContacts: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+  }
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   }
 }

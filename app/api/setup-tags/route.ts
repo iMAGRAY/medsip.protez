@@ -76,7 +76,6 @@ export async function GET() {
       message: `Таблицы тегов созданы успешно. Всего тегов: ${count}`
     })
   } catch (error: any) {
-    console.error('Error setting up tags:', error)
     return NextResponse.json({
       success: false,
       error: error.message

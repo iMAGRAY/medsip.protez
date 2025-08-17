@@ -2,22 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery, testConnection } from '@/lib/db-connection'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in model line GET")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const modelLineId = params.id;
+    const resolvedParams = await params
+    const modelLineId = resolvedParams.id;
 
     // Проверяем существование таблицы model_series
     const tableCheckQuery = `
@@ -82,7 +82,7 @@ export async function GET(
           p.id,
           p.name,
           p.description,
-          p.is_active,
+          (p.is_deleted = false OR p.is_deleted IS NULL) as is_active,
           p.created_at
         FROM products p
         WHERE p.series_id = $1
@@ -103,12 +103,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Model Line API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
       { error: 'Failed to fetch model line', success: false, details: error.message },
       { status: 500 }
@@ -118,21 +112,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in model line PUT")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const modelLineId = params.id;
+    const resolvedParams = await params
+    const modelLineId = resolvedParams.id;
     const data = await request.json();
 
     // Валидация обязательных полей
@@ -206,12 +200,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('❌ Model Line API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
 
     // Обработка дубликатов
     if ((error as any).code === '23505') {
@@ -229,22 +217,22 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
     // Проверяем соединение с базой данных
     const isConnected = await testConnection()
     if (!isConnected) {
-      console.error("Database connection failed in model line DELETE")
       return NextResponse.json(
         { error: 'Database connection failed', success: false },
         { status: 503 }
       )
     }
 
-    const modelLineId = params.id;
+    const resolvedParams = await params
+    const modelLineId = resolvedParams.id;
 
     // Проверяем существование таблицы model_series
     const tableCheckQuery = `
@@ -302,7 +290,7 @@ export async function DELETE(
 
     // Удаляем модельную линию
     const deleteQuery = 'DELETE FROM model_series WHERE id = $1 RETURNING id';
-    const result = await executeQuery(deleteQuery, [modelLineId]);
+    const _result = await executeQuery(deleteQuery, [modelLineId]);
 
     return NextResponse.json({
       message: 'Model line deleted successfully',
@@ -310,12 +298,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('❌ Model Line API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
       { error: 'Failed to delete model line', success: false, details: error.message },
       { status: 500 }

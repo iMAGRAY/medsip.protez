@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -81,56 +81,56 @@ export function ProductVariantSelectorV2({
   const [comparisonMode, setComparisonMode] = useState(false)
   const [compareVariants, setCompareVariants] = useState<number[]>([])
 
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
+        )
+        const data = await response.json()
+        
+        if (data.success && data.data) {
+          setVariants(data.data)
+          
+          // Выбираем начальный вариант
+          let variantToSelect = null
+          
+          if (initialVariantId) {
+            variantToSelect = data.data.find((v: ProductVariantV2) => v.id === initialVariantId)
+          }
+          
+          if (!variantToSelect) {
+            // Приоритеты: рекомендуемый > избранный > в наличии > первый
+            variantToSelect = data.data.find((v: ProductVariantV2) => v.is_recommended) ||
+                             data.data.find((v: ProductVariantV2) => v.is_featured) ||
+                             data.data.find((v: ProductVariantV2) => v.in_stock) ||
+                             data.data[0]
+          }
+          
+          if (variantToSelect) {
+            handleVariantSelect(variantToSelect)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты товара')
+      } finally {
+        setLoading(false)
+      }
+    }, [productId, initialVariantId])
+
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
-      )
-      const data = await response.json()
-      
-      if (data.success && data.data) {
-        setVariants(data.data)
-        
-        // Выбираем начальный вариант
-        let variantToSelect = null
-        
-        if (initialVariantId) {
-          variantToSelect = data.data.find((v: ProductVariantV2) => v.id === initialVariantId)
-        }
-        
-        if (!variantToSelect) {
-          // Приоритеты: рекомендуемый > избранный > в наличии > первый
-          variantToSelect = data.data.find((v: ProductVariantV2) => v.is_recommended) ||
-                           data.data.find((v: ProductVariantV2) => v.is_featured) ||
-                           data.data.find((v: ProductVariantV2) => v.in_stock) ||
-                           data.data[0]
-        }
-        
-        if (variantToSelect) {
-          handleVariantSelect(variantToSelect)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты товара')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleVariantSelect = (variant: ProductVariantV2) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2) => {
     setImageLoading(true)
     setSelectedVariant(variant)
     onVariantChange(variant)
     
     // Имитация загрузки изображения
     setTimeout(() => setImageLoading(false), 300)
-  }
+  }, [onVariantChange])
 
   const handleReturnToMaster = () => {
     setSelectedVariant(null)
@@ -151,7 +151,7 @@ export function ProductVariantSelectorV2({
   }
 
   // Группировка вариантов по атрибутам
-  const groupedVariants = useMemo(() => {
+  const _groupedVariants = useMemo(() => {
     const groups: Record<string, ProductVariantV2[]> = {}
     
     variants.forEach(variant => {

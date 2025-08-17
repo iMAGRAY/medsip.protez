@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
+import { guardDbOr503Fast, tablesExist } from '@/lib/api-guards'
 
-export async function GET(request: NextRequest) {
+export const dynamic = 'force-dynamic'
+
+export async function GET(_request: NextRequest) {
   try {
-    // Загружаем все группы характеристик (используем корневые группы как разделы)
+    const guard = guardDbOr503Fast()
+    if (guard) return guard
+
+    const need = await tablesExist(['characteristics_groups_simple','characteristics_values_simple'])
+    if (!need.characteristics_groups_simple || !need.characteristics_values_simple) {
+      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
+    }
+
     const groupsQuery = `
       SELECT
         cg.id as group_id,
@@ -26,7 +36,6 @@ export async function GET(request: NextRequest) {
     const groupsResult = await executeQuery(groupsQuery)
     const groups = groupsResult.rows
 
-    // Создаем разделы из корневых групп
     const sectionsMap = new Map()
     groups.forEach(group => {
       if (!group.parent_id) {
@@ -40,7 +49,6 @@ export async function GET(request: NextRequest) {
     })
     const sections = Array.from(sectionsMap.values())
 
-    // Загружаем все значения характеристик
     const valuesQuery = `
       SELECT
         cv.id,
@@ -57,7 +65,6 @@ export async function GET(request: NextRequest) {
     const valuesResult = await executeQuery(valuesQuery)
     const values = valuesResult.rows
 
-    // Группируем значения по группам
     const valuesByGroup = values.reduce((acc: any, value: any) => {
       if (!acc[value.group_id]) {
         acc[value.group_id] = []
@@ -67,12 +74,11 @@ export async function GET(request: NextRequest) {
         value: value.value,
         color_hex: value.color_hex,
         sort_order: value.sort_order,
-        is_selected: false // Для новых продуктов ничего не выбрано
+        is_selected: false
       })
       return acc
     }, {})
 
-    // Группируем группы по разделам
     const groupsBySection = groups.reduce((acc: any, group: any) => {
       if (!acc[group.section_id]) {
         acc[group.section_id] = []
@@ -87,7 +93,6 @@ export async function GET(request: NextRequest) {
       return acc
     }, {})
 
-    // Формируем итоговую структуру разделов
     const sectionsWithGroups = sections.map((section: any) => ({
       section_id: section.section_id,
       section_name: section.section_name,
@@ -96,8 +101,6 @@ export async function GET(request: NextRequest) {
       groups: groupsBySection[section.section_id] || []
     }))
 
-    // Формируем список всех доступных групп характеристик
-    // Исключаем дублирование - берем только группы, которые реально есть в разделах
     const availableCharacteristics = sectionsWithGroups.flatMap(section =>
       section.groups.map((group: any) => ({
         group_id: group.group_id,
@@ -114,12 +117,11 @@ export async function GET(request: NextRequest) {
       data: {
         sections: sectionsWithGroups,
         available_characteristics: availableCharacteristics,
-        selected_characteristics: [] // Для новых продуктов пустой массив
+        selected_characteristics: []
       }
     })
 
   } catch (error) {
-    console.error('❌ Error loading available characteristics:', error)
     return NextResponse.json(
       {
         success: false,

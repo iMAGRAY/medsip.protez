@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,13 +9,11 @@ import { Progress } from '@/components/ui/progress'
 import {
   Warehouse,
   Package,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
   Loader2,
   MapPin,
   Thermometer,
-  Droplets,
   Calendar,
   BarChart3
 } from 'lucide-react'
@@ -77,46 +75,46 @@ export function WarehouseSection() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('near')
 
+  const fetchWarehouseData = useCallback(async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Загружаем зоны
+        const zonesResponse = await fetch('/api/warehouse/zones')
+        if (!zonesResponse.ok) {
+          throw new Error('Ошибка загрузки зон склада')
+        }
+        const zonesData = await zonesResponse.json()
+        setZones(zonesData.data || [])
+
+        // Загружаем секции
+        const sectionsResponse = await fetch('/api/warehouse/sections')
+        if (!sectionsResponse.ok) {
+          throw new Error('Ошибка загрузки секций склада')
+        }
+        const sectionsData = await sectionsResponse.json()
+        setSections(sectionsData.data || [])
+
+        // Загружаем инвентарь
+        const inventoryResponse = await fetch('/api/warehouse/inventory')
+        if (!inventoryResponse.ok) {
+          throw new Error('Ошибка загрузки инвентаря')
+        }
+        const inventoryData = await inventoryResponse.json()
+        setInventory(inventoryData.data || [])
+
+      } catch (error) {
+        console.error('Ошибка загрузки данных склада:', error)
+        setError(error instanceof Error ? error.message : 'Неизвестная ошибка')
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     fetchWarehouseData()
-  }, [])
-
-  const fetchWarehouseData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Загружаем зоны
-      const zonesResponse = await fetch('/api/warehouse/zones')
-      if (!zonesResponse.ok) {
-        throw new Error('Ошибка загрузки зон склада')
-      }
-      const zonesData = await zonesResponse.json()
-      setZones(zonesData.data || [])
-
-      // Загружаем секции
-      const sectionsResponse = await fetch('/api/warehouse/sections')
-      if (!sectionsResponse.ok) {
-        throw new Error('Ошибка загрузки секций склада')
-      }
-      const sectionsData = await sectionsResponse.json()
-      setSections(sectionsData.data || [])
-
-      // Загружаем инвентарь
-      const inventoryResponse = await fetch('/api/warehouse/inventory')
-      if (!inventoryResponse.ok) {
-        throw new Error('Ошибка загрузки инвентаря')
-      }
-      const inventoryData = await inventoryResponse.json()
-      setInventory(inventoryData.data || [])
-
-    } catch (error) {
-      console.error('Ошибка загрузки данных склада:', error)
-      setError(error instanceof Error ? error.message : 'Неизвестная ошибка')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [fetchWarehouseData])
 
   const getUtilizationColor = (percentage: number) => {
     if (percentage < 70) return 'text-green-600'
@@ -153,7 +151,7 @@ export function WarehouseSection() {
     })
   }
 
-  const formatPrice = (price: string) => {
+  const _formatPrice = (price: string) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB',

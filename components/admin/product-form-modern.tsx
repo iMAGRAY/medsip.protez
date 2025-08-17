@@ -1,9 +1,8 @@
-'use client'
+"use client"
 
 import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, Save, X } from 'lucide-react'
@@ -48,7 +47,7 @@ interface ProductFormModernProps {
   onCancel?: () => void
 }
 
-export function ProductFormModern({ product, onSave, onCancel }: ProductFormModernProps) {
+export function ProductFormModern({ product, onSave: _onSave, onCancel }: ProductFormModernProps) {
   const { toast: toastHook } = useToast()
   const [activeTab, setActiveTab] = useState('basic')
 
@@ -71,7 +70,7 @@ export function ProductFormModern({ product, onSave, onCancel }: ProductFormMode
     actions,
     data,
     operations,
-    utils
+    utils: _utils
   } = useProductForm(product)
 
   const {
@@ -82,8 +81,8 @@ export function ProductFormModern({ product, onSave, onCancel }: ProductFormMode
     isDirty,
     productImages,
     productCharacteristics,
-    newProductSelectionTables,
-    existingProductSelectionTables
+    newProductSelectionTables: _newProductSelectionTables,
+    existingProductSelectionTables: _existingProductSelectionTables
   } = state
 
   const {

@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -68,35 +68,35 @@ export default function RedisMonitorPage() {
 
   const { toast } = useToast()
 
-  const fetchRedisStats = async () => {
-    try {
-      const response = await fetch('/api/redis-status')
-      const data = await response.json()
+  const fetchRedisStats = useCallback(async () => {
+      try {
+        const response = await fetch('/api/redis-status')
+        const data = await response.json()
 
-      if (data.success) {
-        setStats(data)
-        setLastUpdate(new Date())
-      } else {
-        toast({
-          title: "Ошибка",
-          description: data.error || "Не удалось получить статус Redis",
-          variant: "destructive"
-        })
+        if (data.success) {
+          setStats(data)
+          setLastUpdate(new Date())
+        } else {
+          toast({
+            title: "Ошибка",
+            description: data.error || "Не удалось получить статус Redis",
+            variant: "destructive"
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching Redis stats:', error)
+        if (loading || refreshing) { // Показываем toast только при ручном обновлении
+          toast({
+            title: "Ошибка подключения",
+            description: "Не удалось связаться с Redis сервером",
+            variant: "destructive"
+          })
+        }
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
       }
-    } catch (error) {
-      console.error('Error fetching Redis stats:', error)
-      if (loading || refreshing) { // Показываем toast только при ручном обновлении
-        toast({
-          title: "Ошибка подключения",
-          description: "Не удалось связаться с Redis сервером",
-          variant: "destructive"
-        })
-      }
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }
+    }, [loading, refreshing, toast])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -133,7 +133,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось очистить кеш",
@@ -185,7 +185,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Неверный JSON или ошибка сохранения",
@@ -235,7 +235,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось получить данные",
@@ -271,7 +271,7 @@ export default function RedisMonitorPage() {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Не удалось выполнить ping",
@@ -301,7 +301,7 @@ export default function RedisMonitorPage() {
         clearInterval(interval)
       }
     }
-  }, [autoUpdateEnabled])
+  }, [fetchRedisStats, autoUpdateEnabled])
 
   if (loading) {
     return (

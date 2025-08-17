@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { destroyUserSession, AUTH_CONFIG } from '@/lib/database-auth'
 import { logger } from '@/lib/logger'
 

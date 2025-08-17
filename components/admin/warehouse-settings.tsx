@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,14 +11,11 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import {
   Settings,
-  AlertTriangle,
-  Clock,
   Package,
   TrendingUp,
   Shield,
   Database,
   Bell,
-  Users,
   CheckCircle,
   Save,
   RefreshCw
@@ -78,26 +75,26 @@ export function WarehouseSettings() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  const loadSettings = useCallback(async () => {
+      setLoading(true)
+      try {
+        const response = await fetch('/api/warehouse/settings')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success) {
+            setSettings(prev => ({ ...prev, ...result.data }))
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки настроек:', error)
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     loadSettings()
-  }, [])
-
-  const loadSettings = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/warehouse/settings')
-      if (response.ok) {
-        const result = await response.json()
-        if (result.success) {
-          setSettings({ ...settings, ...result.data })
-        }
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки настроек:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadSettings])
 
   const saveSettings = async () => {
     setSaving(true)

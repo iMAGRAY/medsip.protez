@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { testConnection } from '@/lib/db-connection'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
-    // Проверяем соединение с БД
     const isConnected = await testConnection()
 
     if (isConnected) {
@@ -14,19 +15,17 @@ export async function GET() {
       })
     } else {
       return NextResponse.json({
-        status: 'error',
+        status: 'degraded',
         database: 'disconnected',
         timestamp: new Date().toISOString()
-      }, { status: 500 })
+      }, { status: 503 })
     }
   } catch (error) {
-    console.error('Database status check failed:', error)
-
     return NextResponse.json({
-      status: 'error',
+      status: 'degraded',
       database: 'disconnected',
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString()
-    }, { status: 500 })
+    }, { status: 503 })
   }
 }

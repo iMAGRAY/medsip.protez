@@ -72,14 +72,10 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     ([_, itemConfig]) => itemConfig.theme || itemConfig.color
   )
 
-  if (!colorConfig.length) {
-    return null
-  }
-
   // Создаем безопасные CSS стили без использования dangerouslySetInnerHTML
   const styles = Object.entries(THEMES)
     .map(([theme, prefix]) => {
-      const cssRules = colorConfig
+      const _cssRules = colorConfig
         .map(([key, itemConfig]) => {
           const color =
             itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
@@ -89,11 +85,19 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
         .filter(Boolean)
         .join(' ')
 
-      return { prefix, cssRules }
+      return { prefix, cssRules: _cssRules }
     })
 
   // Применяем стили через style объект вместо HTML
   React.useEffect(() => {
+    if (typeof document === 'undefined') return
+
+    // Если нет цветовых правил — не добавляем пустой стиль
+    const hasRules = styles.some(s => s.cssRules && s.cssRules.length > 0)
+    if (!hasRules) {
+      return
+    }
+
     const styleElement = document.createElement('style')
     styleElement.id = `chart-style-${id}`
 
@@ -106,12 +110,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
     return () => {
       const existingStyle = document.getElementById(`chart-style-${id}`)
-      if (existingStyle) {
-        document.head.removeChild(existingStyle)
+      if (existingStyle && existingStyle.parentNode) {
+        existingStyle.parentNode.removeChild(existingStyle)
       }
     }
   }, [id, styles])
 
+  // Всегда ничего не рендерим — эффект управляет стилями
   return null
 }
 

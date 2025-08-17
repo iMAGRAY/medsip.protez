@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,8 +26,7 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Tag, Palette, Hash, Move, Sparkles, TrendingUp, Star, Percent, Crown, Gem, Leaf, ShieldCheck, Truck, Flag } from 'lucide-react'
-import * as Icons from 'lucide-react'
+import { Plus, Pencil, Trash2, Tag, Sparkles, TrendingUp, Star, Percent, Crown, Gem, Leaf, ShieldCheck, Truck, Flag } from 'lucide-react'
 
 interface ProductTag {
   id: number
@@ -71,41 +70,41 @@ export default function ProductTagsPage() {
     sort_order: 0
   })
 
+  const fetchTags = useCallback(async () => {
+      try {
+        const response = await fetch('/api/product-tags?include_inactive=true', {
+          credentials: 'include', // Важно для передачи cookies
+        })
+        const data = await response.json()
+        
+        if (data.success) {
+          setTags(data.data)
+        } else {
+          toast.error('Ошибка загрузки тегов')
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        toast.error('Ошибка соединения с сервером')
+      } finally {
+        setIsLoading(false)
+      }
+    }, [])
+
   useEffect(() => {
     fetchTags()
-  }, [])
-
-  const fetchTags = async () => {
-    try {
-      const response = await fetch('/api/product-tags?include_inactive=true', {
-        credentials: 'include', // Важно для передачи cookies
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        setTags(data.data)
-      } else {
-        toast.error('Ошибка загрузки тегов')
-      }
-    } catch (error) {
-      console.error('Error fetching tags:', error)
-      toast.error('Ошибка загрузки тегов')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [fetchTags])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      const method = editingTag ? 'PUT' : 'POST'
+      const _method = editingTag ? 'PUT' : 'POST'
       const body = editingTag 
         ? { id: editingTag.id, ...formData }
         : formData
       
       const response = await fetch('/api/product-tags', {
-        method,
+        method: _method,
         headers: {
           'Content-Type': 'application/json',
         },

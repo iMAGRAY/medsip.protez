@@ -239,7 +239,7 @@ export function CharacteristicsTemplatesManager({
             } else {
               errorCount++
             }
-          } catch (error) {
+          } catch (_error) {
             errorCount++
           }
         }

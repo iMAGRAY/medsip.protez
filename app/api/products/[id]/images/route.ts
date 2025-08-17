@@ -3,11 +3,12 @@ import { executeQuery } from '@/lib/db-connection'
 import { requireAuth, hasPermission } from '@/lib/database-auth'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id);
+    const { id } = await params
+    const productId = parseInt(id);
 
     if (isNaN(productId)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
@@ -35,14 +36,13 @@ export async function GET(
     // Process images from JSON field or fallback to image_url
     try {
       if (product.images && Array.isArray(product.images)) {
-        imageUrls = product.images.map((img, index) =>
+        imageUrls = product.images.map((img, _index) =>
           typeof img === 'string' ? img : img.url || img.image_url
         ).filter(Boolean);
       } else if (product.image_url) {
         imageUrls = [product.image_url];
       }
     } catch (error) {
-      console.warn('Could not parse product images:', error);
       imageUrls = product.image_url ? [product.image_url] : [];
     }
 
@@ -52,7 +52,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching product images:', error);
     return NextResponse.json({
       error: 'Failed to fetch product images',
       details: error.message
@@ -62,7 +61,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -84,7 +83,8 @@ export async function PUT(
       )
     }
 
-    const productId = parseInt(params.id);
+    const { id } = await params
+    const productId = parseInt(id);
     const { images } = await request.json();
 
     if (isNaN(productId)) {
@@ -118,7 +118,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Error updating product images:', error);
     return NextResponse.json({
       error: 'Failed to update product images',
       details: error.message

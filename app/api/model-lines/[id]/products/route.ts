@@ -6,11 +6,12 @@ const pool = new Pool({
 });
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
 
   try {
+    const resolvedParams = await params
 
     const client = await pool.connect();
 
@@ -26,7 +27,7 @@ export async function GET(
         WHERE ml.id = $1
       `;
 
-      const modelLineResult = await client.query(modelLineQuery, [params.id]);
+      const modelLineResult = await client.query(modelLineQuery, [resolvedParams.id]);
 
       if (modelLineResult.rows.length === 0) {
         client.release();
@@ -50,7 +51,7 @@ export async function GET(
         ORDER BY p.name
       `;
 
-      const productsResult = await client.query(productsQuery, [params.id]);
+      const productsResult = await client.query(productsQuery, [resolvedParams.id]);
 
       client.release();
 
@@ -62,14 +63,6 @@ export async function GET(
         }
       });
     } catch (innerError) {
-      console.error('Inner SQL error:', innerError);
-      console.error('Error details:', {
-        message: innerError.message,
-        code: innerError.code,
-        detail: innerError.detail,
-        hint: innerError.hint,
-        position: innerError.position
-      });
       client.release();
       return NextResponse.json(
         { success: false, error: `Ошибка SQL: ${innerError.message}` },
@@ -77,12 +70,6 @@ export async function GET(
       );
     }
   } catch (error) {
-    console.error('Ошибка получения продуктов модельного ряда:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     return NextResponse.json(
       { success: false, error: `Ошибка получения данных: ${error.message}` },
       { status: 500 }

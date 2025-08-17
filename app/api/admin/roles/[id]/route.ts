@@ -15,7 +15,7 @@ function getDbConnection() {
 // GET - получение конкретной роли
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -39,7 +39,8 @@ return NextResponse.json(
       )
     }
 
-    const roleId = parseInt(params.id)
+    const resolvedParams = await params
+    const roleId = parseInt(resolvedParams.id)
     if (isNaN(roleId)) {
 
       return NextResponse.json(
@@ -87,7 +88,6 @@ await client.end()
         }
       })
     } catch (error) {
-      console.error('Database error getting role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка получения роли из базы данных' },
@@ -95,7 +95,6 @@ await client.end()
       )
     }
   } catch (error) {
-    console.error('Error getting role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -106,7 +105,7 @@ await client.end()
 // PATCH - обновление роли (только для главного администратора)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -126,7 +125,8 @@ export async function PATCH(
       )
     }
 
-    const roleId = parseInt(params.id)
+    const resolvedParams = await params
+    const roleId = parseInt(resolvedParams.id)
     if (isNaN(roleId)) {
       return NextResponse.json(
         { error: 'Invalid role ID' },
@@ -244,7 +244,6 @@ export async function PATCH(
         }
       })
     } catch (error) {
-      console.error('Database error updating role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка обновления роли в базе данных' },
@@ -252,7 +251,6 @@ export async function PATCH(
       )
     }
   } catch (error) {
-    console.error('Error updating role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -263,7 +261,7 @@ export async function PATCH(
 // DELETE - удаление роли (только для главного администратора)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Проверяем аутентификацию
@@ -283,7 +281,8 @@ export async function DELETE(
       )
     }
 
-    const roleId = parseInt(params.id)
+    const resolvedParams = await params
+    const roleId = parseInt(resolvedParams.id)
     if (isNaN(roleId)) {
       return NextResponse.json(
         { error: 'Invalid role ID' },
@@ -361,7 +360,6 @@ export async function DELETE(
         message: 'Роль успешно удалена'
       })
     } catch (error) {
-      console.error('Database error deleting role:', error)
       await client.end()
       return NextResponse.json(
         { error: 'Ошибка удаления роли в базе данных' },
@@ -369,7 +367,6 @@ export async function DELETE(
       )
     }
   } catch (error) {
-    console.error('Error deleting role:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

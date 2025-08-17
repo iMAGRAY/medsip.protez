@@ -1,5 +1,5 @@
-"use client";
-import { useEffect, useState } from "react"
+"use client"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,12 +7,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-import { Plus, Edit, Trash2, Settings, Database, List, ChevronDown, ChevronRight, Zap, Edit2, Hash, Folder, FolderOpen, Package, Tag } from "lucide-react"
+import { Plus, Edit, Trash2, Settings, Database, ChevronDown, ChevronRight, Hash, Folder, FolderOpen, Package, Tag } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 interface SpecGroup {
@@ -81,8 +78,8 @@ interface ProductCharacteristic {
 
 export default function SpecificationsAdmin() {
   const [specGroups, setSpecGroups] = useState<SpecGroup[]>([])
-  const [productSizes, setProductSizes] = useState<ProductSize[]>([])
-  const [productCharacteristics, setProductCharacteristics] = useState<ProductCharacteristic[]>([])
+  const [_productSizes, setProductSizes] = useState<ProductSize[]>([])
+  const [_productCharacteristics, setProductCharacteristics] = useState<ProductCharacteristic[]>([])
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
 
@@ -91,7 +88,7 @@ export default function SpecificationsAdmin() {
   const [isEnumDialogOpen, setIsEnumDialogOpen] = useState(false)
   const [editingGroup, setEditingGroup] = useState<SpecGroup | null>(null)
   const [editingEnum, setEditingEnum] = useState<SpecEnum | null>(null)
-  const [isCreatingSection, setIsCreatingSection] = useState(false) // Флаг для создания раздела
+  const [_isCreatingSection, setIsCreatingSection] = useState(false) // Флаг для создания раздела
 
   // Состояния для удаления
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -157,8 +154,110 @@ export default function SpecificationsAdmin() {
     return colorMap[normalizedName] || '#E5E7EB' // По умолчанию серый
   }
 
+  // Функция для построения иерархической структуры
+  const buildHierarchy = useCallback((flatGroups: SpecGroup[]): SpecGroup[] => {
+
+    // Логируем все группы для отладки
+    flatGroups.forEach(_group => {
+      // Debug logging можно добавить здесь при необходимости
+    })
+
+    // Создаем карту групп по ID для быстрого поиска
+    const groupMap = new Map<string | number, SpecGroup>()
+    flatGroups.forEach(group => {
+      groupMap.set(group.id, { ...group, children: [] })
+    })
+
+    const rootGroups: SpecGroup[] = []
+
+    // Строим дерево, устанавливая связи parent-child
+    flatGroups.forEach(group => {
+      const currentGroup = groupMap.get(group.id)!
+      
+      if (group.parent_id && groupMap.has(group.parent_id)) {
+        const parentGroup = groupMap.get(group.parent_id)!
+        parentGroup.children!.push(currentGroup)
+      } else {
+        rootGroups.push(currentGroup)
+      }
+    })
+
+    // Сортируем группы по ordering
+    const sortGroups = (groups: SpecGroup[]) => {
+      groups.sort((a, b) => {
+        return (a.ordering || 0) - (b.ordering || 0)
+      })
+      
+      groups.forEach(group => {
+        if (group.children && group.children.length > 0) {
+          sortGroups(group.children)
+        }
+      })
+    }
+
+    sortGroups(rootGroups)
+
+    // Устанавливаем уровни рекурсивно
+    const setLevels = (groups: SpecGroup[], level: number = 0) => {
+      groups.forEach(group => {
+        group.level = level
+
+        if (group.children && group.children.length > 0) {
+          setLevels(group.children, level + 1)
+        }
+      })
+    }
+
+    setLevels(rootGroups)
+
+    // Логируем финальную структуру
+    const logHierarchy = (groups: SpecGroup[], indent = '') => {
+      groups.forEach(group => {
+if (group.children && group.children.length > 0) {
+          logHierarchy(group.children, indent + '  ')
+        }
+      })
+    }
+
+    logHierarchy(rootGroups)
+
+    return rootGroups
+  }, [])
+
+  // Функция для обработки данных из API characteristics
+  const processHierarchicalGroups = useCallback((groups: any[]): SpecGroup[] => {
+    const processGroup = (group: any): SpecGroup => {
+      // API возвращает "enums", но мы используем "enum_values" в интерфейсе
+      const enumValues = group.enums || group.enum_values || []
+      const enumCount = group.enum_values_count || enumValues.length || 0
+
+      const processedGroup: SpecGroup = {
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        enum_count: enumCount,
+        enum_values: enumValues, // Используем данные из API
+        enums: enumValues,       // Дублируем для совместимости
+        parent_id: group.parent_id,
+        level: 0, // Будет вычислен в buildHierarchy
+        source_type: 'spec_group',
+        original_id: typeof group.id === 'string' && group.id.startsWith('section_') ? group.id : group.id,
+        ordering: group.ordering || 0,
+        children: [],
+        is_section: group.is_section || false // Добавляем флаг для определения раздела
+      }
+
+      return processedGroup
+    }
+
+    const processedGroups = groups.map(processGroup)
+
+    // Строим иерархическую структуру из плоского списка
+    return buildHierarchy(processedGroups)
+  }, [buildHierarchy])
+
   // Загрузка данных
-  const loadSpecGroups = async () => {
+  const loadSpecGroups = useCallback(async () => {
     try {
 
       const res = await fetch("/api/characteristics")
@@ -240,110 +339,7 @@ allGroups.push({
         variant: "destructive"
       })
     }
-  }
-
-  // Функция для обработки данных из API characteristics
-  const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
-    const processGroup = (group: any): SpecGroup => {
-      // API возвращает "enums", но мы используем "enum_values" в интерфейсе
-      const enumValues = group.enums || group.enum_values || []
-      const enumCount = group.enum_values_count || enumValues.length || 0
-
-      const processedGroup: SpecGroup = {
-        id: group.id,
-        name: group.name,
-        description: group.description,
-        enum_count: enumCount,
-        enum_values: enumValues, // Используем данные из API
-        enums: enumValues,       // Дублируем для совместимости
-        parent_id: group.parent_id,
-        level: 0, // Будет вычислен в buildHierarchy
-        source_type: 'spec_group',
-        original_id: typeof group.id === 'string' && group.id.startsWith('section_') ? group.id : group.id,
-        ordering: group.ordering || 0,
-        children: [],
-        is_section: group.is_section || false // Добавляем флаг для определения раздела
-      }
-
-      return processedGroup
-    }
-
-    const processedGroups = groups.map(processGroup)
-
-    // Строим иерархическую структуру из плоского списка
-    return buildHierarchy(processedGroups)
-  }
-
-  // Функция для построения иерархической структуры
-  const buildHierarchy = (flatGroups: SpecGroup[]): SpecGroup[] => {
-
-    // Логируем все группы для отладки
-    flatGroups.forEach(group => {
-})
-
-    // Создаем карту групп по ID для быстрого поиска
-    const groupMap = new Map<string | number, SpecGroup>()
-    flatGroups.forEach(group => {
-      groupMap.set(group.id, { ...group, children: [] })
-    })
-
-    const rootGroups: SpecGroup[] = []
-
-    // Строим дерево, устанавливая связи parent-child
-    flatGroups.forEach(group => {
-      const currentGroup = groupMap.get(group.id)!
-
-      if (group.parent_id && groupMap.has(group.parent_id)) {
-        // Это дочерняя группа
-        const parentGroup = groupMap.get(group.parent_id)!
-        if (!parentGroup.children) {
-          parentGroup.children = []
-        }
-        parentGroup.children.push(currentGroup)
-} else {
-        // Это корневая группа
-        rootGroups.push(currentGroup)
-}
-    })
-
-    // Сортируем группы по ordering
-    const sortGroups = (groups: SpecGroup[]) => {
-      groups.sort((a, b) => (a.ordering || 0) - (b.ordering || 0))
-      groups.forEach(group => {
-        if (group.children && group.children.length > 0) {
-          sortGroups(group.children)
-        }
-      })
-    }
-
-    sortGroups(rootGroups)
-
-    // Устанавливаем уровни рекурсивно
-    const setLevels = (groups: SpecGroup[], level: number = 0) => {
-      groups.forEach(group => {
-        group.level = level
-
-        if (group.children && group.children.length > 0) {
-          setLevels(group.children, level + 1)
-        }
-      })
-    }
-
-    setLevels(rootGroups)
-
-    // Логируем финальную структуру
-    const logHierarchy = (groups: SpecGroup[], indent = '') => {
-      groups.forEach(group => {
-if (group.children && group.children.length > 0) {
-          logHierarchy(group.children, indent + '  ')
-        }
-      })
-    }
-
-    logHierarchy(rootGroups)
-
-    return rootGroups
-  }
+  }, [processHierarchicalGroups])
 
   const loadProductSizes = async () => {
     try {
@@ -365,19 +361,20 @@ if (group.children && group.children.length > 0) {
               console.error("Ошибка загрузки характеристик товаров:", error)
     }
   }
+    const loadData = useCallback(async () => {
+              setLoading(true)
+              await Promise.all([
+                loadSpecGroups(),
+                loadProductSizes(),
+                loadProductCharacteristics()
+              ])
+              setLoading(false)
+            }, [loadSpecGroups])
+
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      await Promise.all([
-        loadSpecGroups(),
-        loadProductSizes(),
-        loadProductCharacteristics()
-      ])
-      setLoading(false)
-    }
     loadData()
-  }, [])
+  }, [loadData])
 
   const resetGroupForm = () => {
     setEditingGroup(null)
@@ -434,7 +431,7 @@ if (group.children && group.children.length > 0) {
     }
 
     try {
-      const method = editingGroup ? "PUT" : "POST"
+      const _method = editingGroup ? "PUT" : "POST"
 
       // Определяем правильный ID и URL для запроса
       let editingId = null
@@ -467,13 +464,13 @@ if (group.children && group.children.length > 0) {
       }
 
       const res = await fetch(url, {
-        method,
+        method: _method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       })
 
       if (res.ok) {
-        const responseData = await res.json()
+        const _responseData = await res.json()
 
         const isSubgroup = groupFormData.parent_id !== undefined
         const isSection = groupFormData.is_section
@@ -580,7 +577,7 @@ if (group.children && group.children.length > 0) {
       setDeletingGroupId(actualId)
       setIsDeleteDialogOpen(true)
 
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка получения информации об удалении",
@@ -614,7 +611,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления группы",
@@ -671,10 +668,10 @@ if (group.children && group.children.length > 0) {
         ? `/api/characteristics/values?id=${editingEnum.id}`
         : "/api/characteristics/values"
 
-      const method = editingEnum ? "PUT" : "POST"
+      const _method = editingEnum ? "PUT" : "POST"
 
       const res = await fetch(url, {
-        method,
+        method: _method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           group_id: enumFormData.groupId,
@@ -702,7 +699,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка сохранения характеристики",
@@ -739,7 +736,7 @@ if (group.children && group.children.length > 0) {
           })
         }
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления характеристики",
@@ -771,7 +768,7 @@ if (group.children && group.children.length > 0) {
           variant: "destructive"
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Ошибка",
         description: "Ошибка удаления характеристики",
@@ -781,7 +778,7 @@ if (group.children && group.children.length > 0) {
   }
 
   // Функция для переключения сворачивания разделов
-  const toggleSectionCollapse = (sectionId: string) => {
+  const _toggleSectionCollapse = (sectionId: string) => {
     const newCollapsed = new Set(collapsedSections)
     if (newCollapsed.has(sectionId)) {
       newCollapsed.delete(sectionId)
@@ -1035,10 +1032,10 @@ if (group.children && group.children.length > 0) {
                   }
 
                   // Устанавливаем группу для создания характеристики
-                  const groupId = typeof group.id === 'string' && group.id.startsWith('spec_')
+                  const _groupId = typeof group.id === 'string' && group.id.startsWith('spec_')
                     ? parseInt(group.id.replace('spec_', ''))
                     : typeof group.id === 'number' ? group.id : 0;
-                  setEnumFormData(prev => ({ ...prev, groupId }));
+                  setEnumFormData(prev => ({ ...prev, groupId: _groupId }));
                   setIsEnumDialogOpen(true);
                 }}
                 className="h-6 w-6 p-0 text-gray-400 hover:text-green-600"
@@ -1348,7 +1345,7 @@ if (group.children && group.children.length > 0) {
                               <SelectItem value="root">Корневая группа</SelectItem>
                               {(() => {
                                 // Функция для получения всех доступных групп (исключая текущую и её дочерние)
-                                const getAllAvailableGroups = (groups: SpecGroup[], currentGroupId?: string | number): SpecGroup[] => {
+                                const getAllAvailableGroups = (groups: SpecGroup[], _currentGroupId?: string | number): SpecGroup[] => {
                                   const result: SpecGroup[] = [];
 
                                   const addGroup = (group: SpecGroup, level = 0) => {
@@ -1577,8 +1574,8 @@ if (group.children && group.children.length > 0) {
                     <span className="text-red-600 font-medium">⚠️ Внимание!</span>
                   </div>
                   <p className="text-sm text-red-700 mb-3">
-                    Вы собираетесь удалить {deleteInfo.group.type} <strong>"{deleteInfo.group.name}"</strong>.
-                    {deleteInfo.warnings.length > 0 && " Это приведет к следующим последствиям:"}
+                    Вы собираетесь удалить {deleteInfo.group.type} <strong>&quot;{deleteInfo.group.name}&quot;</strong>.
+                    {deleteInfo.warnings.length > 0 && ' Это приведет к следующим последствиям:'}
                   </p>
 
                   {deleteInfo.warnings.length > 0 && (

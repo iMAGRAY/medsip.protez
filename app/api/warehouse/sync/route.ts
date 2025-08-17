@@ -4,7 +4,7 @@ import { getCacheManager } from '@/lib/dependency-injection';
 import { invalidateRelated } from '@/lib/cache-manager';
 
 // POST - синхронизировать данные о товарах между складом и каталогом
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
     const cacheManager = getCacheManager();
 
     try {
@@ -54,10 +54,9 @@ export async function POST(request: NextRequest) {
                 'product:*'
             ]);
 
-            cacheManager.clearAll();
+            cacheManager.clear();
 
         } catch (cacheError) {
-            console.warn('⚠️ Не удалось инвалидировать кэш:', cacheError);
         }
 
         return NextResponse.json({
@@ -70,7 +69,6 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('❌ Ошибка синхронизации:', error);
         return NextResponse.json({
             success: false,
             error: 'Ошибка синхронизации данных о товарах'

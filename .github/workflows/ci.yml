@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
+
+  db-audit:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Run DB audit
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_AUDIT_OUTPUT: database/reports
+        run: node scripts/analysis/db-audit.js
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-audit-${{ github.run_id }}
+          path: database/reports

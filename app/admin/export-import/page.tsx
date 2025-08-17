@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Download, Table as TableIcon, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -30,19 +29,20 @@ export default function ExportImportAdminPage() {
   const [previewTable, setPreviewTable] = useState<string>('products')
 
   // Fetch preview when table changes
+    const loadPreview = useCallback(async () => {
+              try {
+                const res = await fetch(`/api/sql-table/${previewTable}`)
+                const data = await res.json()
+                setPreviewRows(data.rows || [])
+              } catch (error) {
+                console.error('Preview load error', error)
+                setPreviewRows([])
+              }
+            }, [previewTable])
+
   useEffect(() => {
-    const loadPreview = async () => {
-      try {
-        const res = await fetch(`/api/sql-table/${previewTable}`)
-        const data = await res.json()
-        setPreviewRows(data.rows || [])
-      } catch (error) {
-        console.error('Preview load error', error)
-        setPreviewRows([])
-      }
-    }
     loadPreview()
-  }, [previewTable])
+  }, [loadPreview])
 
   const toggleTable = (key: string) => {
     setSelectedTables((prev) => {
@@ -69,7 +69,7 @@ export default function ExportImportAdminPage() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    } catch (error) {
+    } catch (_error) {
       alert('Ошибка экспорта')
     }
   }
@@ -88,7 +88,7 @@ export default function ExportImportAdminPage() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    } catch (error) {
+    } catch (_error) {
       alert('Ошибка экспорта')
     }
   }

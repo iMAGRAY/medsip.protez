@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { CheckCircle, Circle, Star, Shield, Clock, Package, ChevronDown } from 'lucide-react'
+import { CheckCircle, Circle, Star, Package } from 'lucide-react'
 import { SafeImage } from '@/components/safe-image'
 import { toast } from 'sonner'
 
@@ -80,53 +80,53 @@ export function ProductVariantSelectorGrid({
   const [variants, setVariants] = useState<ProductVariantV2[]>([])
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantV2 | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showAll, setShowAll] = useState(false)
+  const [_showAll, _setShowAll] = useState(false)
+
+  const fetchVariants = useCallback(async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
+        )
+        const data = await response.json()
+        
+        if (data.success && data.data) {
+          // Фильтруем стандартные варианты
+          let filteredVariants = data.data.filter((variant: ProductVariantV2) => 
+            !variant.name?.toLowerCase().includes('standard')
+          )
+          
+          if (filteredVariants.length === 0) {
+            setVariants([])
+            setLoading(false)
+            return
+          }
+          
+          setVariants(filteredVariants)
+          
+          if (initialVariantId) {
+            const variantToSelect = filteredVariants.find((v: ProductVariantV2) => v.id === initialVariantId)
+            if (variantToSelect) {
+              handleVariantSelect(variantToSelect)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching variants:', error)
+        toast.error('Не удалось загрузить варианты товара')
+      } finally {
+        setLoading(false)
+      }
+    }, [productId, initialVariantId])
 
   useEffect(() => {
     fetchVariants()
-  }, [productId])
+  }, [fetchVariants])
 
-  const fetchVariants = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `/api/v2/product-variants?master_id=${productId}&include_images=true&include_characteristics=true`
-      )
-      const data = await response.json()
-      
-      if (data.success && data.data) {
-        // Фильтруем стандартные варианты
-        let filteredVariants = data.data.filter((variant: ProductVariantV2) => 
-          !variant.name?.toLowerCase().includes('standard')
-        )
-        
-        if (filteredVariants.length === 0) {
-          setVariants([])
-          setLoading(false)
-          return
-        }
-        
-        setVariants(filteredVariants)
-        
-        if (initialVariantId) {
-          const variantToSelect = filteredVariants.find((v: ProductVariantV2) => v.id === initialVariantId)
-          if (variantToSelect) {
-            handleVariantSelect(variantToSelect)
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching variants:', error)
-      toast.error('Не удалось загрузить варианты товара')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleVariantSelect = (variant: ProductVariantV2 | null) => {
+  const handleVariantSelect = useCallback((variant: ProductVariantV2 | null) => {
     setSelectedVariant(variant)
     onVariantChange(variant)
-  }
+  }, [onVariantChange])
 
   if (loading) {
     return (
@@ -160,8 +160,8 @@ export function ProductVariantSelectorGrid({
 
   // Определяем, сколько элементов показывать изначально на мобильных устройствах
   const mobileInitialCount = 6
-  const itemsToShow = showAll ? allItems : allItems.slice(0, mobileInitialCount)
-  const hasMoreItems = allItems.length > mobileInitialCount
+  const _itemsToShow = _showAll ? allItems : allItems.slice(0, mobileInitialCount)
+  const _hasMoreItems = allItems.length > mobileInitialCount
 
   return (
     <div className={cn("space-y-3", className)}>

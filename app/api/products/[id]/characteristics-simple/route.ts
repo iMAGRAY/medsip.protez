@@ -14,10 +14,11 @@ import { requireAuth, hasPermission } from '@/lib/database-auth';
 
 // GET /api/products/[id]/characteristics-simple - получить характеристики продукта из упрощенной системы
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const { id } = await params
+  const productId = parseInt(id);
 
   try {
     if (isNaN(productId)) {
@@ -207,7 +208,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('❌ Error loading product characteristics:', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка загрузки характеристик товара' },
       { status: 500 }
@@ -218,9 +218,10 @@ export async function GET(
 // POST /api/products/[id]/characteristics-simple - сохранить характеристики продукта
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const { id } = await params
+  const productId = parseInt(id);
 
   try {
     if (isNaN(productId)) {
@@ -258,7 +259,6 @@ export async function POST(
         const { value_id, additional_value } = char;
 
         if (!value_id) {
-          console.warn('Пропускаем характеристику без value_id:', char);
           continue;
         }
 
@@ -269,7 +269,6 @@ export async function POST(
         );
 
         if (valueCheck.rows.length === 0) {
-          console.warn(`Пропускаем несуществующий value_id: ${value_id}`);
           continue;
         }
 
@@ -300,7 +299,6 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка сохранения характеристик (упрощенная система):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка сохранения характеристик', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -311,9 +309,10 @@ export async function POST(
 // PUT /api/products/[id]/characteristics-simple - обновить характеристики продукта (UPSERT)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const { id } = await params
+  const productId = parseInt(id);
 
   try {
     // Проверяем аутентификацию
@@ -370,7 +369,6 @@ export async function PUT(
         const { value_id, value_name, group_name, additional_value } = char;
 
         if (!value_id) {
-          console.warn('⚠️ Пропускаем характеристику без value_id:', char);
           continue;
         }
 
@@ -379,10 +377,7 @@ export async function PUT(
         // Проверяем, является ли value_id временным (отрицательное число)
         const isTemporaryId = value_id < 0;
 
-        if (isTemporaryId) {
-
-          if (!value_name || !group_name) {
-            console.warn('⚠️ Пропускаем временную характеристику без value_name или group_name:', char);
+        if (isTemporaryId) {          if (!value_name || !group_name) {
             continue;
           }
 
@@ -418,7 +413,6 @@ export async function PUT(
           );
 
           if (valueCheck.rows.length === 0) {
-            console.warn(`⚠️ Пропускаем несуществующий value_id: ${value_id}`);
             continue;
           }
         }
@@ -450,7 +444,6 @@ export async function PUT(
     }
 
   } catch (error) {
-    console.error('❌ Ошибка обновления характеристик (упрощенная система):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка обновления характеристик', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -461,9 +454,10 @@ export async function PUT(
 // DELETE /api/products/[id]/characteristics-simple - удалить характеристики продукта
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const productId = parseInt(params.id);
+  const { id } = await params
+  const productId = parseInt(id);
 
   try {
     // Проверяем аутентификацию
@@ -510,7 +504,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('❌ Ошибка удаления характеристик (упрощенная система):', error);
     return NextResponse.json(
       { success: false, error: 'Ошибка удаления характеристик', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

@@ -2,12 +2,10 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Upload, X, Loader2, Star, Move, Copy, Maximize2, ImageIcon } from "lucide-react"
-import { MediaManager, type UploadResult, type UploadOptions } from "@/lib/s3-client"
+import { Upload, X, Loader2, Star, Maximize2, ImageIcon } from "lucide-react"
+import { MediaManager, type UploadOptions } from "@/lib/s3-client"
 import { DuplicateFileDialog } from "@/components/admin/duplicate-file-dialog"
 import { DuplicateFileInfo, DuplicateCheckResult } from "@/lib/file-hash"
 import { SafeImage } from "@/components/safe-image"
@@ -54,7 +52,7 @@ export function ProductImageUploader({
   })
   
   const [files, setFiles] = useState<File[]>([])
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
+  const [_uploadProgress, __setUploadProgress] = useState<{ [key: string]: number }>({})
   const [uploading, setUploading] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [selectedIndices, setSelectedIndices] = useState<number[]>([])
@@ -109,9 +107,9 @@ export function ProductImageUploader({
     }
   }
 
-  const handleDuplicateChoice = (file: File, existingFile: DuplicateFileInfo): Promise<'use-existing' | 'upload-new' | 'cancel'> => {
-    return new Promise((resolve) => {
-      setCurrentDuplicate({ file, existingFile, resolve })
+  const handleDuplicateChoice = (_file: File, _existingFile: DuplicateFileInfo): Promise<'use-existing' | 'upload-new' | 'cancel'> => {
+    return new Promise((_resolve) => {
+      setCurrentDuplicate({ file: _file, existingFile: _existingFile, resolve: _resolve })
       setDuplicateDialogOpen(true)
     })
   }
@@ -136,7 +134,7 @@ export function ProductImageUploader({
   }
 
   // Синхронизация изображений с базой данных
-  const syncImagesToDatabase = async (images: string[]) => {
+  const _syncImagesToDatabase = async (images: string[]) => {
     // Используем переданный productId или пытаемся получить из URL
     let resolvedProductId: string | null = null
     let useVariantApi = isVariant // Используем переданный prop
@@ -231,7 +229,7 @@ export function ProductImageUploader({
           folder: 'products',
           checkDuplicates: true,
           onProgress: (progress) => {
-            setUploadProgress(prev => ({
+            __setUploadProgress(prev => ({
               ...prev,
               [file.name]: progress
             }))
@@ -264,7 +262,7 @@ export function ProductImageUploader({
 
     // Очищаем состояние
     setFiles([])
-    setUploadProgress({})
+    __setUploadProgress({})
     setUploading(false)
   }
 
@@ -288,7 +286,7 @@ export function ProductImageUploader({
         folder: 'products',
         checkDuplicates: true,
         onProgress: (progress) => {
-          setUploadProgress(prev => ({
+          __setUploadProgress(prev => ({
             ...prev,
             [file.name]: progress
           }))
@@ -328,7 +326,7 @@ export function ProductImageUploader({
     } catch (error) {
       console.error('Error replacing image:', error)
     } finally {
-      setUploadProgress({})
+      __setUploadProgress({})
       setUploading(false)
       setReplacingIndex(null)
       // Очищаем input
@@ -535,7 +533,7 @@ export function ProductImageUploader({
     setFullscreenImageIndex(newIndex)
   }, [fullscreenImageIndex, safeProductImages.length])
 
-  const navigateImage = (direction: 'prev' | 'next') => {
+  const _navigateImage = (direction: 'prev' | 'next') => {
     if (safeProductImages.length === 0) return
 
     let newIndex = selectedImageIndex
@@ -612,7 +610,7 @@ export function ProductImageUploader({
     }
   }, [fullscreenOpen, navigateFullscreen, closeFullscreen])
 
-  const totalImages = safeProductImages.length + files.length
+  const _totalImages = safeProductImages.length + files.length
 
   return (
     <>

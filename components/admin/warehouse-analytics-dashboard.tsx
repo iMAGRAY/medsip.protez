@@ -12,19 +12,14 @@ import {
   MapPin,
   Warehouse,
   Package,
-  Users,
-  Activity,
   AlertTriangle,
   CheckCircle,
   Clock,
   BarChart3,
   PieChart,
   Globe,
-  Zap,
   Target,
-  DollarSign,
   RefreshCw,
-  Filter,
   Download
 } from 'lucide-react'
 
@@ -102,15 +97,15 @@ export const WarehouseAnalyticsDashboard: React.FC<WarehouseAnalyticsDashboardPr
 
     const totalCapacity = filteredWarehouses.reduce((sum, w) => sum + w.capacity, 0)
     const totalUsed = filteredWarehouses.reduce((sum, w) => sum + w.used, 0)
-    const avgEfficiency = filteredWarehouses.length > 0
+    const _avgEfficiency = filteredWarehouses.length > 0
       ? filteredWarehouses.reduce((sum, w) => sum + w.efficiency, 0) / filteredWarehouses.length
       : 0
 
-    const criticalAlerts = filteredWarehouses.reduce((sum, w) =>
+    const _criticalAlerts = filteredWarehouses.reduce((sum, w) =>
       sum + w.alerts.filter(a => a.type === 'critical').length, 0
     )
 
-    const warningAlerts = filteredWarehouses.reduce((sum, w) =>
+    const _warningAlerts = filteredWarehouses.reduce((sum, w) =>
       sum + w.alerts.filter(a => a.type === 'warning').length, 0
     )
 
@@ -118,9 +113,9 @@ export const WarehouseAnalyticsDashboard: React.FC<WarehouseAnalyticsDashboardPr
       totalCapacity,
       totalUsed,
       utilizationRate: totalCapacity > 0 ? (totalUsed / totalCapacity) * 100 : 0,
-      avgEfficiency,
-      criticalAlerts,
-      warningAlerts,
+      avgEfficiency: _avgEfficiency,
+      criticalAlerts: _criticalAlerts,
+      warningAlerts: _warningAlerts,
       activeWarehouses: filteredWarehouses.filter(w => w.status === 'active').length,
       maintenanceWarehouses: filteredWarehouses.filter(w => w.status === 'maintenance').length
     }

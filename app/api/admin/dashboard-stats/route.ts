@@ -24,7 +24,6 @@ export async function GET() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load products stats:', error)
     }
 
     // Получаем статистику категорий с fallback
@@ -43,7 +42,6 @@ export async function GET() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load categories stats:', error)
     }
 
     // Получаем статистику производителей с fallback
@@ -62,7 +60,6 @@ export async function GET() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load manufacturers stats:', error)
     }
 
     // Получаем статистику медиафайлов с fallback
@@ -85,7 +82,6 @@ export async function GET() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load media stats:', error)
     }
 
     // Загружаем реальные данные о зонах склада из базы данных
@@ -146,8 +142,6 @@ export async function GET() {
         throw new Error('Table not found')
       }
     } catch (error) {
-      console.warn('⚠️ Не удалось загрузить данные о зонах склада, используем fallback:', error)
-
       // Fallback: генерируем реалистичные данные о складах на основе количества товаров
       const totalProducts = productsStats.total || 26
       const baseCapacityPerZone = Math.ceil(totalProducts / 4) + 10 // Добавляем запас
@@ -204,7 +198,6 @@ export async function GET() {
     return NextResponse.json(stats)
 
   } catch (error) {
-    console.error('❌ Failed to load dashboard statistics:', error)
     return NextResponse.json(
       { error: 'Failed to load dashboard statistics' },
       { status: 500 }

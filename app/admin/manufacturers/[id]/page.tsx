@@ -1,6 +1,7 @@
 "use client"
+import { SafeImage } from "@/components/safe-image"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -68,28 +69,28 @@ export default function ManufacturerModelLinesPage() {
     is_active: true
   })
 
+  const loadData = useCallback(async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`/api/manufacturers/${manufacturerId}/model-lines`)
+        const data = await response.json()
+
+        if (data.success) {
+          setManufacturer(data.data.manufacturer)
+          setModelLines(data.data.modelLines)
+        } else {
+          setMessage({ type: 'error', text: 'Ошибка загрузки данных' })
+        }
+      } catch (_error) {
+        setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
+      } finally {
+        setIsLoading(false)
+      }
+    }, [manufacturerId])
+
   useEffect(() => {
     loadData()
-  }, [manufacturerId])
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch(`/api/manufacturers/${manufacturerId}/model-lines`)
-      const data = await response.json()
-
-      if (data.success) {
-        setManufacturer(data.data.manufacturer)
-        setModelLines(data.data.modelLines)
-      } else {
-        setMessage({ type: 'error', text: 'Ошибка загрузки данных' })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [loadData])
 
   const handleDeleteModelLine = async (id: number, name: string) => {
     if (!confirm(`Вы уверены, что хотите удалить модельный ряд "${name}"?`)) {
@@ -109,7 +110,7 @@ export default function ManufacturerModelLinesPage() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Ошибка удаления' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Ошибка соединения с сервером' })
     }
   }
@@ -182,15 +183,7 @@ export default function ManufacturerModelLinesPage() {
             {manufacturer && (
               <div className="flex items-center gap-4">
                 {manufacturer.logo_url && (
-                  <img
-                    src={manufacturer.logo_url}
-                    alt={manufacturer.name}
-                    className="w-12 h-12 object-contain rounded-lg bg-slate-50 p-2"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                    }}
-                  />
+                  <SafeImage src={manufacturer.logo_url} alt={manufacturer.name} width={48} height={48} className="w-12 h-12 object-contain rounded-lg bg-slate-50 p-2" />
                 )}
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900">

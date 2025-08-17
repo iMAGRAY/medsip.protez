@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -44,42 +44,25 @@ export function WarehouseStockManager({
   const [saving, setSaving] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
 
+  const fetchWarehouses = useCallback(async () => {
+      try {
+        const response = await fetch('/api/warehouses')
+        if (response.ok) {
+          const data = await response.json()
+          setWarehouses(data)
+        }
+      } catch (error) {
+        console.error('Error fetching warehouses:', error)
+        toast.error('Ошибка загрузки складов')
+      }
+    }, [])
+
   // Загрузка списка складов
   useEffect(() => {
     fetchWarehouses()
-  }, [])
+  }, [fetchWarehouses])
 
-  // Загрузка остатков при изменении productId
-  useEffect(() => {
-    if (productId) {
-      fetchWarehouseStocks()
-    } else {
-      // Для нового товара показываем склады с нулевыми остатками
-      setWarehouseStocks(warehouses.map(w => ({
-        warehouse_id: w.id,
-        warehouse_name: w.name,
-        warehouse_code: w.code,
-        city: w.city,
-        quantity: 0,
-        reserved_quantity: 0
-      })))
-    }
-  }, [productId, warehouses])
-
-  const fetchWarehouses = async () => {
-    try {
-      const response = await fetch('/api/warehouses')
-      if (response.ok) {
-        const data = await response.json()
-        setWarehouses(data)
-      }
-    } catch (error) {
-      console.error('Error fetching warehouses:', error)
-      toast.error('Ошибка загрузки складов')
-    }
-  }
-
-  const fetchWarehouseStocks = async () => {
+  const fetchWarehouseStocks = useCallback(async () => {
     if (!productId) return
 
     setLoading(true)
@@ -96,7 +79,24 @@ export function WarehouseStockManager({
     } finally {
       setLoading(false)
     }
-  }
+  }, [productId])
+
+  // Загрузка остатков при изменении productId
+  useEffect(() => {
+    if (productId) {
+      fetchWarehouseStocks()
+    } else {
+      // Для нового товара показываем склады с нулевыми остатками
+      setWarehouseStocks(warehouses.map(w => ({
+        warehouse_id: w.id,
+        warehouse_name: w.name,
+        warehouse_code: w.code,
+        city: w.city,
+        quantity: 0,
+        reserved_quantity: 0
+      })))
+    }
+  }, [productId, warehouses, fetchWarehouseStocks])
 
   const handleQuantityChange = (warehouseId: number, quantity: string) => {
     const numQuantity = parseInt(quantity) || 0

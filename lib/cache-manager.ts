@@ -91,8 +91,8 @@ export class SecureCacheManager {
       })
 
       return success
-    } catch (error) {
-      logger.error('Cache set failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache set failed', { key, error: _error })
       return false
     }
   }
@@ -124,8 +124,8 @@ export class SecureCacheManager {
       logger.debug('Cache hit', { key: cacheKey })
 
       return parsed as T
-    } catch (error) {
-      logger.error('Cache get failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache get failed', { key, error: _error })
       return null
     }
   }
@@ -150,8 +150,8 @@ export class SecureCacheManager {
       logger.debug('Cache delete', { key: cacheKey, deleted: result })
 
       return result
-    } catch (error) {
-      logger.error('Cache delete failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache delete failed', { key, error: _error })
       return false
     }
   }
@@ -172,8 +172,8 @@ export class SecureCacheManager {
       const cacheKey = this.generateKey(key)
       const result = await redis.exists(cacheKey)
       return result
-    } catch (error) {
-      logger.error('Cache exists check failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache exists check failed', { key, error: _error })
       return false
     }
   }
@@ -200,14 +200,14 @@ export class SecureCacheManager {
       })
 
       return deleted
-    } catch (error) {
-      logger.error('Cache clear failed', { prefix: this.config.prefix, error })
+    } catch (_error) {
+      logger.error('Cache clear failed', { prefix: this.config.prefix, error: _error })
       return 0
     }
   }
 
   // Методы для работы через API (клиентская сторона)
-  private async setViaAPI<T>(key: string, value: T, ttl?: number): Promise<boolean> {
+  private async setViaAPI<T>(key: string, _value: T, ttl?: number): Promise<boolean> {
     try {
       const response = await fetch('/api/cache', {
         method: 'POST',
@@ -215,15 +215,15 @@ export class SecureCacheManager {
         body: JSON.stringify({
           action: 'set',
           key: this.generateKey(key),
-          value,
+          value: _value,
           ttl: ttl || this.config.ttl
         })
       })
 
       const result = await response.json()
       return result.success
-    } catch (error) {
-      logger.error('Cache API set failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache API set failed', { key, error: _error })
       return false
     }
   }
@@ -238,8 +238,8 @@ export class SecureCacheManager {
 
       const result = await response.json()
       return result.data || null
-    } catch (error) {
-      logger.error('Cache API get failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache API get failed', { key, error: _error })
       return null
     }
   }
@@ -256,8 +256,8 @@ export class SecureCacheManager {
 
       const result = await response.json()
       return result.success
-    } catch (error) {
-      logger.error('Cache API delete failed', { key, error })
+    } catch (_error) {
+      logger.error('Cache API delete failed', { key, error: _error })
       return false
     }
   }
@@ -282,17 +282,17 @@ export class SecureCacheManager {
       const keys = await redis.keys(pattern)
 
       // Получаем упрощенную статистику без info команды
-      const memoryUsage = '0B' // Заглушка, так как info недоступна
+      const _memoryUsage = '0B' // Заглушка, так как info недоступна
 
-      const hitRate: number | undefined = undefined // Заглушка, так как info недоступна
+      const _hitRate: number | undefined = undefined // Заглушка, так как info недоступна
 
       return {
         totalKeys: keys.length,
-        memoryUsage,
-        hitRate
+        memoryUsage: _memoryUsage,
+        hitRate: _hitRate
       }
-    } catch (error) {
-      logger.error('Cache stats failed', { prefix: this.config.prefix, error })
+    } catch (_error) {
+      logger.error('Cache stats failed', { prefix: this.config.prefix, error: _error })
       return { totalKeys: 0, memoryUsage: '0B' }
     }
   }
@@ -319,8 +319,8 @@ export async function cacheWithRefresh<T>(
     await cacheManager.set(key, data, ttl)
 
     return data
-  } catch (error) {
-    logger.error('Cache with refresh failed', { key, error })
+  } catch (_error) {
+    logger.error('Cache with refresh failed', { key, error: _error })
     // В случае ошибки кеша возвращаем данные напрямую
     return await fetcher()
   }
@@ -345,8 +345,8 @@ export async function invalidateRelated(patterns: string[]): Promise<void> {
         logger.info('Invalidated cache pattern', { pattern, keys: keys.length })
       }
     }
-  } catch (error) {
-    logger.error('Cache invalidation failed', { patterns, error })
+  } catch (_error) {
+    logger.error('Cache invalidation failed', { patterns, error: _error })
   }
 }
 
@@ -369,8 +369,8 @@ export async function warmupCache(
           const data = await fetcher()
           await cacheManager.set(key, data, ttl)
           logger.debug('Cache warmed up', { key })
-        } catch (error) {
-          logger.error('Cache warmup failed for key', { key, error })
+        } catch (_error) {
+          logger.error('Cache warmup failed for key', { key, error: _error })
         }
       })
     )

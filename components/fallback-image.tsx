@@ -26,7 +26,7 @@ export function FallbackImage({
   className,
   fill,
   objectFit = "cover",
-  layout,
+  layout: _layout,
   sizes,
   priority,
   onError

@@ -1,41 +1,54 @@
 import { NextRequest, NextResponse } from "next/server"
 import { executeQuery, getPool } from "@/lib/db-connection"
+import { guardDbOr503, tablesExist } from '@/lib/api-guards'
+
+export const dynamic = 'force-dynamic'
+
+function _isDbConfigured() {
+  return !!process.env.DATABASE_URL || (
+    !!process.env.POSTGRESQL_HOST && !!process.env.POSTGRESQL_USER && !!process.env.POSTGRESQL_DBNAME
+  )
+}
 
 export async function GET() {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
 
-    // Запрос к реальным таблицам spec_groups
+    const need = await tablesExist(['characteristics_groups_simple'])
+    if (!need.characteristics_groups_simple) {
+      return NextResponse.json({ success: true, data: [], total: 0 })
+    }
+
     const query = `
       WITH RECURSIVE group_tree AS (
-        -- Базовый случай: корневые группы
         SELECT
           sg.id,
           sg.name,
           sg.description,
           sg.parent_id,
-          sg.ordering,
+          sg.sort_order as ordering,
           sg.is_active,
           sg.created_at,
           sg.updated_at,
           0 as level,
-          ARRAY[sg.ordering, sg.id] as path
+          ARRAY[sg.sort_order, sg.id] as path
         FROM characteristics_groups_simple sg
         WHERE sg.parent_id IS NULL AND sg.is_active = true
 
         UNION ALL
 
-        -- Рекурсивный случай: дочерние группы
         SELECT
           sg.id,
           sg.name,
           sg.description,
           sg.parent_id,
-          sg.ordering,
+          sg.sort_order as ordering,
           sg.is_active,
           sg.created_at,
           sg.updated_at,
           gt.level + 1,
-          gt.path || ARRAY[sg.ordering, sg.id]
+          gt.path || ARRAY[sg.sort_order, sg.id]
         FROM characteristics_groups_simple sg
         INNER JOIN group_tree gt ON sg.parent_id = gt.id
         WHERE sg.is_active = true
@@ -64,7 +77,6 @@ export async function GET() {
     })
 
   } catch (error) {
-    console.error("Database error in spec-groups GET:", error)
     return NextResponse.json(
       {
         success: false,
@@ -78,6 +90,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { name, description, parent_id } = await request.json()
 
     if (!name?.trim()) {
@@ -87,9 +102,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const need = await tablesExist(['characteristics_groups_simple'])
+    if (!need.characteristics_groups_simple) {
+      return NextResponse.json({ success: false, error: 'Characteristics schema is not initialized' }, { status: 503 })
+    }
+
     const result = await executeQuery(
-      `INSERT INTO spec_groups (name, description, parent_id, ordering, is_active, created_at, updated_at)
-       VALUES ($1, $2, $3, COALESCE((SELECT MAX(ordering) + 1 FROM characteristics_groups_simple WHERE parent_id = $3), 0), true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `INSERT INTO characteristics_groups_simple (name, description, parent_id, sort_order, is_active, created_at, updated_at)
+       VALUES ($1, $2, $3, COALESCE((SELECT MAX(sort_order) + 1 FROM characteristics_groups_simple WHERE parent_id = $3), 0), true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        RETURNING *`,
       [name.trim(), description?.trim() || null, parent_id || null]
     )
@@ -99,8 +119,7 @@ export async function POST(request: NextRequest) {
       data: result.rows[0]
     })
 
-  } catch (error) {
-    console.error("Database error in spec-groups POST:", error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: "Failed to create spec group" },
       { status: 500 }
@@ -108,16 +127,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - Обновить группу характеристик
 export async function PUT(request: NextRequest) {
   const pool = getPool()
 
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
-
       return NextResponse.json(
         { error: 'ID группы обязателен' },
         { status: 400 }
@@ -125,10 +145,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-const { name, description, parent_id } = body
+    const { name, description, parent_id } = body
 
-if (!name?.trim()) {
-
+    if (!name?.trim()) {
       return NextResponse.json(
         { error: 'Название группы обязательно' },
         { status: 400 }
@@ -137,32 +156,22 @@ if (!name?.trim()) {
 
     const client = await pool.connect()
 
-    // Проверяем существование группы для обновления
     const existsCheck = await client.query(
       'SELECT id, name FROM characteristics_groups_simple WHERE id = $1',
       [parseInt(id)]
     )
 
-    if (existsCheck.rows.length > 0) {
-
-    }
-
     if (existsCheck.rows.length === 0) {
       client.release()
-
       return NextResponse.json(
         { error: 'Группа не найдена' },
         { status: 404 }
       )
     }
 
-    // Если указан parent_id, проверяем что родительская группа существует и не является дочерней
     if (parent_id) {
-
-      // Проверяем, что группа не пытается стать родителем самой себя
       if (parseInt(parent_id) === parseInt(id)) {
         client.release()
-
         return NextResponse.json(
           { error: 'Группа не может быть родителем самой себя' },
           { status: 400 }
@@ -174,32 +183,22 @@ if (!name?.trim()) {
         [parent_id]
       )
 
-      if (parentCheck.rows.length > 0) {
-
-      }
-
       if (parentCheck.rows.length === 0) {
         client.release()
-
         return NextResponse.json(
           { error: 'Родительская группа не найдена' },
           { status: 400 }
         )
       }
 
-      // Проверяем, что не создаем циклическую зависимость
-
-      // Ищем всех потомков текущей группы
       const cyclicCheck = await client.query(`
         WITH RECURSIVE hierarchy AS (
-          -- Начинаем с текущей редактируемой группы
           SELECT id, parent_id, 1 as level, ARRAY[id] as path
           FROM characteristics_groups_simple
           WHERE id = $1
 
           UNION ALL
 
-          -- Ищем всех потомков этой группы
           SELECT sg.id, sg.parent_id, h.level + 1, h.path || sg.id
           FROM characteristics_groups_simple sg
           JOIN hierarchy h ON sg.parent_id = h.id
@@ -210,9 +209,8 @@ if (!name?.trim()) {
         WHERE id = $2 AND level > 1
       `, [parseInt(id), parent_id])
 
-      if (cyclicCheck.rows[0].count > 0) {
+      if (parseInt(cyclicCheck.rows[0].count) > 0) {
         client.release()
-
         return NextResponse.json(
           { error: `Нельзя установить группу как родительскую для своего предка. Группа ${parent_id} является потомком группы ${id}.` },
           { status: 400 }
@@ -221,20 +219,16 @@ if (!name?.trim()) {
     }
 
     const result = await client.query(`
-      UPDATE spec_groups
+      UPDATE characteristics_groups_simple
       SET name = $1, description = $2, parent_id = $3, updated_at = CURRENT_TIMESTAMP
       WHERE id = $4
       RETURNING *
     `, [name.trim(), description?.trim() || null, parent_id || null, parseInt(id)])
 
-    if (result.rows.length > 0) {
-
-    }
-
     client.release()
 
     if (result.rows.length === 0) {
-return NextResponse.json(
+      return NextResponse.json(
         { error: 'Группа не найдена' },
         { status: 404 }
       )
@@ -242,15 +236,7 @@ return NextResponse.json(
 
     return NextResponse.json(result.rows[0])
   } catch (error) {
-    console.error('❌ Error updating spec group:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      code: error.code,
-      detail: error.detail,
-      stack: error.stack
-    })
-
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // unique violation
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
       return NextResponse.json(
         { error: 'Группа с таким названием уже существует' },
         { status: 409 }
@@ -264,9 +250,11 @@ return NextResponse.json(
   }
 }
 
-// DELETE - Удалить группу характеристик
 export async function DELETE(request: NextRequest) {
   try {
+    const guard = await guardDbOr503()
+    if (guard) return guard
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     const force = searchParams.get('force') === 'true'
@@ -278,15 +266,14 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-const pool = getPool()
+    const pool = getPool()
     const client = await pool.connect()
 
     try {
-          // Проверяем существование группы
-    const checkResult = await client.query(
-      'SELECT id, name FROM characteristics_groups_simple WHERE id = $1',
-      [parseInt(id)]
-    )
+      const checkResult = await client.query(
+        'SELECT id, name FROM characteristics_groups_simple WHERE id = $1',
+        [parseInt(id)]
+      )
 
       if (checkResult.rows.length === 0) {
         client.release()
@@ -297,23 +284,8 @@ const pool = getPool()
       }
 
       const groupName = checkResult.rows[0].name
-// Check if this is a protected group that cannot be deleted
-      if (groupName === 'Общие параметры') {
-        client.release()
-        return NextResponse.json(
-          {
-            error: 'Группа "Общие параметры" защищена от удаления',
-            details: 'Эта группа является системной и не может быть удалена',
-            code: 'PROTECTED_GROUP'
-          },
-          { status: 403 }
-        )
-      }
 
       if (!force) {
-        // Обычное удаление - проверяем связи
-
-        // Проверяем наличие дочерних групп
         const childrenCheck = await client.query(
           'SELECT COUNT(*) as count, array_agg(name) as names FROM characteristics_groups_simple WHERE parent_id = $1',
           [parseInt(id)]
@@ -321,7 +293,7 @@ const pool = getPool()
 
         const childrenCount = parseInt(childrenCheck.rows[0].count)
         if (childrenCount > 0) {
-          const childrenNames = childrenCheck.rows[0].names.join(', ')
+          const childrenNames = (childrenCheck.rows[0].names || []).join(', ')
 
           client.release()
           return NextResponse.json(
@@ -334,7 +306,6 @@ const pool = getPool()
           )
         }
 
-        // Проверяем наличие связанных характеристик в product_characteristics_simple
         const characteristicsCheck = await client.query(`
           SELECT
             COUNT(*) as count,
@@ -371,10 +342,7 @@ const pool = getPool()
           )
         }
       } else {
-        // Принудительное удаление - удаляем каскадно
-
-        // Сначала удаляем все характеристики товаров, связанные с этой группой
-        const deletedCharacteristics = await client.query(`
+        const _deletedCharacteristics = await client.query(`
           DELETE FROM product_characteristics_simple
           WHERE value_id IN (
             SELECT id FROM characteristics_values_simple WHERE group_id = $1
@@ -382,7 +350,6 @@ const pool = getPool()
           RETURNING id
         `, [parseInt(id)])
 
-        // Затем рекурсивно удаляем все дочерние группы
         const deleteChildrenRecursively = async (parentId: number) => {
           const children = await client.query(
             'SELECT id, name FROM characteristics_groups_simple WHERE parent_id = $1',
@@ -390,10 +357,8 @@ const pool = getPool()
           )
 
           for (const child of children.rows) {
-// Рекурсивно удаляем детей этого ребенка
             await deleteChildrenRecursively(child.id)
 
-            // Удаляем характеристики товаров дочерней группы
             await client.query(`
               DELETE FROM product_characteristics_simple
               WHERE value_id IN (
@@ -401,10 +366,7 @@ const pool = getPool()
               )
             `, [child.id])
 
-            // Удаляем enum значения дочерней группы
             await client.query('DELETE FROM characteristics_values_simple WHERE group_id = $1', [child.id])
-
-            // Удаляем дочернюю группу
             await client.query('DELETE FROM characteristics_groups_simple WHERE id = $1', [child.id])
           }
         }
@@ -412,7 +374,6 @@ const pool = getPool()
         await deleteChildrenRecursively(parseInt(id))
       }
 
-      // Удаляем enum значения основной группы
       const valuesCheck = await client.query(
         'SELECT COUNT(*) as count FROM characteristics_values_simple WHERE group_id = $1',
         [parseInt(id)]
@@ -420,19 +381,15 @@ const pool = getPool()
 
       const valuesCount = parseInt(valuesCheck.rows[0].count)
       if (valuesCount > 0) {
-
         await client.query('DELETE FROM characteristics_values_simple WHERE group_id = $1', [parseInt(id)])
-
       }
-
-      // Удаляем основную группу
 
       const result = await client.query(
         'DELETE FROM characteristics_groups_simple WHERE id = $1 RETURNING *',
         [parseInt(id)]
       )
 
-client.release()
+      client.release()
 
       return NextResponse.json({
         success: true,
@@ -448,13 +405,8 @@ client.release()
     }
 
   } catch (error) {
-    console.error('❌ Ошибка удаления группы характеристик:', error)
-
-    // Проверяем нарушение внешних ключей
     if ((error as any).code === '23503') {
       const detail = (error as any).detail || ''
-
-      // Извлекаем информацию из detail сообщения
       const match = detail.match(/Key \(id\)=\((\d+)\) is still referenced from table "(\w+)"/)
       const constraintInfo = match ? `ID ${match[1]} используется в таблице "${match[2]}"` : 'существуют связанные записи'
 

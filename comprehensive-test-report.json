@@ -1,0 +1,340 @@
+{
+  "summary": {
+    "testSuite": "Комплексное тестирование интернет-магазина медицинских товаров",
+    "timestamp": "2025-08-16T12:37:10.873Z",
+    "duration": "17s",
+    "totalTests": 22,
+    "passed": 19,
+    "failed": 3,
+    "skipped": 0,
+    "successRate": "86%"
+  },
+  "performanceMetrics": {
+    "averagePageLoad": 1064,
+    "averageAPIResponse": 791
+  },
+  "regressionValidation": {
+    "product371": [
+      {
+        "test": "Product ID 371 API",
+        "status": "FIXED",
+        "data": {
+          "success": true,
+          "data": {
+            "id": 371,
+            "name": "Коленный модуль MPK-006 (Нерж. сталь)",
+            "category_id": 109,
+            "description": "Механический полицентрический коленный модуль MPK-006 с геометрическим замыканием и регулируемой фазой сгибания и разгибания разработан для использования при протезировании после односторонней или двусторонней ампутации бедра на уровне средней и нижней трети. Модель предназначена для пациентов с низким уровнем активности.\n\nИзготовленный из нержавеющей стали, этот четырёхзвенный шарнир с углом сгибания 120° рассчитан на нагрузку до 110 кг. О обеспечивает надежную поддержку и комфорт в процессе повседневного использования.",
+            "image_url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753091466089_nxouzd.jpg",
+            "images": [
+              "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753091466089_nxouzd.jpg",
+              "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753471518_1dh8qo.jpg",
+              "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753472714_kd3jq7.jpg",
+              "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753473868_9kh8pg.jpg",
+              "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753475080_obtupw.jpg"
+            ],
+            "weight": null,
+            "battery_life": null,
+            "warranty": "12 месяцев",
+            "in_stock": true,
+            "created_at": "2025-07-20T06:00:41.445Z",
+            "updated_at": "2025-08-08T07:42:53.066Z",
+            "stock_quantity": 0,
+            "stock_status": "distant_warehouse",
+            "manufacturer_id": 1,
+            "sku": "4F20 (Ss)",
+            "article_number": "MPK-006",
+            "price": "25000.00",
+            "discount_price": "16740.00",
+            "series_id": 4,
+            "specs_cache": null,
+            "created_by": null,
+            "updated_by": null,
+            "is_deleted": false,
+            "show_price": true,
+            "short_name": "Коленный модуль MPK-006",
+            "model_line_name": "МедСИП Walk",
+            "manufacturer_name": "МедСИП",
+            "category_name": "Механика",
+            "category_full_path": "Протезы / Протезы нижних конечностей / Коленные модули / Взрослые / Механика",
+            "characteristics": {},
+            "imageUrls": [
+              {
+                "url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753091466089_nxouzd.jpg",
+                "alt": "Product image 1",
+                "isPrimary": true,
+                "order": 0
+              },
+              {
+                "url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753471518_1dh8qo.jpg",
+                "alt": "Product image 2",
+                "isPrimary": false,
+                "order": 1
+              },
+              {
+                "url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753472714_kd3jq7.jpg",
+                "alt": "Product image 3",
+                "isPrimary": false,
+                "order": 2
+              },
+              {
+                "url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753473868_9kh8pg.jpg",
+                "alt": "Product image 4",
+                "isPrimary": false,
+                "order": 3
+              },
+              {
+                "url": "https://s3.twcstorage.ru/b71e5c4b-4a3b3109-65a0-4e48-b7ad-86e55fabe3b5/products/1753753475080_obtupw.jpg",
+                "alt": "Product image 5",
+                "isPrimary": false,
+                "order": 4
+              }
+            ]
+          }
+        }
+      },
+      {
+        "test": "Product ID 371 Page",
+        "status": "FIXED"
+      }
+    ],
+    "categoriesStructure": [],
+    "noRedisCompatibility": [
+      {
+        "test": "No Redis Compatibility",
+        "status": "CONFIRMED"
+      }
+    ]
+  },
+  "issues": [
+    {
+      "test": "Производительность: Главная страница",
+      "error": "Время загрузки 3217ms превышает порог 3000ms",
+      "priority": "LOW"
+    },
+    {
+      "test": "Загрузка: Каталог товаров",
+      "error": "HTTP 404",
+      "priority": "HIGH"
+    },
+    {
+      "test": "API Производительность: Health Check",
+      "error": "Время ответа 1136ms превышает порог 1000ms",
+      "priority": "MEDIUM"
+    },
+    {
+      "test": "API Производительность: Products API",
+      "error": "Время ответа 1047ms превышает порог 1000ms",
+      "priority": "MEDIUM"
+    },
+    {
+      "test": "Структура категорий: Парсинг данных",
+      "error": "JSON Parse Error: categories.filter is not a function",
+      "priority": "HIGH"
+    },
+    {
+      "test": "Redis: Статус отключения",
+      "error": "Redis работает, но должен быть отключен",
+      "priority": "LOW"
+    }
+  ],
+  "detailedResults": [
+    {
+      "test": "Загрузка: Главная страница",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:14.091Z",
+      "timing": 3217,
+      "threshold": 3000,
+      "performant": false,
+      "url": "http://localhost:3004/"
+    },
+    {
+      "test": "Загрузка: Страница \"О нас\"",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:14.680Z",
+      "timing": 589,
+      "threshold": 3000,
+      "performant": true,
+      "url": "http://localhost:3004/about"
+    },
+    {
+      "test": "Загрузка: Страница контактов",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:14.889Z",
+      "timing": 209,
+      "threshold": 3000,
+      "performant": true,
+      "url": "http://localhost:3004/contacts"
+    },
+    {
+      "test": "Загрузка: Страница производителей",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:15.130Z",
+      "timing": 241,
+      "threshold": 3000,
+      "performant": true,
+      "url": "http://localhost:3004/manufacturers"
+    },
+    {
+      "test": "Загрузка: Каталог товаров",
+      "status": "FAIL",
+      "timestamp": "2025-08-16T12:37:15.413Z",
+      "error": "HTTP 404",
+      "priority": "HIGH",
+      "url": "http://localhost:3004/products"
+    },
+    {
+      "test": "API: Health Check",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:16.550Z",
+      "timing": 1136,
+      "threshold": 1000,
+      "performant": false,
+      "url": "http://localhost:3004/api/health",
+      "hasData": true
+    },
+    {
+      "test": "API: Database Status",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:17.190Z",
+      "timing": 640,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/db-status",
+      "hasData": true
+    },
+    {
+      "test": "API: Cache Status",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:17.574Z",
+      "timing": 384,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/cache-status",
+      "hasData": true
+    },
+    {
+      "test": "API: Categories API",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:18.449Z",
+      "timing": 875,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/categories",
+      "hasData": true
+    },
+    {
+      "test": "API: Products API",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:19.497Z",
+      "timing": 1047,
+      "threshold": 1000,
+      "performant": false,
+      "url": "http://localhost:3004/api/products",
+      "hasData": true
+    },
+    {
+      "test": "API: Manufacturers API",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:20.265Z",
+      "timing": 768,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/manufacturers",
+      "hasData": true
+    },
+    {
+      "test": "API: Home Data API",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:20.987Z",
+      "timing": 721,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/home",
+      "hasData": true
+    },
+    {
+      "test": "API: Site Settings API",
+      "status": 200,
+      "timestamp": "2025-08-16T12:37:21.743Z",
+      "timing": 756,
+      "threshold": 1000,
+      "performant": true,
+      "url": "http://localhost:3004/api/site-settings",
+      "hasData": true
+    },
+    {
+      "test": "Регрессия: API товара ID 371",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:22.857Z",
+      "timing": 1114,
+      "hasData": true,
+      "productName": "Unknown"
+    },
+    {
+      "test": "Регрессия: Страница товара ID 371",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:24.529Z",
+      "timing": 1672,
+      "url": "http://localhost:3004/products/371"
+    },
+    {
+      "test": "Структура категорий: Парсинг данных",
+      "status": "FAIL",
+      "timestamp": "2025-08-16T12:37:25.109Z",
+      "error": "JSON Parse Error: categories.filter is not a function",
+      "priority": "HIGH"
+    },
+    {
+      "test": "Поиск: \"протез\"",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:25.843Z",
+      "timing": 734,
+      "threshold": 1500,
+      "performant": true,
+      "resultsCount": 0
+    },
+    {
+      "test": "Поиск: \"кисть\"",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:25.929Z",
+      "timing": 86,
+      "threshold": 1500,
+      "performant": true,
+      "resultsCount": 0
+    },
+    {
+      "test": "Поиск: \"стопа\"",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:26.012Z",
+      "timing": 83,
+      "threshold": 1500,
+      "performant": true,
+      "resultsCount": 0
+    },
+    {
+      "test": "Поиск: \"медицинский\"",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:26.103Z",
+      "timing": 91,
+      "threshold": 1500,
+      "performant": true,
+      "resultsCount": 0
+    },
+    {
+      "test": "Redis: Статус отключения",
+      "status": "FAIL",
+      "timestamp": "2025-08-16T12:37:26.387Z",
+      "error": "Redis работает, но должен быть отключен",
+      "priority": "LOW"
+    },
+    {
+      "test": "Fallback: Работа без Redis",
+      "status": "PASS",
+      "timestamp": "2025-08-16T12:37:27.657Z",
+      "note": "Все критические страницы работают без Redis",
+      "workingPages": 3,
+      "totalPages": 3
+    }
+  ]
+}

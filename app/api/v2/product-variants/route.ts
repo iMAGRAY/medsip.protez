@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const masterId = searchParams.get('master_id')
     const variantId = searchParams.get('variant_id')
     const includeCharacteristics = searchParams.get('include_characteristics') === 'true'
-    const includeImages = searchParams.get('include_images') === 'true'
+    const _includeImages = searchParams.get('include_images') === 'true'
     const onlyActive = searchParams.get('only_active') !== 'false'
     
     // Базовый запрос - выбираем поля напрямую из таблицы product_variants
@@ -138,33 +138,33 @@ export async function GET(request: NextRequest) {
     
     // Если запрашивается конкретный вариант, возвращаем объект
     if (variantId && result.rows.length > 0) {
-      const duration = Date.now() - startTime
-      logger.info('Product variant loaded', { variantId, duration })
+      const _duration = Date.now() - startTime
+      logger.info('Product variant loaded', { variantId, duration: _duration })
       
       return NextResponse.json({
         success: true,
         data: result.rows[0],
-        duration
+        duration: _duration
       })
     }
     
     // Иначе возвращаем массив
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variants loaded', { 
       count: result.rows.length, 
       masterId, 
-      duration 
+      duration: _duration 
     })
     
     return NextResponse.json({
       success: true,
       data: result.rows,
       count: result.rows.length,
-      duration
+      duration: _duration
     })
     
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Error loading product variants', error, 'API')
     
     return NextResponse.json(
@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to load product variants',
         details: error instanceof Error ? error.message : 'Unknown error',
-        duration
+        duration: _duration
       },
       { status: 500 }
     )
@@ -248,9 +248,7 @@ export async function POST(request: NextRequest) {
     if (!finalSku && article_number) {
       finalSku = `VAR-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     }
-    
 
-    
     // Проверяем существование мастер-товара
     const masterCheck = await pool.query(
       'SELECT id FROM products WHERE id = $1 AND is_deleted = FALSE',
@@ -270,7 +268,6 @@ export async function POST(request: NextRequest) {
     // Генерируем slug
     const slug = await generateUniqueSlug(name)
 
-    
     // Создаем вариант
 
     const result = await pool.query(`
@@ -318,22 +315,21 @@ export async function POST(request: NextRequest) {
       // Продолжаем выполнение, так как отсутствие характеристик не является критичной ошибкой
     }
     
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variant created', { 
       variantId: result.rows[0].id,
       masterId: master_id,
-      duration 
+      duration: _duration 
     })
     
     return NextResponse.json({
       success: true,
       data: result.rows[0],
-      duration
+      duration: _duration
     }, { status: 201 })
     
   } catch (error) {
-    const duration = Date.now() - startTime
-    console.error('Error creating product variant:', error)
+    const _duration = Date.now() - startTime
     logger.error('Error creating product variant', error, 'API')
     
     return NextResponse.json(
@@ -342,7 +338,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to create product variant',
         details: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-        duration
+        duration: _duration
       },
       { status: 500 }
     )

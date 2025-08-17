@@ -92,7 +92,6 @@ return NextResponse.json({
     })
 
   } catch (error) {
-    console.error('❌ Ошибка при регистрации медиафайла:', error)
     return NextResponse.json(
       { error: "Ошибка при регистрации медиафайла" },
       { status: 500 }
@@ -150,7 +149,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Ошибка при получении информации о файле:', error)
     return NextResponse.json(
       { error: "Ошибка при получении информации о файле" },
       { status: 500 }

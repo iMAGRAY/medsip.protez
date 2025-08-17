@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db-connection'
 import { getCacheManager, getLogger } from '@/lib/dependency-injection'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const logger = getLogger()
   const cacheManager = getCacheManager()
 
@@ -18,24 +18,22 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await executeQuery('SELECT COUNT(*) as total FROM orders')
-    const total = parseInt(result.rows[0].total)
+    const _total = parseInt(result.rows[0].total)
 
     const responseData = {
       success: true,
-      data: { total }
+      data: { total: _total }
     }
 
     // Кэшируем результат на 1 минуту
     cacheManager.set(cacheKey, responseData, 60000)
 
-    logger.info('Orders count loaded successfully', { total })
+    logger.info('Orders count loaded successfully', { total: _total })
 
     return NextResponse.json(responseData)
 
   } catch (error) {
     logger.error('Ошибка получения количества заказов:', error)
-    console.error('Ошибка получения количества заказов:', error)
-
     // Возвращаем fallback данные если БД недоступна
     const fallbackData = {
       success: true,

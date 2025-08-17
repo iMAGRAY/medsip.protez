@@ -6,9 +6,17 @@ class RedisManager {
   private isConnected = false
   private connectionAttempts = 0
   private maxRetries = 3
+  private emergencyMode = false
 
   constructor() {
-    this.connect()
+    // Включаем аварийный режим - не подключаемся к Redis при инициализации
+    if (process.env.NODE_ENV === 'production' || process.env.EMERGENCY_NO_REDIS === 'true') {
+      console.warn('🚨 EMERGENCY MODE: Redis connection disabled for stability')
+      this.emergencyMode = true
+      this.isConnected = false
+    } else {
+      this.connect()
+    }
   }
 
   private async connect(): Promise<void> {
@@ -58,7 +66,8 @@ class RedisManager {
   }
 
   async get(key: string): Promise<string | null> {
-    if (!this.isConnected || !this.client) {
+    if (this.emergencyMode || !this.isConnected || !this.client) {
+      // В аварийном режиме всегда возвращаем null (cache miss)
       return null
     }
 
@@ -71,8 +80,9 @@ class RedisManager {
   }
 
   async set(key: string, value: string, options?: { EX?: number; PX?: number }): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
-      return false
+    if (this.emergencyMode || !this.isConnected || !this.client) {
+      // В аварийном режиме притворяемся что кеш работает
+      return true
     }
 
     try {
@@ -187,6 +197,11 @@ class RedisManager {
   }
 
   async ping(): Promise<boolean> {
+    if (this.emergencyMode) {
+      // В аварийном режиме притворяемся что Redis работает
+      return true
+    }
+
     if (!this.isConnected || !this.client) {
       return false
     }

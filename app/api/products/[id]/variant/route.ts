@@ -4,13 +4,14 @@ import { executeQuery } from '@/lib/db-connection'
 import { logger } from '@/lib/logger'
 
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -21,7 +22,6 @@ export async function POST(
 
     logger.info('Product variant POST request', { productId })
 
-    // Проверяем существование продукта
     const productCheck = await executeQuery(
       'SELECT id, name, sku FROM products WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL)',
       [productId]
@@ -36,18 +36,16 @@ export async function POST(
 
     const product = productCheck.rows[0]
 
-    // Проверяем, есть ли уже вариант для этого продукта
     const existingVariantCheck = await executeQuery(
-      'SELECT id, variant_sku FROM product_variants WHERE product_id = $1 AND (is_deleted = false OR is_deleted IS NULL)',
+      'SELECT id, variant_sku FROM product_variants WHERE master_id = $1 AND (is_deleted = false OR is_deleted IS NULL)',
       [productId]
     )
 
     if (existingVariantCheck.rows.length > 0) {
-      // Возвращаем существующий вариант
       const variant = existingVariantCheck.rows[0]
 
-      const duration = Date.now() - startTime
-      logger.info('Existing product variant returned', { productId, variantId: variant.id, duration })
+      const _duration = Date.now() - startTime
+      logger.info('Existing product variant returned', { productId, variantId: variant.id, duration: _duration })
 
       return NextResponse.json({
         success: true,
@@ -63,12 +61,11 @@ export async function POST(
       })
     }
 
-    // Создаем новый вариант
     const variantSku = `${product.sku || productId}-VAR-${Date.now()}`
 
     const createVariantQuery = `
       INSERT INTO product_variants (
-        product_id,
+        master_id,
         variant_sku,
         variant_name,
         price_modifier,
@@ -84,19 +81,19 @@ export async function POST(
       productId,
       variantSku,
       `${product.name} Variant`,
-      0, // no price modifier by default
-      0, // no stock by default
+      0,
+      0,
       true
     ])
 
     const newVariant = variantResult.rows[0]
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('New product variant created', {
       productId,
       variantId: newVariant.id,
       variantSku: newVariant.variant_sku,
-      duration
+      duration: _duration
     })
 
     return NextResponse.json({
@@ -114,17 +111,16 @@ export async function POST(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Product variant POST error', error, 'API')
 
-    // Определяем тип ошибки
     let statusCode = 500
     let errorMessage = 'Failed to create product variant'
 
-    if (error.code === '23505') { // PostgreSQL unique violation
+    if ((error as any).code === '23505') {
       statusCode = 409
       errorMessage = 'Product variant with this SKU already exists'
-    } else if (error.code === '23503') { // PostgreSQL foreign key violation
+    } else if ((error as any).code === '23503') {
       statusCode = 400
       errorMessage = 'Invalid product reference'
     }
@@ -138,13 +134,14 @@ export async function POST(
 }
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now()
 
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params
+    const productId = parseInt(resolvedParams.id)
 
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
@@ -155,25 +152,24 @@ export async function GET(
 
     logger.info('Product variant GET request', { productId })
 
-    // Загружаем варианты продукта
     const query = `
       SELECT
         pv.*,
         p.name as product_name,
         p.sku as product_sku
       FROM product_variants pv
-      LEFT JOIN products p ON pv.product_id = p.id
-      WHERE pv.product_id = $1 AND (pv.is_deleted = false OR pv.is_deleted IS NULL)
+      LEFT JOIN products p ON pv.master_id = p.id
+      WHERE pv.master_id = $1 AND (pv.is_deleted = false OR pv.is_deleted IS NULL)
       ORDER BY pv.created_at DESC
     `
 
     const result = await executeQuery(query, [productId])
 
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.info('Product variants loaded', {
       productId,
       variantsCount: result.rows.length,
-      duration
+      duration: _duration
     })
 
     return NextResponse.json({
@@ -183,7 +179,7 @@ export async function GET(
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime
+    const _duration = Date.now() - startTime
     logger.error('Product variant GET error', error, 'API')
 
     return NextResponse.json({

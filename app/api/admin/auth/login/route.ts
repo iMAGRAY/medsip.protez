@@ -1,13 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { authenticateUser, createUserSession, AUTH_CONFIG } from '@/lib/database-auth'
+import { authenticateUser, AUTH_CONFIG } from '@/lib/database-auth'
 import { logger } from '@/lib/logger'
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 // Принудительно делаем маршрут динамическим
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
+    // Проверяем rate limiting
+    const rateLimitResult = rateLimit(request, RATE_LIMITS.login)
+    if (!rateLimitResult.allowed) {
+      const resetTime = Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000 / 60)
+      logger.warn('Rate limit exceeded for login', { 
+        ip: request.headers.get('x-forwarded-for') || 'unknown',
+        resetTimeMinutes: resetTime
+      })
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Too many login attempts. Try again in ${resetTime} minutes.` 
+        },
+        { status: 429 }
+      )
+    }
+
     const { username, password, rememberMe = false } = await request.json()
 
     if (!username || !password) {
@@ -18,8 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем IP и User-Agent для безопасности
-    const ipAddress = request.ip ||
-      request.headers.get('x-forwarded-for') ||
+    const ipAddress = request.headers.get('x-forwarded-for') ||
       request.headers.get('x-real-ip') ||
       'unknown'
 

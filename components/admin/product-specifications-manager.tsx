@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,10 +8,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Edit, Trash2, Settings, Database, Type, ChevronDown, ChevronRight, Folder, FolderOpen, Package, Tag } from 'lucide-react'
+import { Plus, Edit, Trash2, Settings, Database, Type, ChevronDown, ChevronRight, FolderOpen, Package, Tag } from 'lucide-react'
 import { toast } from 'sonner'
 import { getCharacteristicColor } from '@/lib/theme-colors'
 
@@ -61,14 +60,14 @@ interface ProductSpecificationsManagerProps {
 }
 
 export function ProductSpecificationsManager({
-  productId,
+  productId: _productId,
   productName,
   specifications,
   onSpecificationsChange,
-  isNewProduct
+  isNewProduct: _isNewProduct
 }: ProductSpecificationsManagerProps) {
   const [specGroups, setSpecGroups] = useState<SpecGroup[]>([])
-  const [characteristics, setCharacteristics] = useState<Characteristic[]>([])
+  const [_characteristics, _setCharacteristics] = useState<Characteristic[]>([])
   const [search, setSearch] = useState("")
   const [activeTab, setActiveTab] = useState("groups")
   const [loading, setLoading] = useState(true)
@@ -76,10 +75,10 @@ export function ProductSpecificationsManager({
   // Диалоги
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false)
   const [isEnumDialogOpen, setIsEnumDialogOpen] = useState(false)
-  const [isCharacteristicDialogOpen, setIsCharacteristicDialogOpen] = useState(false)
+  const [_isCharacteristicDialogOpen, _setIsCharacteristicDialogOpen] = useState(false)
   const [editingGroup, setEditingGroup] = useState<SpecGroup | null>(null)
   const [editingEnum, setEditingEnum] = useState<SpecEnum | null>(null)
-  const [editingCharacteristic, setEditingCharacteristic] = useState<Characteristic | null>(null)
+  const [_editingCharacteristic, _setEditingCharacteristic] = useState<Characteristic | null>(null)
 
   // Формы
   const [groupFormData, setGroupFormData] = useState({
@@ -96,7 +95,7 @@ export function ProductSpecificationsManager({
     color_value: ""
   })
 
-  const [characteristicFormData, setCharacteristicFormData] = useState<Characteristic>({
+  const [_characteristicFormData, _setCharacteristicFormData] = useState<Characteristic>({
     name: "",
     type: "text",
     unit: "",
@@ -121,29 +120,29 @@ export function ProductSpecificationsManager({
   }
 
   // Загрузка данных
-  const loadSpecGroups = async () => {
-    try {
+  const loadSpecGroups = useCallback(async () => {
+      try {
 
-      const res = await fetch("/api/specifications")
+        const res = await fetch("/api/specifications")
 
-      if (res.ok) {
-        const apiResponse = await res.json()
-        const data = apiResponse.data || apiResponse
+        if (res.ok) {
+          const apiResponse = await res.json()
+          const data = apiResponse.data || apiResponse
 
-        const hierarchicalGroups = processHierarchicalGroups(data)
+          const hierarchicalGroups = processHierarchicalGroups(data)
 
-        setSpecGroups(hierarchicalGroups)
-      } else {
-        console.error("❌ Failed to load spec groups:", res.status)
-        toast.error('Не удалось загрузить группы характеристик')
+          setSpecGroups(hierarchicalGroups)
+        } else {
+          console.error("❌ Failed to load spec groups:", res.status)
+          toast.error('Не удалось загрузить группы характеристик')
+        }
+      } catch (error) {
+        console.error("❌ Error loading spec groups:", error)
+        toast.error('Ошибка при загрузке групп характеристик')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("❌ Error loading spec groups:", error)
-      toast.error('Ошибка при загрузке групп характеристик')
-    } finally {
-      setLoading(false)
-    }
-  }
+    }, [])
 
   const processHierarchicalGroups = (groups: any[]): SpecGroup[] => {
     const processGroup = (group: any): SpecGroup => {
@@ -168,7 +167,7 @@ export function ProductSpecificationsManager({
 
   useEffect(() => {
     loadSpecGroups()
-  }, [])
+  }, [loadSpecGroups])
 
   // Синхронизация с родительским компонентом
   useEffect(() => {
@@ -361,14 +360,14 @@ export function ProductSpecificationsManager({
     }
 
     try {
-      const id = typeof groupId === 'string' && groupId.startsWith('spec_')
+      const _id = typeof groupId === 'string' && groupId.startsWith('spec_')
         ? parseInt(groupId.replace('spec_', ''))
         : groupId
 
       const response = await fetch(`/api/spec-groups`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id: _id })
       })
 
       if (response.ok) {
@@ -839,7 +838,7 @@ export function ProductSpecificationsManager({
                 <div className="space-y-1 text-xs">
                   <div>• Нажмите <span className="bg-green-100 text-green-700 px-1 rounded font-mono">+</span> рядом с группой для добавления как текстовой характеристики</div>
                   <div>• Нажмите <span className="bg-green-100 text-green-700 px-1 rounded font-mono">+</span> рядом с характеристикой для добавления готового значения</div>
-                  <div>• Переключитесь на вкладку "Характеристики" для редактирования значений</div>
+                  <div>• Переключитесь на вкладку &quot;Характеристики&quot; для редактирования значений</div>
                 </div>
               </div>
             </div>
@@ -1083,7 +1082,7 @@ export function ProductSpecificationsManager({
                   <div className="text-center py-8 text-gray-500">
                     <Type className="w-12 h-12 mx-auto mb-4 text-gray-300"/>
                     <div className="text-lg font-medium mb-2">Нет характеристик</div>
-                                            <div className="text-sm mb-4">Добавьте характеристики через вкладку "Группы характеристик"</div>
+                                            <div className="text-sm mb-4">Добавьте характеристики через вкладку &quot;Группы характеристик&quot;</div>
                     <div className="text-xs text-gray-400">
                       Нажмите <span className="bg-green-100 text-green-700 px-1 rounded">+</span> рядом с группами или характеристиками для добавления
                     </div>

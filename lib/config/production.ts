@@ -243,14 +243,22 @@ export const productionConfig = {
 
 // Функция для валидации конфигурации
 export function validateConfig() {
-  const required = [
+  const requiredBase = [
     'JWT_SECRET',
-    'DATABASE_URL',
     'REDIS_HOST',
   ];
 
-  const missing = required.filter(key => !process.env[key]);
-  
+  const missingBase = requiredBase.filter(key => !process.env[key]);
+
+  // База данных: допускаем либо DATABASE_URL, либо набор POSTGRESQL_*
+  const hasDatabaseUrl = !!process.env.DATABASE_URL;
+  const hasPgParts = !!(process.env.POSTGRESQL_HOST && process.env.POSTGRESQL_USER && process.env.POSTGRESQL_DBNAME);
+
+  const missing: string[] = [...missingBase];
+  if (!hasDatabaseUrl && !hasPgParts) {
+    missing.push('DATABASE_URL|POSTGRESQL_HOST+POSTGRESQL_USER+POSTGRESQL_DBNAME');
+  }
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }

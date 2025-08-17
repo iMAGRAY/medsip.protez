@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
     const category = formData.get('category') as string || 'products'
 
     if (!file) {
-      console.error("❌ Upload error: No file provided")
       return NextResponse.json(
         { error: "No file provided" },
         { status: 400 }
@@ -41,7 +40,6 @@ export async function POST(request: NextRequest) {
       ]
 
       if (!allowedCatalogTypes.includes(file.type)) {
-        console.error(`❌ Upload error: Invalid catalog file type: ${file.type}`)
         return NextResponse.json(
           { error: `Catalog files must be PDF, DOC, DOCX, XLS, or XLSX. Received: ${file.type}` },
           { status: 400 }
@@ -50,7 +48,6 @@ export async function POST(request: NextRequest) {
     } else {
       // For other categories (images), keep existing validation
       if (!file.type.startsWith('image/')) {
-        console.error(`❌ Upload error: Invalid file type: ${file.type}`)
         return NextResponse.json(
           { error: `File must be an image. Received: ${file.type}` },
           { status: 400 }
@@ -63,7 +60,6 @@ export async function POST(request: NextRequest) {
     if (file.size > maxSize) {
       const fileSizeMB = (file.size / 1024 / 1024).toFixed(2)
       const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0)
-      console.error(`❌ Upload error: File too large: ${fileSizeMB}MB > ${maxSizeMB}MB`)
       return NextResponse.json(
         { error: `File size must be less than ${maxSizeMB}MB. Current size: ${fileSizeMB}MB` },
         { status: 400 }
@@ -111,7 +107,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("❌ Error uploading file to S3:", error)
     return NextResponse.json(
       { error: "Failed to upload file to S3", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

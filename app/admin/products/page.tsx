@@ -1,6 +1,7 @@
 "use client"
+import { SafeImage } from "@/components/safe-image"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { ProductFormModern } from "@/components/admin/product-form-modern"
@@ -18,10 +19,10 @@ import { useAuth } from "@/components/admin/auth-guard"
 
 export default function ProductsAdmin() {
   const router = useRouter()
-  const { authStatus, hasPermission } = useAuth()
+  const { authStatus: _authStatus, hasPermission } = useAuth()
   const {
     products,
-    addProduct,
+    addProduct: _addProduct,
     updateProduct,
     deleteProduct,
     initializeData,
@@ -41,71 +42,53 @@ export default function ProductsAdmin() {
   const canUpdateProducts = hasPermission('products.update') || hasPermission('products.*') || hasPermission('*')
   const canDeleteProducts = hasPermission('products.delete') || hasPermission('products.*') || hasPermission('*')
 
-  // Если нет прав на просмотр продуктов, показываем сообщение об ошибке
-  if (!canViewProducts) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-8">
-              <Shield className="w-16 h-16 text-red-500" />
-              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
-              <p className="text-gray-600 text-center">
-                У вас нет прав для просмотра товаров
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    )
-  }
 
   // Initialize data when component mounts with force refresh
+    const loadData = useCallback(async () => {
+              try {
+
+                // Сначала очищаем кэш
+                const { apiClient } = await import('@/lib/api-client')
+                apiClient.clearCache()
+
+                // Принудительно очищаем Redis кэш
+                try {
+                  const response = await fetch('/api/cache/clear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      patterns: [
+                        'medsip:products:*',
+                        'products:*',
+                        'product:*',
+                        'products-fast:*',
+                        'products-full:*',
+                        'products-detailed:*',
+                        'products-basic:*'
+                      ]
+                    })
+                  })
+
+                  if (response.ok) {
+
+                  }
+                } catch (cacheError) {
+                  console.warn('⚠️ Failed to clear cache via API:', cacheError)
+                }
+
+                // Принудительно обновляем данные при загрузке страницы
+                await forceRefresh()
+
+              } catch (error) {
+                console.error('❌ Ошибка при загрузке данных:', error)
+                // Fallback к обычной загрузке
+                await initializeData()
+              }
+            }, [forceRefresh, initializeData])
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-
-        // Сначала очищаем кэш
-        const { apiClient } = await import('@/lib/api-client')
-        apiClient.clearCache()
-
-        // Принудительно очищаем Redis кэш
-        try {
-          const response = await fetch('/api/cache/clear', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              patterns: [
-                'medsip:products:*',
-                'products:*',
-                'product:*',
-                'products-fast:*',
-                'products-full:*',
-                'products-detailed:*',
-                'products-basic:*'
-              ]
-            })
-          })
-
-          if (response.ok) {
-
-          }
-        } catch (cacheError) {
-          console.warn('⚠️ Failed to clear cache via API:', cacheError)
-        }
-
-        // Принудительно обновляем данные при загрузке страницы
-        await forceRefresh()
-
-      } catch (error) {
-        console.error('❌ Ошибка при загрузке данных:', error)
-        // Fallback к обычной загрузке
-        await initializeData()
-      }
-    }
-
     loadData()
-  }, [forceRefresh, initializeData])
+  }, [loadData])
 
   // Дополнительное обновление при наличии параметра refresh в URL
   useEffect(() => {
@@ -134,10 +117,8 @@ export default function ProductsAdmin() {
   // Обновляем данные при возвращении на страницу (фокус на вкладке)
   useEffect(() => {
     const handleFocus = async () => {
-
       try {
         await forceRefresh()
-
       } catch (error) {
         console.error('❌ Error refreshing on focus:', error)
       }
@@ -146,6 +127,30 @@ export default function ProductsAdmin() {
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
   }, [forceRefresh])
+
+  // Сбрасываем страницу при изменении поиска
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
+  // Ранний возврат без прав — после хуков
+  if (!canViewProducts) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="flex flex-col items-center gap-4 p-8">
+              <Shield className="w-16 h-16 text-red-500" />
+              <h2 className="text-xl font-semibold text-gray-900">Доступ запрещен</h2>
+              <p className="text-gray-600 text-center">
+                У вас нет прав для просмотра товаров
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    )
+  }
 
   // Безопасно обрабатываем возможные null/undefined значения полей name и category
   const filteredProducts = products.filter((product) => {
@@ -194,11 +199,6 @@ export default function ProductsAdmin() {
     (currentPage - 1) * ROWS_PER_PAGE,
     currentPage * ROWS_PER_PAGE,
   )
-
-  useEffect(() => {
-    // Сбрасываем страницу если меняется результат поиска
-    setCurrentPage(1)
-  }, [searchQuery])
 
   const handleSaveProduct = async (savedProduct: Prosthetic) => {
     try {
@@ -366,11 +366,7 @@ export default function ProductsAdmin() {
                   {paginatedProducts.map((product) => (
                     <Card key={product.id} className="p-4">
                       <div className="flex items-start gap-3">
-                        <img
-                          src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE}
-                          alt={product.name}
-                          className="w-16 h-16 object-cover rounded-md border border-slate-200 flex-shrink-0"
-                        />
+                        <SafeImage src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE} alt={product.name} width={64} height={64} className="w-16 h-16 object-cover rounded-md border border-slate-200 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <h3 className="font-medium text-sm leading-tight">{product.name}</h3>
@@ -489,11 +485,7 @@ export default function ProductsAdmin() {
                       {paginatedProducts.map((product) => (
                         <TableRow key={product.id}>
                           <TableCell className="w-16">
-                            <img
-                              src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE}
-                              alt={product.name}
-                              className="w-14 h-14 object-cover rounded-md border border-slate-200"
-                            />
+                            <SafeImage src={product.imageUrl || product.images?.[0] || PROSTHETIC_FALLBACK_IMAGE} alt={product.name} width={56} height={56} className="w-14 h-14 object-cover rounded-md border border-slate-200" />
                           </TableCell>
                           <TableCell className="font-medium max-w-[220px] truncate">{product.name}</TableCell>
                           <TableCell>

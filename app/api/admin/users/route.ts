@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     const result = await client.query(query);
 
-    const users = result.rows.map(row => ({
+    const _users = result.rows.map(row => ({
       id: row.id,
       username: row.username,
       email: row.email,
@@ -79,11 +79,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      users
+      users: _users
     })
 
   } catch (error) {
-    console.error('Error getting users:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -189,7 +188,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error creating user:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
